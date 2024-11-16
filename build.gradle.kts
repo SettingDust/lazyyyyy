@@ -10,6 +10,8 @@ plugins {
     alias(catalog.plugins.git.version)
 
     alias(catalog.plugins.unmined)
+
+    alias(catalog.plugins.explosion)
 }
 
 val archive_name: String by rootProject.properties
@@ -53,6 +55,14 @@ repositories {
     maven("https://thedarkcolour.github.io/KotlinForForge/") {
         content { includeGroup("thedarkcolour") }
     }
+
+    maven("https://maven.terraformersmc.com/") {
+        content { includeGroupAndSubgroups("com.terraformersmc") }
+    }
+
+    maven("https://maven.isxander.dev/releases") {
+        name = "Xander Maven"
+    }
 }
 
 sourceSets {
@@ -76,7 +86,7 @@ unimined.minecraft {
         mojmap()
         parchment(version = "2023.09.03")
 
-        devFallbackNamespace("official")
+        devFallbackNamespace("intermediary")
     }
 
     if (sourceSet == sourceSets.main.get()) {
@@ -155,11 +165,13 @@ dependencies {
         lexforgeImplementation(it)
     }
 
-    "maven.modrinth:yacl:3.6.1+1.20.1-fabric".let {
+    "dev.isxander:yet-another-config-lib:3.6.1+1.20.1-fabric".let {
         modImplementation(it)
         fabricModImplementation(it)
-        modImplementation("maven.modrinth:flow:2.1.2+1.20.1")
-        modImplementation("maven.modrinth:mru:1.0.4+1.20.1-fabric")
+    }
+
+    catalog.modmenu.let {
+        fabricModImplementation(it)
     }
 }
 

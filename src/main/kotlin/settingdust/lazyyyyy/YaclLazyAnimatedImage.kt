@@ -2,7 +2,7 @@ package settingdust.lazyyyyy
 
 import dev.isxander.yacl3.gui.image.ImageRenderer
 import dev.isxander.yacl3.gui.image.ImageRendererFactory
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -12,8 +12,9 @@ import java.io.InputStream
 
 class AsyncImageRenderer(val original: Lazy<ImageRendererFactory.ImageSupplier>) : ImageRenderer {
     val image = lazy { original.value.completeImage() }
-    private val loadingJob: Job = Lazyyyyy.scope.launch { image.value }
+    private val loadingJob = Lazyyyyy.scope.launch { image.value }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun render(
         graphics: GuiGraphics,
         x: Int,
@@ -26,14 +27,13 @@ class AsyncImageRenderer(val original: Lazy<ImageRendererFactory.ImageSupplier>)
         0
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun close() {
         runBlocking {
             if (loadingJob.isActive)
                 loadingJob.cancelAndJoin()
         }
-        if (image.isInitialized()) {
-            image.value.close()
-        }
+        image.value.close()
     }
 }
 
@@ -43,3 +43,7 @@ fun asyncPrepareWEBP(
 ): ImageRendererFactory.ImageSupplier = object : ImageRendererFactory.ImageSupplier {
     override fun completeImage() = AsyncImageRenderer(lazy { original(resource.open()) })
 }
+
+fun syncCompleteWEBP(
+    original: () -> ImageRenderer
+): ImageRenderer = runBlocking(Lazyyyyy.mainThreadContext) { original.invoke() }

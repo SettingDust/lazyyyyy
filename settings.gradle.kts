@@ -1,6 +1,7 @@
 dependencyResolutionManagement {
     pluginManagement {
         repositories {
+            maven("https://maven2.bai.lol")
             maven("https://maven.wagyourtail.xyz/releases")
             mavenCentral()
             gradlePluginPortal()
@@ -16,6 +17,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     plugin("unmined", "xyz.wagyourtail.unimined").version("1.+")
 
+    plugin("explosion", "lol.bai.explosion").version("0.2.0")
 
     val minecraft = "1.20.1"
     version("minecraft", minecraft)
@@ -56,6 +58,8 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     library("mixinextras-common", "io.github.llamalad7", "mixinextras-common").version(mixinextras)
     library("mixinextras-lexforge", "io.github.llamalad7", "mixinextras-forge").version(mixinextras)
     library("mixinextras-fabric", "io.github.llamalad7", "mixinextras-fabric").version(mixinextras)
+
+    library("modmenu", "com.terraformersmc", "modmenu").version("7.2.2")
 }
 
 plugins {
