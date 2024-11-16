@@ -3,16 +3,14 @@ package settingdust.lazyyyyy
 import dev.isxander.yacl3.gui.image.ImageRenderer
 import dev.isxander.yacl3.gui.image.ImageRendererFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.server.packs.resources.Resource
 import java.io.InputStream
 
 class AsyncImageRenderer(val original: Lazy<ImageRendererFactory.ImageSupplier>) : ImageRenderer {
-    val image = lazy { original.value.completeImage() }
-    private val loadingJob = Lazyyyyy.scope.launch { image.value }
+    val image = lazy { Lazyyyyy.scope.async{original.value.completeImage()} }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun render(
@@ -21,19 +19,18 @@ class AsyncImageRenderer(val original: Lazy<ImageRendererFactory.ImageSupplier>)
         y: Int,
         renderWidth: Int,
         tickDelta: Float
-    ) = if (image.isInitialized()) {
-        image.value.render(graphics, x, y, renderWidth, tickDelta)
+    ) = if (image.isInitialized() && image.value.isCompleted) {
+        image.value.getCompleted().render(graphics, x, y, renderWidth, tickDelta)
     } else {
+        image.value
         0
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun close() {
-        runBlocking {
-            if (loadingJob.isActive)
-                loadingJob.cancelAndJoin()
-        }
-        image.value.close()
+        try {
+            image.value.getCompleted().close()
+        } catch (_: IllegalStateException) {}
     }
 }
 
