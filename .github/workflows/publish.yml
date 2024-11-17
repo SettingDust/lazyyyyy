@@ -1,0 +1,71 @@
+on:
+  push:
+    tags: [ '[0-9]+.[0-9]+.[0-9]+' ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: Execute Gradle build
+        run: ./gradlew build
+
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          tag: ${{ github.ref_name }}
+
+      - name: Upload jar
+        uses: Kir-Antipov/mc-publish@v3.3.0
+        with:
+          changelog: ${{ steps.changelog.outputs.changes }}
+          # Only include this section if you wish to publish
+          # your assets on Modrinth.
+          modrinth-id: lazyyyyy
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          # Only include this section if you wish to publish
+          # your assets on CurseForge.
+          curseforge-id: 1142812
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          files: |
+            build/libs/!(*-@(fabric|sources|dev)).jar
+            build/libs/*-@(sources).jar
+
+          version: ${{ github.ref_name }}
+
+          loaders: |
+            forge
+
+          game-versions: |
+            1.20.1
+          game-version-filter: releases
+
+          dependencies: |
+            fabric-language-kotlin
+            moonlight{curseforge:499980}
+
+          java: |
+            17
+
+      - name: Commit CHANGELOG.md
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: main
+          commit_message: 'docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]'
+          file_pattern: CHANGELOG.md
