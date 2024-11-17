@@ -1,0 +1,13 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "settingdust.lazyyyyy.mixin.forge",
+    "compatibilityLevel": "JAVA_17",
+    "refmap": "lazyyyyy.forge.refmap.json",
+    "plugin": "settingdust.lazyyyyy.LazyyyyyMixinPlugin",
+    "mixins": [
+        "kiwi_annotation.AnnotatedTypeLoaderMixin"
+    ],
+    "client": [
+    ]
+}

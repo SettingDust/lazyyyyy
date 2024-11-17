@@ -2,6 +2,7 @@ import groovy.lang.Closure
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import xyz.wagyourtail.unimined.api.minecraft.task.RemapJarTask
 
 plugins {
     java
@@ -108,7 +109,7 @@ unimined.minecraft(sourceSets.getByName("lexforge")) {
     combineWith(sourceSets.main.get())
 
     minecraftForge {
-        mixinConfig("$id.mixins.json")
+        mixinConfig("$id.mixins.json", "$id.forge.mixins.json")
         loader(catalog.versions.lexforge.get())
     }
 }
@@ -133,7 +134,10 @@ val lexforgeMinecraftLibraries by configurations.getting
 
 dependencies {
     mainImplementation(catalog.mixin)
-    mainImplementation(catalog.mixinextras.common)
+    catalog.mixinextras.common.let {
+        mainImplementation(it)
+        lexforgeImplementation(it)
+    }
 
     unimined.fabricApi.fabric(catalog.versions.fabric.api.get()).let {
         modImplementation(it)
@@ -162,11 +166,9 @@ dependencies {
         fabricModImplementation(it)
     }
 
-    catalog.modmenu.let {
-        fabricModImplementation(it)
-    }
+    fabricModImplementation(catalog.modmenu)
 
-
+    lexforgeModImplementation("maven.modrinth:kiwi:11.8.20+forge")
 }
 
 tasks {
@@ -212,5 +214,11 @@ tasks {
 
     jar {
         duplicatesStrategy = DuplicatesStrategy.WARN
+    }
+
+    named<RemapJarTask>("remapLexforgeJar") {
+        mixinRemap {
+            enableMixinExtra()
+        }
     }
 }

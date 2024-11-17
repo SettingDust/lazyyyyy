@@ -1,0 +1,30 @@
+# Make sure this is set to "kotlinforforge"
+modLoader="kotlinforforge"
+# Make sure this is set to the appropriate version range
+loaderVersion="[4,)" # Require at least 3.x
+# License is REQUIRED after 1.16
+license='CC-BY-SA'
+displayURL='${source}'
+
+[[mods]]
+modId="$id"
+version="$version"
+displayName="$name"
+authors="SettingDust"
+description='''
+$description
+'''
+
+[[dependencies.${id}]]
+modId="forge"
+mandatory=true
+versionRange="[41,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.${id}]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20,1.21)"
+ordering="NONE"
+side="BOTH"
