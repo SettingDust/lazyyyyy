@@ -57,8 +57,7 @@ jobs:
           game-version-filter: releases
 
           dependencies: |
-            fabric-language-kotlin
-            moonlight{curseforge:499980}
+            kotlin-for-forge
 
           java: |
             17

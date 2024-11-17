@@ -3,6 +3,7 @@ package settingdust.lazyyyyy.mixin.forge.kiwi_annotation;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import net.minecraftforge.forgespi.language.IModInfo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,6 +16,7 @@ import snownee.kiwi.loader.AnnotatedTypeLoader;
 import java.io.InputStream;
 import java.util.Optional;
 
+@IfModLoaded("kiwi")
 @Mixin(value = AnnotatedTypeLoader.class, remap = false)
 public class AnnotatedTypeLoaderMixin {
     @Shadow
@@ -30,7 +32,7 @@ public class AnnotatedTypeLoaderMixin {
         )
     )
     private Optional<IModInfo> lazyyyyy$recordMod(
-        final Optional<IModInfo> original,
+        @SuppressWarnings("OptionalUsedAsFieldOrParameterType") final Optional<IModInfo> original,
         @Share("modInfo") LocalRef<IModInfo> modInfoRef
     ) {
         original.ifPresent(modInfoRef::set);
