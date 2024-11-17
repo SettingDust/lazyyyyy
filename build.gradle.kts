@@ -161,7 +161,7 @@ dependencies {
         lexforgeImplementation(it)
     }
 
-    "dev.isxander:yet-another-config-lib:3.6.1+1.20.1-fabric".let {
+    "dev.isxander:yet-another-config-lib:3.6.1+".let {
         modImplementation(it)
         fabricModImplementation(it)
     }
