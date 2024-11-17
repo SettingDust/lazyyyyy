@@ -63,6 +63,8 @@ repositories {
     maven("https://maven.isxander.dev/releases") {
         name = "Xander Maven"
     }
+    maven("https://maven.wagyourtail.xyz/releases")
+    mavenLocal()
 }
 
 sourceSets {
@@ -108,16 +110,6 @@ unimined.minecraft(sourceSets.getByName("lexforge")) {
     minecraftForge {
         mixinConfig("$id.mixins.json")
         loader(catalog.versions.lexforge.get())
-    }
-
-    defaultRemapJar = false
-    createJarTask = false
-
-    runs {
-        all {
-            jvmArgs("-Dmixin.env.disableRefMap=true")
-            systemProperties["mixin.env.disableRefMap"] = true
-        }
     }
 }
 
@@ -173,6 +165,8 @@ dependencies {
     catalog.modmenu.let {
         fabricModImplementation(it)
     }
+
+
 }
 
 tasks {
@@ -189,7 +183,6 @@ tasks {
             "minecraft" to ">=1.20.1",
             "fabric_kotlin" to "*"
         )
-        from(rootProject.sourceSets.main.get().resources)
         inputs.properties(properties)
 
         filesMatching(
@@ -218,16 +211,6 @@ tasks {
     }
 
     jar {
-        archiveClassifier = "mojmap"
-    }
-
-    named<Jar>("fabricJar") {
         duplicatesStrategy = DuplicatesStrategy.WARN
-
-        archiveClassifier = "dev"
-    }
-
-    named<Jar>("remapFabricJar") {
-        archiveClassifier = ""
     }
 }

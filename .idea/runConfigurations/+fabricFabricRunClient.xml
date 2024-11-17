@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name=" Minecraft Client (fabric)" factoryName="Application" type="Application">
+        <option name="ALTERNATIVE_JRE_PATH" value="D:\Applications\Scoop\apps\intellij-jbr17\current"></option>
+        <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true"></option>
+        <envs></envs>
+        <option name="MAIN_CLASS_NAME" value="net.fabricmc.loader.impl.launch.knot.KnotClient"></option>
+        <module name="Lazyyyyy.fabric"></module>
+        <classpathModifications></classpathModifications>
+        <option name="PROGRAM_PARAMETERS" value="--username Dev --version 1.20.1 --gameDir D:\Projects\Minecraft\lazyyyyy\run\client --assetsDir D:\Applications\Scoop\apps\gradle\current\.gradle\caches\unimined\assets --assetIndex 5 --uuid 380df991-f603-344c-a090-369bad2a924a --accessToken 0 --clientId unimined --xuid  --userType msa --versionType release"></option>
+        <option name="VM_PARAMETERS" value="-Xmx2G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump -Djava.library.path=D:\Projects\Minecraft\lazyyyyy\run\client\natives -Djna.tmpdir=D:\Projects\Minecraft\lazyyyyy\run\client\natives -Dorg.lwjgl.system.SharedLibraryExtractPath=D:\Projects\Minecraft\lazyyyyy\run\client\natives -Dio.netty.native.workdir=D:\Projects\Minecraft\lazyyyyy\run\client\natives -Dminecraft.launcher.brand=UniminedDev -Dminecraft.launcher.version=1.0.0 -Dfabric.development=true -Dfabric.remapClasspathFile=D:\Projects\Minecraft\lazyyyyy\.gradle\unimined\local\fabric\fabricRemapClasspath.txt -Dfabric.classPathGroups=D:\Projects\Minecraft\lazyyyyy\build\classes\java\main;D:\Projects\Minecraft\lazyyyyy\build\classes\kotlin\main;D:\Projects\Minecraft\lazyyyyy\build\resources\main;D:\Projects\Minecraft\lazyyyyy\build\classes\java\fabric;D:\Projects\Minecraft\lazyyyyy\build\classes\kotlin\fabric;D:\Projects\Minecraft\lazyyyyy\build\resources\fabric"></option>
+        <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/run\client"></option>
+        <method v="2">
+            <option name="Make" enabled="true"></option>
+            <option scriptParameters="" name="Gradle.BeforeRunTask" externalProjectPath="$PROJECT_DIR$/" vmOptions="" enabled="true" tasks="fabricPreRunClient"></option>
+        </method>
+    </configuration>
+</component>

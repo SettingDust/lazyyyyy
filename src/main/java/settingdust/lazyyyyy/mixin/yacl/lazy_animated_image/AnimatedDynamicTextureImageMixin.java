@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 
 @IfModLoaded("yet_another_config_lib_v3")
-@Mixin(AnimatedDynamicTextureImage.class)
+@Mixin(value = AnimatedDynamicTextureImage.class, remap = false)
 public class AnimatedDynamicTextureImageMixin {
     @Redirect(
         method = {"lambda$createWEBPFromTexture$2", "lambda$createGIFFromTexture$0"},
