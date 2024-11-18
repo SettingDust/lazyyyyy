@@ -1,8 +1,10 @@
 dependencyResolutionManagement {
     pluginManagement {
         repositories {
+            maven("https://maven.architectury.dev/")
+            maven("https://maven.fabricmc.net/")
+            maven("https://maven.minecraftforge.net/")
             maven("https://maven2.bai.lol")
-            maven("https://maven.wagyourtail.xyz/releases")
             mavenCentral()
             gradlePluginPortal()
         }
@@ -15,7 +17,8 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     plugin("shadow", "com.gradleup.shadow").version("8.+")
 
-    plugin("unmined", "xyz.wagyourtail.unimined").version("1.+")
+    plugin("architectury-loom", "dev.architectury.loom").version("1.7.+")
+    plugin("architectury-plugin", "architectury-plugin").version("3.+")
 
     plugin("explosion", "lol.bai.explosion").version("0.2.0")
 
@@ -42,13 +45,18 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     // https://modrinth.com/mod/kinecraft-serialization/versions
     library("kinecraft-serialization", "maven.modrinth", "kinecraft-serialization").version("1.16.0")
 
+    library("minecraft", "com.mojang", "minecraft").version("1.20.1")
+
     // https://linkie.shedaniel.dev/dependencies?loader=fabric
     version("fabric-loader", "0.16.9")
     version("fabric-api", "0.92.2+$minecraft")
+    library("fabric-loader", "net.fabricmc", "fabric-loader").version("0.16.9")
+    library("fabric-api", "net.fabricmc.fabric-api", "fabric-api").version("0.92.2+$minecraft")
     library("fabric-kotlin", "net.fabricmc", "fabric-language-kotlin").version("1.12.3+kotlin.$kotlin")
 
     // https://linkie.shedaniel.dev/dependencies?loader=forge
-    version("lexforge", "47.3.11")
+    version("lexforge", "47.3.12")
+    library("lexforge", "net.minecraftforge", "forge").version("1.20.1-47.3.12")
     library("forgified-fabric-api", "dev.su5ed.sinytra.fabric-api", "fabric-api").version("0.92.2+1.11.8+$minecraft")
     library("sinytra-connector", "org.sinytra", "Connector").version("1.0.0-beta.46+$minecraft")
     library("kotlin-forge", "thedarkcolour", "kotlinforforge").version("4.11.0")
@@ -60,6 +68,13 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     library("mixinextras-fabric", "io.github.llamalad7", "mixinextras-fabric").version(mixinextras)
 
     library("modmenu", "com.terraformersmc", "modmenu").version("7.2.2")
+
+    library("mixin-constraints", "com.moulberry", "mixinconstraints").version("1.0.1")
+
+    library("yacl-fabric", "dev.isxander", "yet-another-config-lib").version("3.6.1+1.20.1-fabric")
+    library("yacl-forge", "dev.isxander", "yet-another-config-lib").version("3.6.1+1.20.1-forge")
+
+    library("kiwi-forge", "maven.modrinth", "kiwi").version("11.8.20+forge")
 }
 
 plugins {
@@ -69,3 +84,8 @@ plugins {
 val name: String by settings
 
 rootProject.name = name
+
+include(":xplat")
+
+include(":lexforge:lexforge-core")
+include(":lexforge:lexforge-mod")
