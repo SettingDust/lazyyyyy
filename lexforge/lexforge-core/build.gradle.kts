@@ -4,7 +4,6 @@ plugins {
 }
 
 architectury {
-    platformSetupLoomIde()
     forge()
 }
 
@@ -13,12 +12,30 @@ dependencies {
     minecraft(catalog.minecraft)
     mappings(loom.officialMojangMappings())
 
-    implementation(project(":xplat", "namedElements")) { isTransitive = false }
-    include(project(":xplat", "transformProductionForge")) { isTransitive = false }
+    compileOnly("net.fabricmc:sponge-mixin:0.15.4+mixin.0.8.7")
 
-    minecraftLibraries(catalog.sinytra.connector)
+    implementation(project(":xplat", "namedElements")) { isTransitive = false }
+
+    implementation(catalog.sinytra.connector)
     modImplementation(catalog.forgified.fabric.api) {
         exclude(module = "fabric-loader")
     }
-    modImplementation(catalog.kotlin.forge)
+    implementation(catalog.kotlin.forge)
+
+    include(project(":lexforge:lexforge-mod"))
+    implementation(project(":lexforge:lexforge-mixin"))
+}
+
+tasks {
+    jar {
+        val mixinJar = project(":lexforge:lexforge-mixin").tasks.jar.flatMap { it.archiveFile }
+        from(mixinJar)
+        doFirst { rename(mixinJar.get().asFile.name, "lazyyyyy-lexforge-mixin.jar") }
+
+        manifest {
+            attributes(
+                "FMLModType" to "LIBRARY"
+            )
+        }
+    }
 }

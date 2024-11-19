@@ -24,8 +24,6 @@ base {
 
 allprojects {
     apply(plugin = "java")
-    apply(plugin = "kotlin")
-    apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
 
     java {
         toolchain {

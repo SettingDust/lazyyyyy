@@ -89,3 +89,4 @@ include(":xplat")
 
 include(":lexforge:lexforge-core")
 include(":lexforge:lexforge-mod")
+include(":lexforge:lexforge-mixin")
