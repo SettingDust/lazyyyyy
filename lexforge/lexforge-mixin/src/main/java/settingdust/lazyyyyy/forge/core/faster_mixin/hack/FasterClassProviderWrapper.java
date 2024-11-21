@@ -30,7 +30,7 @@ public final class FasterClassProviderWrapper implements IClassProvider {
         var isPluginClazz = clazz.isInstance(IMixinConfigPlugin.class);
         if (!isPluginClazz) return clazz;
         var stackTrace = Thread.currentThread().getStackTrace();
-        var isPlugin = stackTrace[1].getClassName().equals("org/spongepowered/asm/mixin/transformer/PluginHandle") &&
+        var isPlugin = stackTrace[1].getClassName().equals("org.spongepowered.asm.mixin.transformer.PluginHandle") &&
                        stackTrace[2].getMethodName().equals("onSelect");
         if (!isPlugin) return clazz;
         var configs = FasterMixinServiceWrapper.pluginToConfigs.get(name);
@@ -40,7 +40,12 @@ public final class FasterClassProviderWrapper implements IClassProvider {
             var plugin = (IMixinConfigPlugin) clazz.getDeclaredConstructor().newInstance();
             var refmap = plugin.getRefMapperConfig();
             for (final var config : configs) {
-                FasterMixinServiceWrapper.configToRefmap.putIfAbsent(config, refmap);
+                FasterMixinServiceWrapper.configToRefmap.computeIfAbsent(
+                    config, (ignored) -> {
+                        FasterMixinServiceWrapper.LOGGER.debug("Config {} find refmap {} from plugin {}", config.getName(), refmap, name);
+                        return refmap;
+                    }
+                );
             }
         } catch (InstantiationException |
                  IllegalAccessException |

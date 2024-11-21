@@ -6,15 +6,15 @@ import cpw.mods.modlauncher.api.ITransformer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.service.IMixinService;
 import org.spongepowered.asm.service.MixinService;
+import org.spongepowered.asm.service.modlauncher.MixinServiceModLauncher;
+import settingdust.lazyyyyy.forge.core.faster_mixin.hack.FasterMixinServiceWrapper;
 
 import java.util.List;
 import java.util.Set;
 
 public class FasterMixinConfigLoaderInjector implements ITransformationService {
     public static final Logger LOGGER = LogManager.getLogger();
-    public static IMixinService wrappedService;
 
     public FasterMixinConfigLoaderInjector() {
     }
@@ -36,7 +36,7 @@ public class FasterMixinConfigLoaderInjector implements ITransformationService {
             var getInstanceMethod = MixinService.class.getDeclaredMethod("getInstance");
             getInstanceMethod.setAccessible(true);
             var service = initServiceMethod.invoke(getInstanceMethod.invoke(null));
-            wrappedService = (IMixinService) service;
+            FasterMixinServiceWrapper.wrapped = (MixinServiceModLauncher) service;
             System.setProperty(
                 "mixin.service",
                 "settingdust.lazyyyyy.forge.core.faster_mixin.hack.FasterMixinServiceWrapper"

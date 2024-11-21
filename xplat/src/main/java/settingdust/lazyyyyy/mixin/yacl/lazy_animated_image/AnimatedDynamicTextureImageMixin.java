@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 
 @IfModLoaded("yet_another_config_lib_v3")
-@Mixin(value = AnimatedDynamicTextureImage.class, remap = false)
+@Mixin(value = AnimatedDynamicTextureImage.class)
 public class AnimatedDynamicTextureImageMixin {
     @Redirect(
         method = {"lambda$createWEBPFromTexture$2", "lambda$createGIFFromTexture$0"},
@@ -33,6 +33,7 @@ public class AnimatedDynamicTextureImageMixin {
 
     @WrapOperation(
         method = "lambda$createWEBPFromTexture$2",
+        remap = false,
         at = @At(
             value = "INVOKE",
             target = "Ldev/isxander/yacl3/gui/image/impl/AnimatedDynamicTextureImage;createWEBPSupplier(Ljava/io/InputStream;Lnet/minecraft/resources/ResourceLocation;)Ldev/isxander/yacl3/gui/image/ImageRendererFactory$ImageSupplier;"
@@ -48,10 +49,11 @@ public class AnimatedDynamicTextureImageMixin {
     }
 
     @WrapOperation(
-        method = "lambda$createWEBPFromPath$3", at = @At(
-        value = "INVOKE",
-        target = "Ldev/isxander/yacl3/gui/image/impl/AnimatedDynamicTextureImage;createWEBPSupplier(Ljava/io/InputStream;Lnet/minecraft/resources/ResourceLocation;)Ldev/isxander/yacl3/gui/image/ImageRendererFactory$ImageSupplier;"
-    )
+        method = "lambda$createWEBPFromPath$3",
+        at = @At(
+            value = "INVOKE",
+            target = "Ldev/isxander/yacl3/gui/image/impl/AnimatedDynamicTextureImage;createWEBPSupplier(Ljava/io/InputStream;Lnet/minecraft/resources/ResourceLocation;)Ldev/isxander/yacl3/gui/image/ImageRendererFactory$ImageSupplier;"
+        )
     )
     private static ImageRendererFactory.ImageSupplier lazyyyyy$createWEBPFromPath$asyncPrepare(
         final InputStream ignored,

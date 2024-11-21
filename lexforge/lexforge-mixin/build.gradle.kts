@@ -12,7 +12,7 @@ dependencies {
     minecraft(catalog.minecraft)
     mappings(loom.officialMojangMappings())
 
-    compileOnly("net.fabricmc:sponge-mixin:0.15.4+mixin.0.8.7")
+    compileOnly("org.sinytra:sponge-mixin:0.12.11+mixin.0.8.5")
 
     implementation(catalog.sinytra.connector)
     modImplementation(catalog.forgified.fabric.api) {

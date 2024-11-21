@@ -29,7 +29,10 @@ dependencies {
     }
     implementation(catalog.kotlin.forge)
 
-    implementation(catalog.mixin.constraints)
+    catalog.mixin.constraints.let {
+        include(it)
+        implementation(it)
+    }
 
     modImplementation(catalog.yacl.forge) {
         exclude(module = "kotlin-stdlib")
@@ -51,6 +54,10 @@ loom {
     }
 
     forge {
-        mixinConfig("$id.mixins.json", "$id.mixins.forge.json")
+        mixinConfig("$id.mixins.json", "$id.forge.mixins.json")
     }
+// TODO https://github.com/architectury/architectury-loom/issues/242
+//    mixin {
+//        defaultRefmapName = "$id.forge.refmap.json"
+//    }
 }

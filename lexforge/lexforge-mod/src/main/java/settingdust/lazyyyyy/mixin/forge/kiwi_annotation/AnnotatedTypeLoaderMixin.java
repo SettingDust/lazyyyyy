@@ -5,9 +5,7 @@ import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import net.minecraftforge.forgespi.language.IModInfo;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import settingdust.lazyyyyy.forge.FasterKiwiAnnotatedTypeLoaderKt;
@@ -19,10 +17,6 @@ import java.util.Optional;
 @IfModLoaded("kiwi")
 @Mixin(value = AnnotatedTypeLoader.class, remap = false)
 public class AnnotatedTypeLoaderMixin {
-    @Shadow
-    @Final
-    public String modId;
-
     @ModifyExpressionValue(
         method = "get()Lsnownee/kiwi/loader/KiwiConfiguration;",
         at = @At(

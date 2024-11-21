@@ -37,6 +37,7 @@ public class InstrumentationHack {
     });
 
     public static void inject() throws Throwable {
+        FasterMixinConfigLoaderInjector.LOGGER.info("Injecting mixin modifier");
         var mixinJarPath = SELF_PATH.resolve("lazyyyyy-lexforge-mixin.jar");
         var mixinJar = SecureJar.from(mixinJarPath);
 

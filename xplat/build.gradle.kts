@@ -9,6 +9,8 @@ plugins {
     alias(catalog.plugins.architectury.loom)
 }
 
+val id: String by rootProject.properties
+
 architectury {
     common("forge", "fabric")
 }
@@ -34,4 +36,20 @@ tasks {
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
+
+    jar {
+        manifest {
+            attributes(
+                "MixinConfigs" to "$id.mixins.json",
+                "FMLModType" to "GAMELIBRARY"
+            )
+        }
+    }
+}
+
+loom {
+// TODO https://github.com/architectury/architectury-loom/issues/242
+//    mixin {
+//        defaultRefmapName = "$id.refmap.json"
+//    }
 }
