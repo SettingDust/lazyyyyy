@@ -44,8 +44,8 @@ jobs:
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
           files: |
-            build/libs/!(*-@(fabric|sources|dev)).jar
-            build/libs/*-@(sources).jar
+            lexforge/lexforge-core/build/libs/!(*-@(fabric|sources|dev)).jar
+            lexforge/lexforge-core/build/libs/*-@(sources).jar
 
           version: ${{ github.ref_name }}
 
