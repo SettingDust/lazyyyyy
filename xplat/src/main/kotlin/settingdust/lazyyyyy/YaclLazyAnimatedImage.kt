@@ -13,7 +13,7 @@ import java.nio.file.Path
 import kotlin.io.path.inputStream
 
 class AsyncImageRenderer(val original: Lazy<ImageRendererFactory.ImageSupplier>) : ImageRenderer {
-    val image = lazy { Lazyyyyy.scope.async { original.value.completeImage() } }
+    val image = Lazyyyyy.scope.async { original.value.completeImage() }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun render(
@@ -22,17 +22,16 @@ class AsyncImageRenderer(val original: Lazy<ImageRendererFactory.ImageSupplier>)
         y: Int,
         renderWidth: Int,
         tickDelta: Float
-    ) = if (image.isInitialized() && image.value.isCompleted) {
-        image.value.getCompleted().render(graphics, x, y, renderWidth, tickDelta)
+    ) = if (image.isCompleted) {
+        image.getCompleted().render(graphics, x, y, renderWidth, tickDelta)
     } else {
-        image.value
         0
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun close() {
         try {
-            image.value.getCompleted().close()
+            image.getCompleted().close()
         } catch (_: IllegalStateException) {
         }
     }

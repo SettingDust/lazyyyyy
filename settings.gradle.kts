@@ -75,6 +75,8 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     library("yacl-forge", "dev.isxander", "yet-another-config-lib").version("3.6.1+1.20.1-forge")
 
     library("kiwi-forge", "maven.modrinth", "kiwi").version("11.8.20+forge")
+
+    library("modernfix-fabric", "maven.modrinth", "modernfix").version("5.19.5+mc1.20.1")
 }
 
 plugins {

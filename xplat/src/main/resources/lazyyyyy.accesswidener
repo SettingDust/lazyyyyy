@@ -1,0 +1,5 @@
+accessWidener v2 named
+
+extendable method net/minecraft/client/renderer/entity/EntityRenderer getPackedLightCoords (Lnet/minecraft/world/entity/Entity;F)I
+
+extendable method net/minecraft/client/renderer/entity/LivingEntityRenderer addLayer (Lnet/minecraft/client/renderer/entity/layers/RenderLayer;)Z

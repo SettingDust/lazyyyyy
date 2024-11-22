@@ -21,7 +21,7 @@ dependencies {
     implementation(catalog.mixinextras.common)
 
     implementation(project(":xplat", "namedElements")) { isTransitive = false }
-    include(project(":xplat", "transformProductionForge")) { isTransitive = false }
+    include(project(":xplat", configuration = "transformProductionForge")) { isTransitive = false }
 
     minecraftLibraries(catalog.sinytra.connector)
     modImplementation(catalog.forgified.fabric.api) {
@@ -54,6 +54,8 @@ loom {
     }
 
     forge {
+        convertAccessWideners = true
+
         mixinConfig("$id.mixins.json", "$id.forge.mixins.json")
     }
 // TODO https://github.com/architectury/architectury-loom/issues/242

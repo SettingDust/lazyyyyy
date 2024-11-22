@@ -48,6 +48,8 @@ tasks {
 }
 
 loom {
+    accessWidenerPath = file("src/main/resources/$id.accesswidener")
+
 // TODO https://github.com/architectury/architectury-loom/issues/242
 //    mixin {
 //        defaultRefmapName = "$id.refmap.json"
