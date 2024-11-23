@@ -3,10 +3,11 @@
     "minVersion": "0.8",
     "package": "settingdust.lazyyyyy.mixin.forge",
     "compatibilityLevel": "JAVA_17",
-    "refmap": "lazyyyyy-lexforge-mod-lexforge_lexforge-mod-refmap.json",
+    "refmap": "lazyyyyy.forge.refmap.json",
     "plugin": "settingdust.lazyyyyy.LazyyyyyMixinPlugin",
     "mixins": [
-        "kiwi.faster_annotation.AnnotatedTypeLoaderMixin"
+        "kiwi.faster_annotation.AnnotatedTypeLoaderMixin",
+        "prismlib.faster_colors_loader.WebColorsMixin"
     ],
     "client": [
     ]

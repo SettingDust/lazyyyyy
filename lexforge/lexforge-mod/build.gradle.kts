@@ -21,7 +21,7 @@ dependencies {
     implementation(catalog.mixinextras.common)
 
     implementation(project(":xplat", "namedElements")) { isTransitive = false }
-    include(project(":xplat", configuration = "transformProductionForge")) { isTransitive = false }
+    include(project(":xplat:xplat-lexforge")) { isTransitive = false }
 
     minecraftLibraries(catalog.sinytra.connector)
     modImplementation(catalog.forgified.fabric.api) {
@@ -42,6 +42,8 @@ dependencies {
 
     modImplementation(catalog.kiwi.forge)
 
+    modImplementation(catalog.prism.forge)
+
     runtimeOnly(project(":lexforge:lexforge-core"))
 }
 
@@ -56,10 +58,16 @@ loom {
     forge {
         convertAccessWideners = true
 
-        mixinConfig("$id.mixins.json", "$id.forge.mixins.json")
+        mixinConfig("$id.forge.mixins.json")
     }
 // TODO https://github.com/architectury/architectury-loom/issues/242
 //    mixin {
 //        defaultRefmapName = "$id.forge.refmap.json"
 //    }
+}
+
+tasks {
+    jar {
+        rename("$id-${project.name}-${project.path.substring(1).replace(':', '_')}-refmap.json", "$id.forge.refmap.json")
+    }
 }

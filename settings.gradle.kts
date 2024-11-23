@@ -77,6 +77,10 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     library("kiwi-forge", "maven.modrinth", "kiwi").version("11.8.20+forge")
 
     library("modernfix-fabric", "maven.modrinth", "modernfix").version("5.19.5+mc1.20.1")
+
+    val prism = "1.0.5"
+    library("prism-fabric", "maven.modrinth", "prism-lib").version("$prism-fabric")
+    library("prism-forge", "maven.modrinth", "prism-lib").version("$prism-forge")
 }
 
 plugins {
@@ -88,6 +92,7 @@ val name: String by settings
 rootProject.name = name
 
 include(":xplat")
+include(":xplat:xplat-lexforge")
 
 include(":lexforge:lexforge-core")
 include(":lexforge:lexforge-mod")
