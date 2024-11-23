@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.mixin.lazy_entity_renderers;
+package settingdust.lazyyyyy.mixin.async_entity_renderers;
 
 import com.google.common.collect.ImmutableMap;
 import com.llamalad7.mixinextras.sugar.Local;

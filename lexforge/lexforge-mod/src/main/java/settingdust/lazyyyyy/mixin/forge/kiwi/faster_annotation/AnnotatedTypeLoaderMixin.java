@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.mixin.forge.kiwi_annotation;
+package settingdust.lazyyyyy.mixin.forge.kiwi.faster_annotation;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Share;

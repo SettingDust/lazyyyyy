@@ -16,8 +16,8 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
-import settingdust.lazyyyyy.mixin.lazy_entity_renderers.EntityRendererAccessor
-import settingdust.lazyyyyy.mixin.lazy_entity_renderers.LivingEntityRendererAccessor
+import settingdust.lazyyyyy.mixin.async_entity_renderers.EntityRendererAccessor
+import settingdust.lazyyyyy.mixin.async_entity_renderers.LivingEntityRendererAccessor
 import java.util.function.BiConsumer
 
 private val emptyContext = EntityRendererProvider.Context(null, null, null, null, null, null, null)
@@ -28,7 +28,7 @@ fun createEntityRenderersAsync(
 ) = runBlocking {
     providers.entries.asFlow().onEachAsync {
         consumer.accept(it.key, it.value)
-    }.launchIn(Lazyyyyy.scope)
+    }.launchIn(Lazyyyyy.scope).join()
 }
 
 /**

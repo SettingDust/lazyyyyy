@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.mixin.lazy_entity_renderers;
+package settingdust.lazyyyyy.mixin.async_entity_renderers;
 
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;

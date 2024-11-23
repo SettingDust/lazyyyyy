@@ -6,7 +6,7 @@
     "refmap": "lazyyyyy-lexforge-mod-lexforge_lexforge-mod-refmap.json",
     "plugin": "settingdust.lazyyyyy.LazyyyyyMixinPlugin",
     "mixins": [
-        "kiwi_annotation.AnnotatedTypeLoaderMixin"
+        "kiwi.faster_annotation.AnnotatedTypeLoaderMixin"
     ],
     "client": [
     ]

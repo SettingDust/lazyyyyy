@@ -19,3 +19,5 @@ It's not rigorous at all, and it's not a value that anyone except me can refer t
 - Faster Kiwi manifest finding
     - 50 secs -> 200ms
     - Trade: The manifest has to be in the jar of the mod itself. No trading honestly. No one will put a manifest of another mod in their own mod.
+- Create entity renderer in async
+    - Don't know. 

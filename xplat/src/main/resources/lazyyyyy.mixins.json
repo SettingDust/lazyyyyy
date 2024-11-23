@@ -6,11 +6,11 @@
     "refmap": "lazyyyyy-xplat-xplat-refmap.json",
     "plugin": "settingdust.lazyyyyy.LazyyyyyMixinPlugin",
     "mixins": [
-        "lazy_entity_renderers.EntityRendererAccessor",
-        "lazy_entity_renderers.LivingEntityRendererAccessor",
+        "async_entity_renderers.EntityRendererAccessor",
+        "async_entity_renderers.LivingEntityRendererAccessor",
         "yacl.lazy_animated_image.AnimatedDynamicTextureImageMixin"
     ],
     "client": [
-        "lazy_entity_renderers.EntityRenderersMixin"
+        "async_entity_renderers.EntityRenderersMixin"
     ]
 }
