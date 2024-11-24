@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy
+package settingdust.lazyyyyy.minecraft
 
 import com.mojang.blaze3d.vertex.PoseStack
 import kotlinx.coroutines.async
@@ -16,8 +16,10 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
+import settingdust.lazyyyyy.Lazyyyyy
 import settingdust.lazyyyyy.mixin.async_entity_renderers.EntityRendererAccessor
 import settingdust.lazyyyyy.mixin.async_entity_renderers.LivingEntityRendererAccessor
+import settingdust.lazyyyyy.onEachAsync
 import java.util.function.BiConsumer
 
 private val emptyContext = EntityRendererProvider.Context(null, null, null, null, null, null, null)

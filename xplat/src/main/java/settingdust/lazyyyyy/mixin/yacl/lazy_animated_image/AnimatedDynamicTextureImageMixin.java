@@ -14,7 +14,7 @@ import net.minecraft.server.packs.resources.Resource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import settingdust.lazyyyyy.YaclLazyAnimatedImageKt;
+import settingdust.lazyyyyy.yacl.YaclLazyAnimatedImageKt;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -24,8 +24,10 @@ import java.nio.file.Path;
 public class AnimatedDynamicTextureImageMixin {
     @Redirect(
         method = {"lambda$createWEBPFromTexture$2", "lambda$createGIFFromTexture$0"},
+        remap = false,
         at = @At(
             value = "INVOKE",
+            remap = true,
             target = "Lnet/minecraft/server/packs/resources/Resource;open()Ljava/io/InputStream;"
         )
     )
@@ -50,6 +52,7 @@ public class AnimatedDynamicTextureImageMixin {
 
     @WrapOperation(
         method = "lambda$createWEBPFromPath$3",
+        remap = false,
         at = @At(
             value = "INVOKE",
             target = "Ldev/isxander/yacl3/gui/image/impl/AnimatedDynamicTextureImage;createWEBPSupplier(Ljava/io/InputStream;Lnet/minecraft/resources/ResourceLocation;)Ldev/isxander/yacl3/gui/image/ImageRendererFactory$ImageSupplier;"
@@ -67,6 +70,7 @@ public class AnimatedDynamicTextureImageMixin {
 
     @WrapOperation(
         method = "lambda$createGIFFromTexture$0",
+        remap = false,
         at = @At(
             value = "INVOKE",
             target = "Ldev/isxander/yacl3/gui/image/impl/AnimatedDynamicTextureImage;createGIFSupplier(Ljava/io/InputStream;Lnet/minecraft/resources/ResourceLocation;)Ldev/isxander/yacl3/gui/image/ImageRendererFactory$ImageSupplier;"
@@ -83,6 +87,7 @@ public class AnimatedDynamicTextureImageMixin {
 
     @WrapOperation(
         method = "lambda$createGIFFromPath$1",
+        remap = false,
         at = @At(
             value = "INVOKE",
             target = "Ldev/isxander/yacl3/gui/image/impl/AnimatedDynamicTextureImage;createGIFSupplier(Ljava/io/InputStream;Lnet/minecraft/resources/ResourceLocation;)Ldev/isxander/yacl3/gui/image/ImageRendererFactory$ImageSupplier;"
@@ -98,7 +103,10 @@ public class AnimatedDynamicTextureImageMixin {
     }
 
 
-    @WrapMethod(method = "lambda$createFromImageReader$9")
+    @WrapMethod(
+        method = "lambda$createFromImageReader$9",
+        remap = false
+    )
     private static ImageRenderer lazyyyyy$syncComplete(
         final NativeImage image,
         final int frameWidth,

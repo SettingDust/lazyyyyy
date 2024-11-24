@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/lexforge/lexforge-mixin" />
             <option value="$PROJECT_DIR$/lexforge/lexforge-mod" />
             <option value="$PROJECT_DIR$/xplat" />
+            <option value="$PROJECT_DIR$/xplat/xplat-lexforge" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -55,6 +55,8 @@ loom {
         }
     }
 
+    accessWidenerPath = project(":xplat").file("src/main/resources/$id.accesswidener")
+
     forge {
         convertAccessWideners = true
 
@@ -68,6 +70,8 @@ loom {
 
 tasks {
     jar {
+        from(loom.accessWidenerPath)
+
         rename("$id-${project.name}-${project.path.substring(1).replace(':', '_')}-refmap.json", "$id.forge.refmap.json")
     }
 }

@@ -11,6 +11,10 @@ plugins {
 
 val id: String by rootProject.properties
 
+subprojects {
+    base { archivesName.set("${rootProject.base.archivesName.get()}-${project.name}") }
+}
+
 architectury {
     common("forge", "fabric")
 }
@@ -26,8 +30,6 @@ dependencies {
     implementation(catalog.mixin.constraints)
 
     modImplementation(catalog.yacl.fabric)
-
-    modImplementation(catalog.kiwi.forge)
 }
 
 tasks {
@@ -44,6 +46,8 @@ tasks {
                 "FMLModType" to "GAMELIBRARY"
             )
         }
+
+        rename(".*?-refmap.json", "$id.refmap.json")
     }
 }
 

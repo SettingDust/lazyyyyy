@@ -9,7 +9,7 @@ import net.minecraft.world.entity.EntityType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import settingdust.lazyyyyy.LazyLivingEntityRendererKt;
+import settingdust.lazyyyyy.minecraft.AsyncEntityRendererKt;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -26,6 +26,6 @@ public class EntityRenderersMixin {
         EntityRendererProvider.Context context,
         @Local ImmutableMap.Builder<EntityType<?>, EntityRenderer<?>> builder
     ) {
-        LazyLivingEntityRendererKt.createEntityRenderersAsync(instance, consumer);
+        AsyncEntityRendererKt.createEntityRenderersAsync(instance, consumer);
     }
 }

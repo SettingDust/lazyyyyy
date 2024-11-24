@@ -58,6 +58,7 @@ jobs:
 
           dependencies: |
             kotlin-for-forge
+            forgified-fabric-api
 
           java: |
             17
