@@ -20,7 +20,6 @@ class AsyncImageRenderer(val original: Lazy<ImageRendererFactory.ImageSupplier>)
     private val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) {
         original.value.completeImage()
     }
-    val image by lazy { runBlocking { loading.await() } }
 
     init {
         Lazyyyyy.scope.launch { Lazyyyyy.clientLaunched.collectLatest { loading.start() } }
@@ -33,12 +32,16 @@ class AsyncImageRenderer(val original: Lazy<ImageRendererFactory.ImageSupplier>)
         y: Int,
         renderWidth: Int,
         tickDelta: Float
-    ) = image.render(graphics, x, y, renderWidth, tickDelta)
+    ) = if (loading.isCompleted) {
+        loading.getCompleted().render(graphics, x, y, renderWidth, tickDelta)
+    } else {
+        0
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun close() {
         try {
-            if (loading.isCompleted) image.close()
+            if (loading.isCompleted) loading.getCompleted().close()
             loading.cancel()
         } catch (_: IllegalStateException) {
         }
