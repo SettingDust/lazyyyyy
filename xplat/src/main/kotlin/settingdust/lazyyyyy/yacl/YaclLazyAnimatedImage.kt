@@ -2,8 +2,11 @@ package settingdust.lazyyyyy.yacl
 
 import dev.isxander.yacl3.gui.image.ImageRenderer
 import dev.isxander.yacl3.gui.image.ImageRendererFactory
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
@@ -14,11 +17,14 @@ import java.nio.file.Path
 import kotlin.io.path.inputStream
 
 class AsyncImageRenderer(val original: Lazy<ImageRendererFactory.ImageSupplier>) : ImageRenderer {
-    private val loading = Lazyyyyy.scope.async {
-        Lazyyyyy.clientLaunched.join()
+    private val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) {
         original.value.completeImage()
     }
     val image by lazy { runBlocking { loading.await() } }
+
+    init {
+        Lazyyyyy.scope.launch { Lazyyyyy.clientLaunched.collectLatest { loading.start() } }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun render(

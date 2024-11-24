@@ -6,6 +6,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import org.apache.logging.log4j.LogManager
+import org.objectweb.asm.tree.ClassNode
+import org.spongepowered.asm.mixin.extensibility.IMixinInfo
 import kotlin.io.path.Path
 import kotlin.io.path.createFile
 import kotlin.io.path.createParentDirectories
@@ -20,7 +22,8 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         "async_entity_renderers" to false,
         "async_model_baking" to true,
         "yacl.lazy_animated_image" to true,
-        "kiwi.faster_annotation" to true
+        "kiwi.faster_annotation" to true,
+        "esf.async_sound_events" to true
     )
         private set
     private val json = Json {
@@ -51,5 +54,19 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
                 .any { entry -> relativeName.startsWith(entry.key) && !entry.value }
         if (disabled) { logger.info("Disabled '$relativeName' due to config") }
         return !disabled && super.shouldApplyMixin(targetClassName, mixinClassName)
+    }
+
+    override fun postApply(
+        targetClassName: String,
+        targetClass: ClassNode,
+        mixinClassName: String,
+        mixinInfo: IMixinInfo
+    ) {
+        when (mixinClassName) {
+            "settingdust.lazyyyyy.mixin.entity_texture_features.async_compat.ETFManagerMixin" -> {
+
+            }
+        }
+        super.postApply(targetClassName, targetClass, mixinClassName, mixinInfo)
     }
 }

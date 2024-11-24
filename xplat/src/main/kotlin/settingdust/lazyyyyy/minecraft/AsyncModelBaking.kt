@@ -4,6 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.model.geom.ModelPart
 import net.minecraft.client.model.geom.PartPose
@@ -17,7 +19,7 @@ class AsyncModelPart(val provider: () -> ModelPart) : ModelPart(emptyList(), emp
     val wrapped by lazy { runBlocking { loading.await() } }
 
     init {
-        Lazyyyyy.clientLaunched.invokeOnCompletion { loading.start() }
+        Lazyyyyy.scope.launch { Lazyyyyy.clientLaunched.collectLatest { loading.start() } }
     }
 
     override fun storePose() = wrapped.storePose()

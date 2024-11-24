@@ -67,6 +67,12 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     library("mixinextras-lexforge", "io.github.llamalad7", "mixinextras-forge").version(mixinextras)
     library("mixinextras-fabric", "io.github.llamalad7", "mixinextras-fabric").version(mixinextras)
 
+    val mixinsquared = "0.2.0"
+    library("mixinsquared-common", "com.github.bawnorton.mixinsquared", "mixinsquared-common").version(mixinsquared)
+    library("mixinsquared-lexforge", "com.github.bawnorton.mixinsquared", "mixinsquared-forge").version(mixinsquared)
+    library("mixinsquared-fabric", "com.github.bawnorton.mixinsquared", "mixinsquared-fabric").version(mixinsquared)
+
+
     library("modmenu", "com.terraformersmc", "modmenu").version("7.2.2")
 
     library("mixin-constraints", "com.moulberry", "mixinconstraints").version("1.0.1")
@@ -81,6 +87,18 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     val prism = "1.0.5"
     library("prism-fabric", "maven.modrinth", "prism-lib").version("$prism-fabric")
     library("prism-forge", "maven.modrinth", "prism-lib").version("$prism-forge")
+
+    val esf = "0.4"
+    library("entity-features-sound-fabric", "maven.modrinth", "esf").version("$esf-fabric")
+    library("entity-features-sound-forge", "maven.modrinth", "esf").version("$esf-forge")
+
+    val emf = "2.2.6"
+    library("entity-features-model-fabric", "maven.modrinth", "entity-model-features").version("$emf-fabric")
+    library("entity-features-model-forge", "maven.modrinth", "entity-model-features").version("$emf-forge")
+
+    val etf = "6.2.8"
+    library("entity-features-texture-fabric", "maven.modrinth", "entitytexturefeatures").version("$etf-fabric")
+    library("entity-features-texture-forge", "maven.modrinth", "entitytexturefeatures").version("$etf-forge")
 }
 
 plugins {

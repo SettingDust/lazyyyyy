@@ -27,7 +27,15 @@ dependencies {
     implementation(catalog.mixinextras.common)
     annotationProcessor(catalog.mixinextras.common)
 
+    implementation(catalog.mixinsquared.common)
+    implementation(catalog.mixinsquared.lexforge)
+    annotationProcessor(catalog.mixinsquared.common)
+
     modImplementation(catalog.yacl.forge)
+
+    modImplementation(catalog.entity.features.sound.forge)
+    modImplementation(catalog.entity.features.model.forge)
+    modImplementation(catalog.entity.features.texture.forge)
 }
 
 sourceSets {

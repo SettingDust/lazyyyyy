@@ -70,6 +70,12 @@ allprojects {
             content { includeGroupAndSubgroups("com.terraformersmc") }
         }
 
+        maven("https://maven.bawnorton.com/releases") {
+            content {
+                includeGroup("com.github.bawnorton.mixinsquared")
+            }
+        }
+
         maven("https://maven.isxander.dev/releases")
 
         mavenCentral()

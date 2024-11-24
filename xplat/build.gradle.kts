@@ -23,6 +23,9 @@ dependencies {
     minecraft(catalog.minecraft)
     mappings(loom.officialMojangMappings())
 
+    implementation(catalog.mixinsquared.common)
+    annotationProcessor(catalog.mixinsquared.common)
+
     modImplementation(catalog.fabric.loader)
     modImplementation(catalog.fabric.api)
     modImplementation(catalog.fabric.kotlin)
@@ -30,6 +33,10 @@ dependencies {
     implementation(catalog.mixin.constraints)
 
     modImplementation(catalog.yacl.fabric)
+
+    modImplementation(catalog.entity.features.sound.fabric)
+    modImplementation(catalog.entity.features.model.fabric)
+    modImplementation(catalog.entity.features.texture.fabric)
 }
 
 tasks {
