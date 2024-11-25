@@ -12,7 +12,7 @@ dependencies {
     minecraft(catalog.minecraft)
     mappings(loom.officialMojangMappings())
 
-    compileOnly("net.fabricmc:sponge-mixin:0.15.4+mixin.0.8.7")
+    compileOnly("net.fabricmc:sponge-mixin:0.15.5+")
 
     implementation(project(":xplat", "namedElements")) { isTransitive = false }
 
