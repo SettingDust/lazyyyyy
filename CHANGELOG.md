@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2024-11-27
+### :bug: Bug Fixes
+- [`5de07c2`](https://github.com/SettingDust/lazyyyyy/commit/5de07c20ffeb6475dbc71078baf944448ef9d186) - optional esf, etf *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.3.1] - 2024-11-24
 ### :bug: Bug Fixes
 - [`2096d26`](https://github.com/SettingDust/lazyyyyy/commit/2096d26aa902de451a7b2e37a554845d2041365e) - **yacl**: avoid deadlock when loading *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -41,3 +46,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.2.0]: https://github.com/SettingDust/lazyyyyy/compare/0.1.0...0.2.0
 [0.3.0]: https://github.com/SettingDust/lazyyyyy/compare/0.2.0...0.3.0
 [0.3.1]: https://github.com/SettingDust/lazyyyyy/compare/0.3.0...0.3.1
+[0.3.2]: https://github.com/SettingDust/lazyyyyy/compare/0.3.1...0.3.2
