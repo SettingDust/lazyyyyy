@@ -2,6 +2,7 @@ package settingdust.lazyyyyy.mixin.entity_texture_features.async_compat;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceMaps;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +16,7 @@ import settingdust.lazyyyyy.entity_sound_features.WrappedObject2ReferenceOpenHas
 import traben.entity_texture_features.features.ETFManager;
 import traben.entity_texture_features.features.texture_handlers.ETFDirectory;
 
+@IfModLoaded("entity_texture_features")
 @Mixin(ETFManager.class)
 public class ETFManagerMixin {
     @Shadow(remap = false)

@@ -3,6 +3,7 @@ package settingdust.lazyyyyy.mixin.entity_sound_features.async_sound_events;
 import com.bawnorton.mixinsquared.TargetHandler;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import kotlinx.coroutines.Job;
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.sounds.WeighedSoundEvents;
@@ -20,6 +21,7 @@ import settingdust.lazyyyyy.entity_sound_features.AsyncSoundEventsKt;
 import traben.entity_sound_features.ESFVariantSupplier;
 import traben.entity_sound_features.mixin.MixinWeighedSoundEvents;
 
+@IfModLoaded("entity_sound_features")
 @Mixin(value = WeighedSoundEvents.class, priority = 1001, remap = false)
 public class WeighedSoundEventsMixin {
     @Shadow

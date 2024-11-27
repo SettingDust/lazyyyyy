@@ -1,11 +1,13 @@
 package settingdust.lazyyyyy.mixin.entity_sound_features.async_sound_events;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import traben.entity_sound_features.ESFVariantSupplier;
 
+@IfModLoaded("entity_sound_features")
 @Mixin(value = ESFVariantSupplier.class, remap = false)
 public class ESFVariantSupplierMixin {
     @Redirect(
