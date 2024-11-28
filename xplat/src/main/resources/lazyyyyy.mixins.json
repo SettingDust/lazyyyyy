@@ -18,6 +18,7 @@
         "async_entity_renderers.EntityRenderersMixin",
         "async_model_baking.EntityModelSetMixin",
         "async_model_baking.ModelPartAccessor",
-        "entity_sound_features.async_sound_events.WeighedSoundEventsMixin"
+        "entity_sound_features.async_sound_events.WeighedSoundEventsMixin",
+        "moremcmeta.avoid_duplicate_sprites.TextureAtlasMixin"
     ]
 }

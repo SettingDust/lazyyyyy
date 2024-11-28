@@ -36,6 +36,8 @@ dependencies {
     modImplementation(catalog.entity.features.sound.forge)
     modImplementation(catalog.entity.features.model.forge)
     modImplementation(catalog.entity.features.texture.forge)
+
+    modImplementation(catalog.moremcmeta.forge)
 }
 
 sourceSets {

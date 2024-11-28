@@ -99,6 +99,10 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     val etf = "6.2.8"
     library("entity-features-texture-fabric", "maven.modrinth", "entitytexturefeatures").version("$etf-fabric")
     library("entity-features-texture-forge", "maven.modrinth", "entitytexturefeatures").version("$etf-forge")
+
+    val moremcmeta = "v1.20.1-4.5.1"
+    library("moremcmeta-fabric", "maven.modrinth", "moremcmeta").version("$moremcmeta-fabric")
+    library("moremcmeta-forge", "maven.modrinth", "moremcmeta").version("$moremcmeta-forge")
 }
 
 plugins {

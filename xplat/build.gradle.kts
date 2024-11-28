@@ -37,6 +37,8 @@ dependencies {
     modImplementation(catalog.entity.features.sound.fabric)
     modImplementation(catalog.entity.features.model.fabric)
     modImplementation(catalog.entity.features.texture.fabric)
+
+    modImplementation(catalog.moremcmeta.fabric)
 }
 
 tasks {
