@@ -15,7 +15,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Mixin(value = TextureAtlas.class, priority = 1001)
 public class TextureAtlasMixin {
     @Dynamic(mixin = io.github.moremcmeta.moremcmeta.impl.client.mixin.TextureAtlasMixin.class)
-    @Redirect(method = "<init>", at = @At(value = "NEW", target = "java.util.concurrent.LinkedBlockingQueue"))
+    @Redirect(method = "<init>", at = @At(value = "NEW", target = "java/util/concurrent/LinkedBlockingQueue"))
     private LinkedBlockingQueue<ResourceLocation> lazyyyyy$avoidDuplicateSprites() {
         return new SetBackingLinkedBlockingQueue<>();
     }

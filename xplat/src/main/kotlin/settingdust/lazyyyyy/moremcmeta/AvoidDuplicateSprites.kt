@@ -3,7 +3,7 @@ package settingdust.lazyyyyy.moremcmeta
 import java.util.*
 import java.util.concurrent.LinkedBlockingQueue
 
-class SetBackingQueue<T>(val backing: LinkedHashSet<T> = linkedSetOf<T>()) : Queue<T>, MutableSet<T> by backing {
+class SetBackingQueue<T>(val backing: LinkedHashSet<T> = linkedSetOf<T>()) : Queue<T>, MutableCollection<T> by backing {
     override fun offer(e: T) = backing.add(e)
 
     override fun remove() = backing.first().also {
