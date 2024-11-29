@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import settingdust.lazyyyyy.minecraft.LazyEntityRenderer;
 import settingdust.lazyyyyy.minecraft.LazyEntityRendererKt;
+import settingdust.lazyyyyy.minecraft.LazyPlayerRenderer;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -66,8 +67,9 @@ public class EntityRenderersMixin {
     private static EntityRenderer<Player> lazyyyyy$createPlayerRenderers$lazyCreateRenderer(
         final EntityRendererProvider<Player> instance,
         final EntityRendererProvider.Context context,
-        final Operation<EntityRenderer<Player>> original
+        final Operation<EntityRenderer<Player>> original,
+        @Local(argsOnly = true) String skin
     ) {
-        return new LazyEntityRenderer<>(EntityType.PLAYER, context, () -> original.call(instance, context));
+        return new LazyPlayerRenderer(skin, context, () -> original.call(instance, context));
     }
 }

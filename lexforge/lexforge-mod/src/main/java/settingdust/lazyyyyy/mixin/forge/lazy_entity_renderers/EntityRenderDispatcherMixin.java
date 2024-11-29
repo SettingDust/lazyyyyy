@@ -21,7 +21,19 @@ public class EntityRenderDispatcherMixin {
             target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;renderers:Ljava/util/Map;"
         )
     )
-    private Map<EntityType<?>, EntityRenderer<?>> lazyyyyy$filterOutLazyRenderers(final Map<EntityType<?>, EntityRenderer<?>> original) {
+    private Map<EntityType<?>, EntityRenderer<?>> lazyyyyy$renderers$filterOutLazyRenderers(final Map<EntityType<?>, EntityRenderer<?>> original) {
+        return LazyEntityRenderersKt.filterLazyRenderers(original);
+    }
+
+    @ModifyExpressionValue(
+        method = "onResourceManagerReload",
+        at = @At(
+            value = "FIELD",
+            opcode = Opcodes.GETFIELD,
+            target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;playerRenderers:Ljava/util/Map;"
+        )
+    )
+    private Map<EntityType<?>, EntityRenderer<?>> lazyyyyy$playerRenderers$filterOutLazyRenderers(final Map<EntityType<?>, EntityRenderer<?>> original) {
         return LazyEntityRenderersKt.filterLazyRenderers(original);
     }
 }

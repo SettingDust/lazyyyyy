@@ -21,6 +21,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.phys.Vec3
 import settingdust.lazyyyyy.Lazyyyyy
@@ -41,7 +42,7 @@ fun createEntityRenderersAsync(
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class LazyEntityRenderer<T : Entity>(
+open class LazyEntityRenderer<T : Entity>(
     val type: EntityType<T>,
     val context: EntityRendererProvider.Context,
     val wrapped: () -> EntityRenderer<T>
@@ -51,15 +52,12 @@ class LazyEntityRenderer<T : Entity>(
             MutableSharedFlow<Triple<EntityType<*>, EntityRendererProvider.Context, LivingEntityRenderer<*, *>>>()
     }
 
-    private val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) { wrapped() }
-
-    init {
+    open val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) { wrapped() }.also { loading ->
         loading.invokeOnCompletion {
-            if (it == null) {
-                val renderer = loading.getCompleted()
-                if (renderer is LivingEntityRenderer<*, *>) {
-                    runBlocking { onAddLayer.emit(Triple(type, context, renderer)) }
-                }
+            if (it != null) return@invokeOnCompletion
+            val renderer = loading.getCompleted()
+            if (renderer is LivingEntityRenderer<*, *>) {
+                runBlocking { onAddLayer.emit(Triple(type, context, renderer)) }
             }
         }
     }
@@ -119,6 +117,28 @@ class LazyEntityRenderer<T : Entity>(
     ) = handle(
         { (this as EntityRendererAccessor<T>).invokeRenderNameTag(entity, component, poseStack, multiBufferSource, i) },
         { super.renderNameTag(entity, component, poseStack, multiBufferSource, i) })
+}
+
+class LazyPlayerRenderer(
+    val skin: String,
+    context: EntityRendererProvider.Context,
+    wrapped: () -> EntityRenderer<Player>
+) : LazyEntityRenderer<Player>(EntityType.PLAYER, context, wrapped) {
+    companion object {
+        val onAddLayer =
+            MutableSharedFlow<Triple<String, EntityRendererProvider.Context, EntityRenderer<out Player>>>()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) { wrapped() }.also { loading ->
+        loading.invokeOnCompletion {
+            if (it != null) return@invokeOnCompletion
+            val renderer = loading.getCompleted()
+            if (renderer is LivingEntityRenderer<*, *>) {
+                runBlocking { onAddLayer.emit(Triple(skin, context, renderer)) }
+            }
+        }
+    }
 }
 
 class LazyBlockEntityRenderer<T : BlockEntity>(
