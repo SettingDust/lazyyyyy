@@ -18,17 +18,24 @@ import kotlin.io.path.outputStream
 class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
     lateinit var mixinPackage: String
         private set
-    var config = mutableMapOf<String, Boolean>(
-        "async_entity_renderers" to false,
-        "async_model_baking" to true,
+
+    val defaultConfig = mapOf<String, Boolean>(
+        "async_model_baking" to false,
+        "axiom.async_check_commercial" to true,
+        "entity_sound_features.async_sound_events" to true,
+        "lazy_entity_renderers" to true,
+        "moremcmeta.avoid_duplicate_sprites" to true,
+        "toomanyplayers.async_networking" to true,
         "yacl.lazy_animated_image" to true,
         "kiwi.faster_annotation" to true,
-        "esf.async_sound_events" to true
     )
+
+    var config = defaultConfig.toMutableMap()
         private set
     private val json = Json {
         prettyPrint = true
         encodeDefaults = true
+        ignoreUnknownKeys = true
     }
 
     val logger = LogManager.getLogger()
@@ -37,7 +44,10 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         val configPath = Path("./config/lazyyyyy.mixins.json")
         runCatching { configPath.createParentDirectories() }
         runCatching { configPath.createFile() }
-        runCatching { config = json.decodeFromStream(configPath.inputStream()) }
+        runCatching {
+            config = defaultConfig.toMutableMap()
+            config.putAll(json.decodeFromStream(configPath.inputStream()))
+        }
         json.encodeToStream(config, configPath.outputStream())
     }
 
@@ -52,7 +62,9 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         val disabled =
             config.asSequence()
                 .any { entry -> relativeName.startsWith(entry.key) && !entry.value }
-        if (disabled) { logger.info("Disabled '$relativeName' due to config") }
+        if (disabled) {
+            logger.info("Disabled '$relativeName' due to config")
+        }
         return !disabled && super.shouldApplyMixin(targetClassName, mixinClassName)
     }
 

@@ -7,9 +7,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.minecraft.client.Minecraft
+import org.apache.logging.log4j.LogManager
 
 object Lazyyyyy {
     const val ID = "lazyyyyy"
+
+    val logger = LogManager.getLogger()
+
     val scope = CoroutineScope(SupervisorJob())
     val mainThreadContext by lazy { Minecraft.getInstance().asCoroutineDispatcher() }
     val mainThreadScope by lazy { CoroutineScope(mainThreadContext) }

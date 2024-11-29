@@ -39,6 +39,10 @@ dependencies {
     modImplementation(catalog.entity.features.texture.fabric)
 
     modImplementation(catalog.moremcmeta.fabric)
+
+    modImplementation(catalog.toomanyplayers)
+
+    modImplementation(catalog.axiom)
 }
 
 tasks {

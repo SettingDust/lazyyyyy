@@ -103,6 +103,12 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     val moremcmeta = "v1.20.1-4.5.1"
     library("moremcmeta-fabric", "maven.modrinth", "moremcmeta").version("$moremcmeta-fabric")
     library("moremcmeta-forge", "maven.modrinth", "moremcmeta").version("$moremcmeta-forge")
+
+    val toomanyplayers = "1.20-1.1.5"
+    library("toomanyplayers", "maven.modrinth", "tmp").version(toomanyplayers)
+
+    val axiom = "4.1.1"
+    library("axiom", "maven.modrinth", "axiom").version(axiom)
 }
 
 plugins {

@@ -19,6 +19,7 @@ dependencies {
     mappings(loom.officialMojangMappings())
 
     implementation(catalog.mixinextras.common)
+    annotationProcessor(catalog.mixinextras.common)
 
     implementation(project(":xplat", "namedElements")) { isTransitive = false }
     include(project(":xplat:xplat-lexforge")) { isTransitive = false }

@@ -6,19 +6,21 @@
     "refmap": "lazyyyyy.refmap.json",
     "plugin": "settingdust.lazyyyyy.LazyyyyyMixinPlugin",
     "mixins": [
-        "async_entity_renderers.EntityRendererAccessor",
-        "async_entity_renderers.LivingEntityRendererAccessor",
+        "axiom.async_check_commercial.AuthorizationMixin",
         "entity_sound_features.async_sound_events.ESFAccessor",
         "entity_sound_features.async_sound_events.ESFVariantSupplierMixin",
         "entity_sound_features.async_sound_events.WeighedSoundEventsMixin",
         "entity_texture_features.async_compat.ETFManagerMixin",
+        "lazy_entity_renderers.EntityRendererAccessor",
+        "lazy_entity_renderers.LivingEntityRendererAccessor",
+        "toomanyplayers.async_networking.TooManyPlayersMixin",
         "yacl.lazy_animated_image.AnimatedDynamicTextureImageMixin"
     ],
     "client": [
-        "async_entity_renderers.EntityRenderersMixin",
         "async_model_baking.EntityModelSetMixin",
         "async_model_baking.ModelPartAccessor",
         "entity_sound_features.async_sound_events.WeighedSoundEventsMixin",
+        "lazy_entity_renderers.EntityRenderersMixin",
         "moremcmeta.avoid_duplicate_sprites.TextureAtlasMixin"
     ]
 }

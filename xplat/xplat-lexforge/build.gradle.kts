@@ -38,6 +38,10 @@ dependencies {
     modImplementation(catalog.entity.features.texture.forge)
 
     modImplementation(catalog.moremcmeta.forge)
+
+    implementation(catalog.toomanyplayers)
+
+    implementation(catalog.axiom)
 }
 
 sourceSets {
