@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2024-11-29
+### :sparkles: New Features
+- [`df78ca3`](https://github.com/SettingDust/lazyyyyy/commit/df78ca36a2b5a00c23c8150969151ef0689116d0) - avoid duplicates in moremcmeta sprites queue *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`5fb5840`](https://github.com/SettingDust/lazyyyyy/commit/5fb58408f1f7b5d3975ed74fb7b2e9b17967dee3) - **toomanyplayers**: avoid requesting online whitelist in main thread *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`5c604dc`](https://github.com/SettingDust/lazyyyyy/commit/5c604dc2f1d5bf4ce92731987caa8b49f16ce89e) - **axiom**: async init the jackson classes *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`dcb3765`](https://github.com/SettingDust/lazyyyyy/commit/dcb37651d33d7d1ab0f3252841b2c23272b5afb3) - lazy entity renderers working *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`a446c19`](https://github.com/SettingDust/lazyyyyy/commit/a446c197ab0806ab79ed9dda59e75c2ae8ef0b6d) - add lazy block entity renderer *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`0296292`](https://github.com/SettingDust/lazyyyyy/commit/0296292ebd9428906c1c9fbf5435d119e14b49a2) - add lazy player entity renderer *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`a8375cb`](https://github.com/SettingDust/lazyyyyy/commit/a8375cb599419296e468255745c844e686c344cb) - async loading the renderers *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :bug: Bug Fixes
+- [`0666658`](https://github.com/SettingDust/lazyyyyy/commit/066665800cc7b00e24e77bccd4ef43a4f0fdfc70) - **moremcmeta**: the mixin target is wrong *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`aff83f0`](https://github.com/SettingDust/lazyyyyy/commit/aff83f0b4dbd9aa2a086505d648858dec2638904) - post the player add layer event correctly *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.3.2] - 2024-11-27
 ### :bug: Bug Fixes
 - [`5de07c2`](https://github.com/SettingDust/lazyyyyy/commit/5de07c20ffeb6475dbc71078baf944448ef9d186) - optional esf, etf *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -47,3 +62,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.0]: https://github.com/SettingDust/lazyyyyy/compare/0.2.0...0.3.0
 [0.3.1]: https://github.com/SettingDust/lazyyyyy/compare/0.3.0...0.3.1
 [0.3.2]: https://github.com/SettingDust/lazyyyyy/compare/0.3.1...0.3.2
+[0.4.0]: https://github.com/SettingDust/lazyyyyy/compare/0.3.2...0.4.0
