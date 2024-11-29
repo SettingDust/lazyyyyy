@@ -1,7 +1,6 @@
-package settingdust.lazyyyyy.toomanyplayers
+package settingdust.lazyyyyy
 
 import kotlinx.coroutines.launch
-import settingdust.lazyyyyy.Lazyyyyy
 
 fun executeOffThread(block: Runnable) {
     Lazyyyyy.scope.launch { block.run() }
