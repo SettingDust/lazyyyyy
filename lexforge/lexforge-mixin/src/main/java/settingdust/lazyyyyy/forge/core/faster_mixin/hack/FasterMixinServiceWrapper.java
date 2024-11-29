@@ -126,6 +126,11 @@ public class FasterMixinServiceWrapper extends MixinServiceModLauncher implement
                 result = Files.newInputStream(((SecureJar) secureJarField.get(handle)).getPath(name));
                 LOGGER.debug("Read config {} from {}", name, ((ContainerHandleURI) handle).getURI());
             } catch (IllegalAccessException | IOException e) {
+                LOGGER.warn(
+                    "Failed to read config {} from {}. Find from all resources will spend extra time. Check the debug log for detail of reason. If the file is missing, let the author of the mod moving the mixin config into the jar declare it",
+                    name,
+                    ((ContainerHandleURI) handle).getURI()
+                );
                 LOGGER.debug("Failed to read config {} from {}", name, ((ContainerHandleURI) handle).getURI(), e);
             }
         }
@@ -146,6 +151,12 @@ public class FasterMixinServiceWrapper extends MixinServiceModLauncher implement
                     );
                     break;
                 } catch (IOException | IllegalAccessException e) {
+                    LOGGER.warn(
+                        "Failed to read refmap {} from {} for config {}. Find from all resources will spend extra time. Check the debug log for detail of reason. If the file is missing, let the author of the mod moving the refmap into the jar declare it",
+                        name,
+                        ((ContainerHandleURI) source).getURI(),
+                        mixinConfig
+                    );
                     LOGGER.debug(
                         "Failed to read refmap {} from {} for config {}",
                         name,
