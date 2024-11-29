@@ -7,14 +7,14 @@ Mainly through asynchronous and lazy loading so that unnecessary logic doesn't p
 Take advantage from index for trading the cpu time with the memory and disk.  
 
 ## Features
-- Faster mixin config loading
-- (YACL) [YACL image resource lazy and async loading. ](https://github.com/isXander/YetAnotherConfigLib/issues/218)
+- **Faster mixin config loading**
+- (YACL) [**YACL image resource lazy and async loading.** ](https://github.com/isXander/YetAnotherConfigLib/issues/218)
     - Load when trying to render it. Won't render before loaded
-- (Kiwi) Faster manifest finding
+- (Kiwi) **Faster manifest finding**
     - The manifest has to be in the jar of the mod itself. No trading honestly. No one will put a manifest of another mod in their own mod.
-- Lazy entity/block entity/player renderer
+- **Lazy entity/block entity/player renderer**
     - Load when trying to render it. Won't render before loaded
-- (Entity Sound Features) Async sound event loading.
+- (Entity Sound Features) **Async sound event loading.**
     - Load when trying to play it. Won't play before loaded
 - (MoreMcmeta) Optimize the memory usage
   
