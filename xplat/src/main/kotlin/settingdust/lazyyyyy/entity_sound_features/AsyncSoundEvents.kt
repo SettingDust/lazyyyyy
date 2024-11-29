@@ -7,7 +7,6 @@ import it.unimi.dsi.fastutil.objects.ObjectSet
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import settingdust.lazyyyyy.Lazyyyyy
@@ -91,14 +90,8 @@ class WrappedObject2ReferenceOpenHashMap<K, V>(val wrapped: Object2ReferenceMap<
 fun asyncGetVariantSupplier(
     wrapped: () -> ESFVariantSupplier?,
     consumer: Consumer<ESFVariantSupplier?>
-): Job {
-    val loading = Lazyyyyy.scope.launch(Dispatchers.IO, start = CoroutineStart.LAZY) {
-        consumer.accept(wrapped())
-    }
-
-    Lazyyyyy.scope.launch { Lazyyyyy.clientLaunched.collectLatest { loading.start() } }
-
-    return loading
+)= Lazyyyyy.scope.launch(Dispatchers.IO, start = CoroutineStart.LAZY) {
+    consumer.accept(wrapped())
 }
 
 fun Job.joinBlocking() = runBlocking { join() }

@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import settingdust.lazyyyyy.minecraft.LazyEntityRenderer;
@@ -44,12 +45,29 @@ public class EntityRenderersMixin {
             target = "Lnet/minecraft/client/renderer/entity/EntityRendererProvider;create(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Lnet/minecraft/client/renderer/entity/EntityRenderer;"
         )
     )
-    private static <T extends Entity> EntityRenderer<T> lazyyyyy$lazyCreateRenderer(
+    private static <T extends Entity> EntityRenderer<T> lazyyyyy$createEntityRenderers$lazyCreateRenderer(
         final EntityRendererProvider<T> instance,
         final EntityRendererProvider.Context context,
         final Operation<EntityRenderer<T>> original,
         @Local(argsOnly = true) EntityType<T> type
     ) {
         return new LazyEntityRenderer<>(type, context, () -> original.call(instance, context));
+    }
+
+    @WrapOperation(
+        method = {"method_32175", "m_234604_"},
+        remap = false,
+        at = @At(
+            value = "INVOKE",
+            remap = true,
+            target = "Lnet/minecraft/client/renderer/entity/EntityRendererProvider;create(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Lnet/minecraft/client/renderer/entity/EntityRenderer;"
+        )
+    )
+    private static EntityRenderer<Player> lazyyyyy$createPlayerRenderers$lazyCreateRenderer(
+        final EntityRendererProvider<Player> instance,
+        final EntityRendererProvider.Context context,
+        final Operation<EntityRenderer<Player>> original
+    ) {
+        return new LazyEntityRenderer<>(EntityType.PLAYER, context, () -> original.call(instance, context));
     }
 }

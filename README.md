@@ -15,15 +15,15 @@ It's not rigorous at all, and it's not a value that anyone except me can refer t
     - 50 secs → 1200ms
 - [YACL image resource lazy and async loading. ](https://github.com/isXander/YetAnotherConfigLib/issues/218)
     - 20 secs → None
-- Faster Kiwi manifest finding
+    - Load when trying to render it. Won't render before loaded
+- (Kiwi) Faster manifest finding
     - 50 secs -> 200ms
-    - Trade: The manifest has to be in the jar of the mod itself. No trading honestly. No one will put a manifest of another mod in their own mod.
-- Create entity renderer in async. Disabled by default. WIP
+    - The manifest has to be in the jar of the mod itself. No trading honestly. No one will put a manifest of another mod in their own mod.
+- Lazy entity/block entity/player renderer
+    - Load when trying to render it. Won't render before loaded
 - (Entity Sound Features) Async sound event loading.
-  - Delay the loading after the client started since we needn't the sound before playing it.
-- Async model baking.
-  - Delay the model baking after the client started since we needn't it.
-  
+    - Load when trying to play it. Won't play before loaded
+- (MoreMcmeta) Optimize the memory usage
   
   
 ![yourkit](https://www.yourkit.com/images/yklogo.png)  
