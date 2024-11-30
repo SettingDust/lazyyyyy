@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.minecraft.client.model.EntityModel
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
@@ -23,6 +24,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.phys.Vec3
 import settingdust.lazyyyyy.Lazyyyyy
@@ -120,6 +122,11 @@ class LazyEntityRenderer<T : Entity>(
         { super.renderNameTag(entity, component, poseStack, multiBufferSource, i) })
 }
 
+class DummyLivingEntityRenderer(context: EntityRendererProvider.Context) :
+    LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>(context, null, 0f) {
+    override fun getTextureLocation(entity: LivingEntity) = MissingTextureAtlasSprite.getLocation()
+}
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class LazyPlayerRenderer(
     val type: String,
@@ -205,8 +212,6 @@ class LazyPlayerRenderer(
         },
         { super.renderNameTag(entity, component, poseStack, multiBufferSource, i) })
 }
-
-val emptyContext = EntityRendererProvider.Context(null, null, null, null, null, null, null)
 
 class DummyPlayerRenderer(context: EntityRendererProvider.Context) : PlayerRenderer(context, false)
 

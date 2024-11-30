@@ -7,6 +7,7 @@
     "plugin": "settingdust.lazyyyyy.LazyyyyyMixinPlugin",
     "mixins": [
         "kiwi.faster_annotation.AnnotatedTypeLoaderMixin",
+        "lazy_entity_renderers.quark.UsesForCursesModule_ClientMixin",
         "prismlib.faster_colors_loader.WebColorsMixin"
     ],
     "client": [

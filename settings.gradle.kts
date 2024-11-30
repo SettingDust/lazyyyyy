@@ -109,6 +109,12 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     val axiom = "4.1.1"
     library("axiom", "maven.modrinth", "axiom").version(axiom)
+
+    val quark = "1.20.1-4.0-460"
+    library("quark", "maven.modrinth", "quark").version(quark)
+
+    val zeta = "1.20.1-1.0-24"
+    library("zeta", "maven.modrinth", "zeta").version(zeta)
 }
 
 plugins {

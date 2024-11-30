@@ -45,17 +45,11 @@ dependencies {
 
     modImplementation(catalog.prism.forge)
 
-    runtimeOnly(project(":lexforge:lexforge-core"))
+    modImplementation(catalog.quark)
+    modImplementation(catalog.zeta)
 }
 
 loom {
-    mods {
-        create(id) {
-            sourceSet("main")
-            sourceSet("main", project(":lexforge:lexforge-core"))
-        }
-    }
-
     accessWidenerPath = project(":xplat").file("src/main/resources/$id.accesswidener")
 
     forge {
