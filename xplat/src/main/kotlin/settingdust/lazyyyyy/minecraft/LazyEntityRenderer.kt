@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
@@ -16,12 +17,12 @@ import net.minecraft.client.renderer.culling.Frustum
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.LivingEntityRenderer
+import net.minecraft.client.renderer.entity.player.PlayerRenderer
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.phys.Vec3
 import settingdust.lazyyyyy.Lazyyyyy
@@ -42,7 +43,7 @@ fun createEntityRenderersAsync(
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-open class LazyEntityRenderer<T : Entity>(
+class LazyEntityRenderer<T : Entity>(
     val type: EntityType<T>,
     val context: EntityRendererProvider.Context,
     val wrapped: () -> EntityRenderer<T>
@@ -52,7 +53,7 @@ open class LazyEntityRenderer<T : Entity>(
             MutableSharedFlow<Triple<EntityType<*>, EntityRendererProvider.Context, LivingEntityRenderer<*, *>>>()
     }
 
-    open val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) { wrapped() }.also { loading ->
+    val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) { wrapped() }.also { loading ->
         loading.invokeOnCompletion {
             if (it != null) return@invokeOnCompletion
             val renderer = loading.getCompleted()
@@ -119,27 +120,95 @@ open class LazyEntityRenderer<T : Entity>(
         { super.renderNameTag(entity, component, poseStack, multiBufferSource, i) })
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LazyPlayerRenderer(
-    val skin: String,
-    context: EntityRendererProvider.Context,
-    wrapped: () -> EntityRenderer<Player>
-) : LazyEntityRenderer<Player>(EntityType.PLAYER, context, wrapped) {
+    val type: String,
+    val context: EntityRendererProvider.Context,
+    val wrapped: () -> EntityRenderer<AbstractClientPlayer>
+) : PlayerRenderer(context, false) {
     companion object {
         val onAddLayer =
-            MutableSharedFlow<Triple<String, EntityRendererProvider.Context, EntityRenderer<out Player>>>()
+            MutableSharedFlow<Triple<String, EntityRendererProvider.Context, EntityRenderer<AbstractClientPlayer>>>()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) { wrapped() }.also { loading ->
+    val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) { wrapped() }.also { loading ->
         loading.invokeOnCompletion {
             if (it != null) return@invokeOnCompletion
             val renderer = loading.getCompleted()
-            if (renderer is LivingEntityRenderer<*, *>) {
-                runBlocking { onAddLayer.emit(Triple(skin, context, renderer)) }
-            }
+            runBlocking { onAddLayer.emit(Triple(type, context, renderer)) }
         }
     }
+
+    private fun <R> handle(loaded: EntityRenderer<AbstractClientPlayer>.() -> R, loading: () -> R) =
+        if (this.loading.isCompleted) {
+            loaded(this.loading.getCompleted())
+        } else {
+            if (!this.loading.isActive) this.loading.start()
+            loading()
+        }
+
+    override fun getPackedLightCoords(entity: AbstractClientPlayer, f: Float) =
+        handle({ getPackedLightCoords(entity, f) }, { super.getPackedLightCoords(entity, f) })
+
+    override fun getSkyLightLevel(entity: AbstractClientPlayer, blockPos: BlockPos) =
+        handle(
+            { (this as EntityRendererAccessor<AbstractClientPlayer>).invokeGetSkyLightLevel(entity, blockPos) },
+            { super.getSkyLightLevel(entity, blockPos) })
+
+    override fun getBlockLightLevel(entity: AbstractClientPlayer, blockPos: BlockPos) =
+        handle(
+            { (this as EntityRendererAccessor<AbstractClientPlayer>).invokeGetBlockLightLevel(entity, blockPos) },
+            { super.getBlockLightLevel(entity, blockPos) })
+
+    override fun shouldRender(entity: AbstractClientPlayer, frustum: Frustum, d: Double, e: Double, f: Double) =
+        handle({ shouldRender(entity, frustum, d, e, f) }, { super.shouldRender(entity, frustum, d, e, f) })
+
+    override fun getRenderOffset(entity: AbstractClientPlayer, f: Float) =
+        handle({ getRenderOffset(entity, f) }, { super.getRenderOffset(entity, f) })
+
+    override fun render(
+        entity: AbstractClientPlayer,
+        f: Float,
+        g: Float,
+        poseStack: PoseStack,
+        multiBufferSource: MultiBufferSource,
+        i: Int
+    ) = handle(
+        { render(entity, f, g, poseStack, multiBufferSource, i) },
+        { super.render(entity, f, g, poseStack, multiBufferSource, i) })
+
+    override fun shouldShowName(entity: AbstractClientPlayer) =
+        handle(
+            { (this as EntityRendererAccessor<AbstractClientPlayer>).invokeShouldShowName(entity) },
+            { super.shouldShowName(entity) })
+
+    override fun getTextureLocation(entity: AbstractClientPlayer) =
+        handle({ getTextureLocation(entity) }, { MissingTextureAtlasSprite.getLocation() })
+
+    override fun getFont() = handle({ font }, { super.font })
+
+    override fun renderNameTag(
+        entity: AbstractClientPlayer,
+        component: Component,
+        poseStack: PoseStack,
+        multiBufferSource: MultiBufferSource,
+        i: Int
+    ) = handle(
+        {
+            (this as EntityRendererAccessor<AbstractClientPlayer>).invokeRenderNameTag(
+                entity,
+                component,
+                poseStack,
+                multiBufferSource,
+                i
+            )
+        },
+        { super.renderNameTag(entity, component, poseStack, multiBufferSource, i) })
 }
+
+val emptyContext = EntityRendererProvider.Context(null, null, null, null, null, null, null)
+
+class DummyPlayerRenderer(context: EntityRendererProvider.Context) : PlayerRenderer(context, false)
 
 class LazyBlockEntityRenderer<T : BlockEntity>(
     val context: BlockEntityRendererProvider.Context,

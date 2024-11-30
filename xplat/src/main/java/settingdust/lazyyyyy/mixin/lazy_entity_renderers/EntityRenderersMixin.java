@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -64,12 +65,16 @@ public class EntityRenderersMixin {
             target = "Lnet/minecraft/client/renderer/entity/EntityRendererProvider;create(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Lnet/minecraft/client/renderer/entity/EntityRenderer;"
         )
     )
-    private static EntityRenderer<Player> lazyyyyy$createPlayerRenderers$lazyCreateRenderer(
-        final EntityRendererProvider<Player> instance,
+    private static <T extends Player> EntityRenderer<T> lazyyyyy$createPlayerRenderers$lazyCreateRenderer(
+        final EntityRendererProvider<T> instance,
         final EntityRendererProvider.Context context,
-        final Operation<EntityRenderer<Player>> original,
+        final Operation<EntityRenderer<T>> original,
         @Local(argsOnly = true) String skin
     ) {
-        return new LazyPlayerRenderer(skin, context, () -> original.call(instance, context));
+        return (EntityRenderer<T>) new LazyPlayerRenderer(
+            skin,
+            context,
+            () -> (EntityRenderer<AbstractClientPlayer>) original.call(instance, context)
+        );
     }
 }

@@ -1,9 +1,12 @@
 package settingdust.lazyyyyy.mixin.forge.lazy_entity_renderers;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,7 +36,10 @@ public class EntityRenderDispatcherMixin {
             target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;playerRenderers:Ljava/util/Map;"
         )
     )
-    private Map<EntityType<?>, EntityRenderer<?>> lazyyyyy$playerRenderers$filterOutLazyRenderers(final Map<EntityType<?>, EntityRenderer<?>> original) {
-        return LazyEntityRenderersKt.filterLazyRenderers(original);
+    private Map<String, EntityRenderer<? extends Player>> lazyyyyy$playerRenderers$filterOutLazyRenderers(
+        final Map<String, EntityRenderer<? extends Player>> original,
+        @Local EntityRendererProvider.Context context
+    ) {
+        return LazyEntityRenderersKt.replaceWithDummy(original, context);
     }
 }
