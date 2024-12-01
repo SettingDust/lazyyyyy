@@ -13,7 +13,7 @@ import settingdust.lazyyyyy.minecraft.DummyLivingEntityRenderer;
 @IfModLoaded("quark")
 @Mixin(UsesForCursesModule.Client.class)
 public class UsesForCursesModule_ClientMixin {
-    @WrapMethod(method = "modelLayers")
+    @WrapMethod(method = "modelLayers", remap = false)
     private void lazyyyyy$avoidAddIfDummy(final ZAddModelLayers event, final Operation<Void> original) {
         var renderer = (EntityRenderer<?>) event.getRenderer(EntityType.ARMOR_STAND);
         if (renderer instanceof DummyLivingEntityRenderer) return;

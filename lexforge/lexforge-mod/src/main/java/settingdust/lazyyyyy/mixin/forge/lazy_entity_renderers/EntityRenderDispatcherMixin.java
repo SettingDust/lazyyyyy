@@ -43,7 +43,7 @@ public class EntityRenderDispatcherMixin {
     ) {
         renderersRef.set(renderers);
         playerRenderersRef.set(playerRenderers);
-        renderers = LazyEntityRenderersKt.replaceWithDummyLivingEntity(renderers, context);
+        renderers = LazyEntityRenderersKt.filterLazyRenderers(renderers);
         playerRenderers = LazyEntityRenderersKt.replaceWithDummyPlayer(playerRenderers, context);
     }
 

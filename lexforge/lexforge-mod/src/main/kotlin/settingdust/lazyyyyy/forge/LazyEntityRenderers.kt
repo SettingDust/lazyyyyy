@@ -9,6 +9,9 @@ import settingdust.lazyyyyy.minecraft.DummyPlayerRenderer
 import settingdust.lazyyyyy.minecraft.LazyEntityRenderer
 import settingdust.lazyyyyy.minecraft.LazyPlayerRenderer
 
+fun Map<EntityType<*>, EntityRenderer<*>>.filterLazyRenderers() =
+    filterTo(hashMapOf()) { it.value !is LazyEntityRenderer }
+
 fun Map<EntityType<*>, EntityRenderer<*>>.replaceWithDummyLivingEntity(context: EntityRendererProvider.Context) =
     mapValues { (_, renderer) -> if (renderer is LazyEntityRenderer) DummyLivingEntityRenderer(context) else renderer }
 
