@@ -8,6 +8,7 @@
     "mixins": [
         "kiwi.faster_annotation.AnnotatedTypeLoaderMixin",
         "lazy_entity_renderers.quark.UsesForCursesModule_ClientMixin",
+        "pack_resources_cache.PathPackResourcesMixin",
         "prismlib.faster_colors_loader.WebColorsMixin"
     ],
     "client": [

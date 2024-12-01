@@ -42,6 +42,8 @@ dependencies {
     implementation(catalog.toomanyplayers)
 
     implementation(catalog.axiom)
+
+    modImplementation(catalog.modernfix.forge)
 }
 
 sourceSets {

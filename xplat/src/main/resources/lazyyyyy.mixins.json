@@ -11,6 +11,9 @@
         "entity_sound_features.async_sound_events.WeighedSoundEventsMixin",
         "entity_texture_features.async_compat.ETFManagerMixin",
         "lazy_entity_renderers.EntityRendererAccessor",
+        "pack_resources_cache.FilePackResourcesMixin",
+        "pack_resources_cache.PathPackResourcesMixin",
+        "pack_resources_cache.SimpleReloadInstanceMixin",
         "toomanyplayers.async_networking.TooManyPlayersMixin",
         "yacl.lazy_animated_image.AnimatedDynamicTextureImageMixin"
     ],

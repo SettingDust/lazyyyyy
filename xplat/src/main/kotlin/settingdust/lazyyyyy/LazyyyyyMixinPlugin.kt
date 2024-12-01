@@ -6,6 +6,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import org.apache.logging.log4j.LogManager
+import org.embeddedt.modernfix.core.ModernFixMixinPlugin
 import org.objectweb.asm.tree.ClassNode
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo
 import kotlin.io.path.Path
@@ -29,6 +30,7 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         "toomanyplayers.async_networking" to true,
         "yacl.lazy_animated_image" to true,
         "kiwi.faster_annotation" to true,
+        "pack_resources_cache" to true,
     )
 
     var config = defaultConfig.toMutableMap()
@@ -55,6 +57,9 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
     override fun onLoad(mixinPackage: String) {
         super.onLoad(mixinPackage)
         this.mixinPackage = mixinPackage
+        if (config["pack_resources_cache"] == true) {
+            ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["mixin.perf.resourcepacks"] = "lazyyyyy"
+        }
     }
 
     override fun shouldApplyMixin(targetClassName: String, mixinClassName: String): Boolean {

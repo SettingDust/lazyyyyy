@@ -82,7 +82,9 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     library("kiwi-forge", "maven.modrinth", "kiwi").version("11.8.20+forge")
 
-    library("modernfix-fabric", "maven.modrinth", "modernfix").version("5.19.5+mc1.20.1")
+    val modernfix = "5.19.5+mc1.20.1"
+    library("modernfix-fabric", "maven.modrinth", "modernfix").version("$modernfix-fabric")
+    library("modernfix-forge", "maven.modrinth", "modernfix").version("$modernfix-forge")
 
     val prism = "1.0.5"
     library("prism-fabric", "maven.modrinth", "prism-lib").version("$prism-fabric")

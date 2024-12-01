@@ -43,6 +43,8 @@ dependencies {
     modImplementation(catalog.toomanyplayers)
 
     modImplementation(catalog.axiom)
+
+    modImplementation(catalog.modernfix.fabric)
 }
 
 tasks {
