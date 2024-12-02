@@ -51,7 +51,7 @@ public abstract class PathPackResourcesMixin implements CachingPackResources {
         final String[] paths,
         final Operation<IoSupplier<InputStream>> original
     ) {
-        return lazyyyyy$cache.getResource(lazyyyyy$cache.getPath(paths));
+        return lazyyyyy$cache.getResource(lazyyyyy$cache.join(paths));
     }
 
     @WrapMethod(method = "listResources")

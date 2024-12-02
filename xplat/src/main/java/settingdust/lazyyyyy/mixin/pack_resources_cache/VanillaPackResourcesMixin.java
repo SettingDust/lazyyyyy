@@ -3,9 +3,10 @@ package settingdust.lazyyyyy.mixin.pack_resources_cache;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.BuiltInMetadata;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.PathPackResources;
+import net.minecraft.server.packs.VanillaPackResources;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,27 +17,33 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import settingdust.lazyyyyy.minecraft.CachingPackResources;
 import settingdust.lazyyyyy.minecraft.PackResourcesCache;
+import settingdust.lazyyyyy.minecraft.VanillaPackResourcesCache;
 
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-@Mixin(PathPackResources.class)
-public class PathPackResourcesMixin implements CachingPackResources {
+@Mixin(VanillaPackResources.class)
+public class VanillaPackResourcesMixin implements CachingPackResources {
     @Unique
-    private PackResourcesCache lazyyyyy$cache;
+    private VanillaPackResourcesCache lazyyyyy$cache;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void lazyyyyy$init(String string, Path path, boolean bl, final CallbackInfo ci) {
-        lazyyyyy$cache = new PackResourcesCache(path, (PackResources) this);
+    private void lazyyyyy$init(
+        BuiltInMetadata metadata,
+        Set<String> namespaces,
+        List<Path> rootPaths,
+        Map<PackType, List<Path>> pathsForType,
+        final CallbackInfo ci
+    ) {
+        lazyyyyy$cache = new VanillaPackResourcesCache(rootPaths, pathsForType, (PackResources) this);
     }
 
-    @WrapMethod(method = "getNamespaces")
-    private Set<String> lazyyyyy$getNamespaces(
-        final PackType packType,
-        final Operation<Set<String>> original
-    ) {
-        return lazyyyyy$cache.getNamespaces(packType);
+    @Override
+    public @NotNull PackResourcesCache getLazyyyyy$cache() {
+        return lazyyyyy$cache;
     }
 
     @WrapMethod(method = "getRootResource")
@@ -60,16 +67,11 @@ public class PathPackResourcesMixin implements CachingPackResources {
     @WrapMethod(method = "listResources")
     private void lazyyyyy$listResources(
         final PackType packType,
-        final String string,
-        final String string2,
+        final String namespace,
+        final String prefix,
         final PackResources.ResourceOutput resourceOutput,
         final Operation<Void> original
     ) {
-        lazyyyyy$cache.listResources(packType, string, string2, resourceOutput);
-    }
-
-    @Override
-    public @NotNull PackResourcesCache getLazyyyyy$cache() {
-        return lazyyyyy$cache;
+        lazyyyyy$cache.listResources(packType, namespace, prefix, resourceOutput);
     }
 }

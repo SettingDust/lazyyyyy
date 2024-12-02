@@ -56,7 +56,7 @@ public abstract class FilePackResourcesMixin implements CachingPackResources {
         final String string,
         final Operation<IoSupplier<InputStream>> original
     ) {
-        return lazyyyyy$cache.getResource(lazyyyyy$cache.getPath(string));
+        return lazyyyyy$cache.getResource(string);
     }
 
     @WrapMethod(method = "listResources")

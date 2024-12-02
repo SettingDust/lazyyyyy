@@ -44,7 +44,7 @@ public abstract class ModNioResourcePackMixin implements CachingPackResources {
         final String filename,
         final CallbackInfoReturnable<IoSupplier<InputStream>> cir
     ) {
-        var result = getLazyyyyy$cache().getResource(getLazyyyyy$cache().getPath(filename));
+        var result = getLazyyyyy$cache().getResource(filename);
         if (result != null) {
             cir.setReturnValue(result);
         }

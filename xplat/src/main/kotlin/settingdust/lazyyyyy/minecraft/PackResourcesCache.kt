@@ -17,7 +17,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.nio.file.FileVisitResult
 import java.nio.file.Path
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.fileVisitor
@@ -27,51 +26,107 @@ import kotlin.io.path.visitFileTree
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
-object PackResourcesCaches {
-    val tracked = Collections.synchronizedSet(Collections.newSetFromMap<PackResources>(WeakHashMap()))
-
-    fun track(packResources: PackResources) {
-        tracked += packResources
-    }
-
-    fun untrack(packResources: PackResources) {
-        tracked -= packResources
-    }
-
-    fun invalidate() {
-        synchronized(tracked) {
-            for (resources in tracked.toList()) {
-                resources.close()
-            }
-        }
-    }
-}
-
 interface CachingPackResources {
     val `lazyyyyy$cache`: PackResourcesCache
 }
 
-class PackResourcesCache(val root: Path, val pack: PackResources) {
-    companion object {
-        val JOINER = Joiner.on('/')
-
-        private val packTypeByDirectory = PackType.entries.associateByTo(Object2ReferenceOpenHashMap()) { it.directory }
-    }
-
-    val files: MutableMap<String, Path> = ConcurrentHashMap()
-    val directories: MutableMap<String, Path> = ConcurrentHashMap()
-    val directoryToFiles: MutableMap<String, MutableSet<Path>> = ConcurrentHashMap()
-    val namespaces: MutableMap<PackType, MutableSet<String>> = ConcurrentHashMap()
-
-    private val scope = CoroutineScope(Dispatchers.IO)
-    private val loadingJob = loadCache()
+class VanillaPackResourcesCache(
+    val rootPaths: List<Path>,
+    val pathsForType: Map<PackType, List<Path>>,
+    pack: PackResources
+) : PackResourcesCache(rootPaths[0], pack) {
+    override val files: MutableMap<String, Path> = ConcurrentHashMap()
+    override val namespacePaths: MutableMap<String, Path> = ConcurrentHashMap()
+    override val directoryToFiles: MutableMap<String, MutableSet<Path>> = ConcurrentHashMap()
 
     init {
         Lazyyyyy.logger.debug("Loading pack {}", pack, Throwable())
     }
 
     @OptIn(ExperimentalPathApi::class)
-    private fun loadCache() = scope.launch {
+    override fun loadCache() = scope.launch {
+        val time = measureTime {
+            val jobs = mutableListOf<Job>()
+            for ((type, roots) in pathsForType) {
+                for (root in roots) {
+                    root.visitFileTree(fileVisitor {
+                        onPreVisitDirectory { directory, attributes ->
+                            jobs.add(launch {
+                                if (directory.nameCount != 1) return@launch
+                                namespacePaths["${type.directory}/${directory.name}"] = directory
+                            })
+                            FileVisitResult.CONTINUE
+                        }
+
+                        onVisitFile { file, attributes ->
+                            jobs.add(launch {
+                                val relativePath = root.relativize(file)
+                                val pathString = JOINER.join(relativePath)
+                                files["${type.directory}/$pathString"] = file
+                                directoryToFiles.getOrPut("") { ConcurrentHashMap.newKeySet() }.add(file)
+                                if (relativePath.parent != null && relativePath.parent.nameCount != 0) {
+                                    var pathString =
+                                        StringBuilder("${type.directory}/${relativePath.parent.first().name}")
+                                    directoryToFiles.getOrPut(pathString.toString()) { ConcurrentHashMap.newKeySet() }
+                                        .add(file)
+                                    for (i in 1 until relativePath.parent.nameCount) {
+                                        val path = relativePath.parent.getName(i)
+                                        pathString.append('/').append(path.name)
+                                        directoryToFiles.getOrPut(pathString.toString()) { ConcurrentHashMap.newKeySet() }
+                                            .add(file)
+                                    }
+                                }
+                            })
+                            FileVisitResult.CONTINUE
+                        }
+                    })
+                }
+            }
+            for (root in rootPaths) {
+                root.visitFileTree(fileVisitor {
+                    onPreVisitDirectory { directory, attributes ->
+                        if (directory.nameCount == 1 && directory.name in PackResourcesCache.packTypeByDirectory) FileVisitResult.SKIP_SUBTREE
+                        else FileVisitResult.CONTINUE
+                    }
+
+                    onVisitFile { file, attributes ->
+                        jobs.add(launch {
+                            val relativePath = root.relativize(file)
+                            val pathString = JOINER.join(relativePath)
+                            files[pathString] = file
+                        })
+                        FileVisitResult.CONTINUE
+                    }
+                })
+            }
+            jobs.joinAll()
+        }
+        if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache vanilla pack ${pack.packId()} in $time")
+        else Lazyyyyy.logger.debug("Cache vanilla pack ${pack.packId()} in $time")
+    }
+}
+
+open class PackResourcesCache(val root: Path, val pack: PackResources) {
+    companion object {
+        val JOINER = Joiner.on('/')
+
+        val packTypeByDirectory = PackType.entries.associateByTo(Object2ReferenceOpenHashMap()) { it.directory }
+    }
+
+    open val files: MutableMap<String, Path> = ConcurrentHashMap()
+    open val namespacePaths: MutableMap<String, Path> = ConcurrentHashMap()
+    open val directoryToFiles: MutableMap<String, MutableSet<Path>> = ConcurrentHashMap()
+    val namespaces: MutableMap<PackType, MutableSet<String>> = ConcurrentHashMap()
+
+    val scope = CoroutineScope(Dispatchers.IO)
+    val loadingJob = loadCache()
+
+    init {
+        Lazyyyyy.logger.debug("Loading pack {}", pack, Throwable())
+    }
+
+    @OptIn(ExperimentalPathApi::class)
+    open fun loadCache() = scope.launch {
         val time = measureTime {
             val jobs = mutableListOf<Job>()
             root.visitFileTree(fileVisitor {
@@ -82,13 +137,12 @@ class PackResourcesCache(val root: Path, val pack: PackResources) {
                     val type = packTypeByDirectory[rootPath.name]
                     if (type == null) return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
                     jobs.add(launch {
-                        val path = JOINER.join(relativePath)
-                        directories[path] = directory
                         if (relativePath.nameCount != 2) return@launch
-                        val namespace = relativePath.name
+                        val path = JOINER.join(relativePath)
+                        namespacePaths[path] = directory
                         namespaces
                             .getOrPut(type) { ConcurrentHashMap.newKeySet() }
-                            .add(namespace)
+                            .add(relativePath.name)
                     })
                     FileVisitResult.CONTINUE
                 }
@@ -102,7 +156,8 @@ class PackResourcesCache(val root: Path, val pack: PackResources) {
                         if (relativePath.parent != null && relativePath.parent.nameCount != 0) {
                             var pathString = StringBuilder(relativePath.parent.first().name)
                             directoryToFiles.getOrPut(pathString.toString()) { ConcurrentHashMap.newKeySet() }.add(file)
-                            for (path in relativePath.parent.drop(1)) {
+                            for (i in 1 until relativePath.parent.nameCount) {
+                                val path = relativePath.parent.getName(i)
                                 pathString.append('/').append(path.name)
                                 directoryToFiles.getOrPut(pathString.toString()) { ConcurrentHashMap.newKeySet() }
                                     .add(file)
@@ -118,6 +173,12 @@ class PackResourcesCache(val root: Path, val pack: PackResources) {
         else Lazyyyyy.logger.debug("Cache pack ${pack.packId()} in $time")
     }
 
+    fun join(vararg paths: String) = when (paths.size) {
+        0 -> ""
+        1 -> paths[0]
+        else -> JOINER.join(paths)
+    }
+
     fun getPath(vararg paths: String) = when (paths.size) {
         0 -> root.fileSystem.getPath("")
         1 -> root.fileSystem.getPath(paths[0])
@@ -130,10 +191,15 @@ class PackResourcesCache(val root: Path, val pack: PackResources) {
     }
 
     fun getResource(
-        path: Path
+        type: PackType,
+        location: ResourceLocation,
+    ) = getResource("${type.directory}/${location.namespace}/${location.path}")
+
+    fun getResource(
+        path: String
     ): IoSupplier<InputStream>? {
         if (!loadingJob.isCompleted) runBlocking { loadingJob.join() }
-        val path = files[JOINER.join(path)] ?: return null
+        val path = files[path] ?: return null
         return try {
             IoSupplier.create(path)
         } catch (_: IOException) {
@@ -144,7 +210,7 @@ class PackResourcesCache(val root: Path, val pack: PackResources) {
     @OptIn(ExperimentalPathApi::class)
     fun listResources(type: PackType, namespace: String, prefix: String, output: PackResources.ResourceOutput) {
         if (!loadingJob.isCompleted) runBlocking { loadingJob.join() }
-        val namespacePath = directories["${type.directory}/$namespace"] ?: return
+        val namespacePath = namespacePaths["${type.directory}/$namespace"] ?: return
         val filesInDir = directoryToFiles["${type.directory}/$namespace/$prefix"] ?: return
         for (path in filesInDir) {
             val relativePath = path.relativeTo(namespacePath)
