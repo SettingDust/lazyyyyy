@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2024-12-02
+### :sparkles: New Features
+- [`564811f`](https://github.com/SettingDust/lazyyyyy/commit/564811fd4ac9223a97fc9e7445912b1b39228eb6) - **pack-resources-cache**: add cache for file, folder and folder on forge *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :bug: Bug Fixes
+- [`af5b176`](https://github.com/SettingDust/lazyyyyy/commit/af5b176f8635326edd9805bf302cb2e46a36cf09) - **lazy-entity-renderers**: don't add dummy renderer for normal entity *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`1347c9c`](https://github.com/SettingDust/lazyyyyy/commit/1347c9c2a9b96f2e7f04aba4aa34bd80d77306ef) - **yacl-lazy-animated-image**: load the image when render *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`d61f1c8`](https://github.com/SettingDust/lazyyyyy/commit/d61f1c83dc5150d37690fd074d80013bc494a7ab) - **pack-resources-cache**: actually working on Forge and Connector *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :zap: Performance Improvements
+- [`fbbfef1`](https://github.com/SettingDust/lazyyyyy/commit/fbbfef1118b1b30890e9f6fe8c55c7f666cab6ce) - **pack-resources-cache**: better performance for cache loader *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.4.0] - 2024-11-29
 ### :sparkles: New Features
 - [`df78ca3`](https://github.com/SettingDust/lazyyyyy/commit/df78ca36a2b5a00c23c8150969151ef0689116d0) - avoid duplicates in moremcmeta sprites queue *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -63,3 +76,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.1]: https://github.com/SettingDust/lazyyyyy/compare/0.3.0...0.3.1
 [0.3.2]: https://github.com/SettingDust/lazyyyyy/compare/0.3.1...0.3.2
 [0.4.0]: https://github.com/SettingDust/lazyyyyy/compare/0.3.2...0.4.0
+[0.5.0]: https://github.com/SettingDust/lazyyyyy/compare/0.4.1...0.5.0
