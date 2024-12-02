@@ -17,6 +17,8 @@ Take advantage from index for trading the cpu time with the memory and disk.
 - (Entity Sound Features) **Async sound event loading.**
     - Load when trying to play it. Won't play before loaded
 - (MoreMcmeta) Optimize the memory usage
+- Pack resource cache
+    - Like how ModernFix works but for more pack types.
   
   
 ![yourkit](https://www.yourkit.com/images/yklogo.png)  
