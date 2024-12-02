@@ -20,17 +20,21 @@ class AsyncImageRenderer(val original: Lazy<ImageRendererFactory.ImageSupplier>)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
+    private fun <T> getOrStart(completed: (ImageRenderer) -> T, loading: () -> T) = if (this.loading.isCompleted) {
+        completed(this.loading.getCompleted())
+    } else {
+        this.loading.start()
+        loading()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun render(
         graphics: GuiGraphics,
         x: Int,
         y: Int,
         renderWidth: Int,
         tickDelta: Float
-    ) = if (loading.isCompleted) {
-        loading.getCompleted().render(graphics, x, y, renderWidth, tickDelta)
-    } else {
-        0
-    }
+    ) = getOrStart({ loading.getCompleted().render(graphics, x, y, renderWidth, tickDelta) }, { 0 })
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun close() {
