@@ -45,6 +45,8 @@ dependencies {
     modImplementation(catalog.axiom)
 
     modImplementation(catalog.modernfix.fabric)
+
+    modImplementation(catalog.fusion.fabric)
 }
 
 tasks {

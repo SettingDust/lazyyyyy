@@ -117,6 +117,10 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     val zeta = "1.20.1-1.0-24"
     library("zeta", "maven.modrinth", "zeta").version(zeta)
+
+    val fusion = "1.1.1"
+    library("fusion-fabric", "maven.modrinth", "fusion-connected-textures").version("$fusion-fabric-mc1.20.1")
+    library("fusion-forge", "maven.modrinth", "fusion-connected-textures").version("$fusion-forge-mc1.20.1")
 }
 
 plugins {

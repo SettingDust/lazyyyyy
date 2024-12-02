@@ -1,14 +1,10 @@
 package settingdust.lazyyyyy.minecraft
 
 import com.google.common.base.Joiner
-import it.unimi.dsi.fastutil.objects.Object2ReferenceMaps
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
-import it.unimi.dsi.fastutil.objects.ObjectArrayList
-import it.unimi.dsi.fastutil.objects.ObjectLists
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -64,13 +60,15 @@ class PackResourcesCache(val root: Path, val pack: PackResources) {
 
     val files: MutableMap<String, Path> = ConcurrentHashMap()
     val directories: MutableMap<String, Path> = ConcurrentHashMap()
-    val directoryToFiles: MutableMap<String, MutableList<Path>> =
-        Object2ReferenceMaps.synchronize(Object2ReferenceOpenHashMap())
-    val namespaces: MutableMap<PackType, MutableSet<String>> =
-        Collections.synchronizedMap(EnumMap(PackType::class.java))
+    val directoryToFiles: MutableMap<String, MutableSet<Path>> = ConcurrentHashMap()
+    val namespaces: MutableMap<PackType, MutableSet<String>> = ConcurrentHashMap()
 
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.IO)
     private val loadingJob = loadCache()
+
+    init {
+        Lazyyyyy.logger.debug("Loading pack {}", pack, Throwable())
+    }
 
     @OptIn(ExperimentalPathApi::class)
     private fun loadCache() = scope.launch {
@@ -89,7 +87,7 @@ class PackResourcesCache(val root: Path, val pack: PackResources) {
                         if (relativePath.nameCount != 2) return@launch
                         val namespace = relativePath.name
                         namespaces
-                            .getOrPut(type) { Collections.newSetFromMap(ConcurrentHashMap()) }
+                            .getOrPut(type) { ConcurrentHashMap.newKeySet() }
                             .add(namespace)
                     })
                     FileVisitResult.CONTINUE
@@ -100,11 +98,14 @@ class PackResourcesCache(val root: Path, val pack: PackResources) {
                         val relativePath = root.relativize(file)
                         val pathString = JOINER.join(relativePath)
                         files[pathString] = file
-                        directoryToFiles.getOrPut("") { ObjectLists.synchronize(ObjectArrayList()) }.add(file)
-                        if (relativePath.parent != null) {
-                            for (i in 1..relativePath.parent.nameCount) {
-                                val path = JOINER.join(relativePath.parent.subpath(0, i))
-                                directoryToFiles.getOrPut(path) { ObjectLists.synchronize(ObjectArrayList()) }.add(file)
+                        directoryToFiles.getOrPut("") { ConcurrentHashMap.newKeySet() }.add(file)
+                        if (relativePath.parent != null && relativePath.parent.nameCount != 0) {
+                            var pathString = StringBuilder(relativePath.parent.first().name)
+                            directoryToFiles.getOrPut(pathString.toString()) { ConcurrentHashMap.newKeySet() }.add(file)
+                            for (path in relativePath.parent.drop(1)) {
+                                pathString.append('/').append(path.name)
+                                directoryToFiles.getOrPut(pathString.toString()) { ConcurrentHashMap.newKeySet() }
+                                    .add(file)
                             }
                         }
                     })
@@ -124,14 +125,14 @@ class PackResourcesCache(val root: Path, val pack: PackResources) {
     }
 
     fun getNamespaces(type: PackType): Set<String> {
-        runBlocking { loadingJob.join() }
+        if (!loadingJob.isCompleted) runBlocking { loadingJob.join() }
         return namespaces[type] ?: emptySet()
     }
 
     fun getResource(
         path: Path
     ): IoSupplier<InputStream>? {
-        runBlocking { loadingJob.join() }
+        if (!loadingJob.isCompleted) runBlocking { loadingJob.join() }
         val path = files[JOINER.join(path)] ?: return null
         return try {
             IoSupplier.create(path)
@@ -142,7 +143,7 @@ class PackResourcesCache(val root: Path, val pack: PackResources) {
 
     @OptIn(ExperimentalPathApi::class)
     fun listResources(type: PackType, namespace: String, prefix: String, output: PackResources.ResourceOutput) {
-        runBlocking { loadingJob.join() }
+        if (!loadingJob.isCompleted) runBlocking { loadingJob.join() }
         val namespacePath = directories["${type.directory}/$namespace"] ?: return
         val filesInDir = directoryToFiles["${type.directory}/$namespace/$prefix"] ?: return
         for (path in filesInDir) {

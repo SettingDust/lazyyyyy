@@ -44,6 +44,8 @@ dependencies {
     implementation(catalog.axiom)
 
     modImplementation(catalog.modernfix.forge)
+
+    modImplementation(catalog.fusion.forge)
 }
 
 sourceSets {
