@@ -24,5 +24,6 @@
         "lazy_entity_renderers.BlockEntityRenderersMixin",
         "lazy_entity_renderers.EntityRenderersMixin",
         "moremcmeta.avoid_duplicate_sprites.TextureAtlasMixin"
-    ]
+    ],
+    "defaultRequire": 1
 }

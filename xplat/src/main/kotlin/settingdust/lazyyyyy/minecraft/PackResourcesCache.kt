@@ -18,6 +18,7 @@ import net.minecraft.server.packs.PackType
 import net.minecraft.server.packs.resources.IoSupplier
 import settingdust.lazyyyyy.Lazyyyyy
 import java.io.IOException
+import java.io.InputStream
 import java.nio.file.FileVisitResult
 import java.nio.file.Path
 import java.util.*
@@ -30,7 +31,7 @@ import kotlin.io.path.visitFileTree
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
-object PackResourcesCache {
+object PackResourcesCaches {
     val tracked = Collections.synchronizedSet(Collections.newSetFromMap<PackResources>(WeakHashMap()))
 
     fun track(packResources: PackResources) {
@@ -50,7 +51,11 @@ object PackResourcesCache {
     }
 }
 
-class CachingPackResources(val root: Path, val pack: PackResources) {
+interface CachingPackResources {
+    val `lazyyyyy$cache`: PackResourcesCache
+}
+
+class PackResourcesCache(val root: Path, val pack: PackResources) {
     companion object {
         val JOINER = Joiner.on('/')
 
@@ -73,12 +78,15 @@ class CachingPackResources(val root: Path, val pack: PackResources) {
             val jobs = mutableListOf<Job>()
             root.visitFileTree(fileVisitor {
                 onPreVisitDirectory { directory, attributes ->
+                    val relativePath = root.relativize(directory)
+                    val rootPath = relativePath.firstOrNull() ?: return@onPreVisitDirectory FileVisitResult.CONTINUE
+                    if (rootPath.name.isEmpty()) return@onPreVisitDirectory FileVisitResult.CONTINUE
+                    val type = packTypeByDirectory[rootPath.name]
+                    if (type == null) return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
                     jobs.add(launch {
-                        val relativePath = root.relativize(directory)
                         val path = JOINER.join(relativePath)
                         directories[path] = directory
                         if (relativePath.nameCount != 2) return@launch
-                        val type = packTypeByDirectory[relativePath.first().name] ?: return@launch
                         val namespace = relativePath.name
                         namespaces
                             .getOrPut(type) { Collections.newSetFromMap(ConcurrentHashMap()) }
@@ -115,17 +123,17 @@ class CachingPackResources(val root: Path, val pack: PackResources) {
         else -> root.fileSystem.getPath(paths[0], *paths.drop(1).toTypedArray())
     }
 
-    fun getNamespaces(type: PackType) = runBlocking(scope.coroutineContext) {
-        loadingJob.join()
-        namespaces[type] ?: emptySet()
+    fun getNamespaces(type: PackType): Set<String> {
+        runBlocking { loadingJob.join() }
+        return namespaces[type] ?: emptySet()
     }
 
     fun getResource(
         path: Path
-    ) = runBlocking(scope.coroutineContext) {
-        loadingJob.join()
-        val path = files[JOINER.join(path)] ?: return@runBlocking null
-        try {
+    ): IoSupplier<InputStream>? {
+        runBlocking { loadingJob.join() }
+        val path = files[JOINER.join(path)] ?: return null
+        return try {
             IoSupplier.create(path)
         } catch (_: IOException) {
             null
@@ -133,21 +141,19 @@ class CachingPackResources(val root: Path, val pack: PackResources) {
     }
 
     @OptIn(ExperimentalPathApi::class)
-    fun listResources(type: PackType, namespace: String, prefix: String, output: PackResources.ResourceOutput) =
-        runBlocking(scope.coroutineContext) {
-            loadingJob.join()
-            val dirName = "${type.directory}/$namespace/$prefix"
-            val dir = directories[dirName] ?: return@runBlocking
-            val filesInDir = directoryToFiles[dirName] ?: return@runBlocking
-            for (path in filesInDir) {
-                val relativePath = path.relativeTo(dir)
-                val relativeString = JOINER.join(relativePath)
-                val location = ResourceLocation.tryBuild(namespace, relativeString)
-                if (location != null) {
-                    output.accept(location, IoSupplier.create(path))
-                } else {
-                    Lazyyyyy.logger.warn("Invalid path in pack: $namespace:$path, ignoring")
-                }
+    fun listResources(type: PackType, namespace: String, prefix: String, output: PackResources.ResourceOutput) {
+        runBlocking { loadingJob.join() }
+        val namespacePath = directories["${type.directory}/$namespace"] ?: return
+        val filesInDir = directoryToFiles["${type.directory}/$namespace/$prefix"] ?: return
+        for (path in filesInDir) {
+            val relativePath = path.relativeTo(namespacePath)
+            val relativeString = JOINER.join(relativePath)
+            val location = ResourceLocation.tryBuild(namespace, relativeString)
+            if (location != null) {
+                output.accept(location, IoSupplier.create(path))
+            } else {
+                Lazyyyyy.logger.warn("Invalid path $namespace:$path in pack ${pack.packId()}, ignoring")
             }
         }
+    }
 }
