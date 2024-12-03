@@ -2,7 +2,6 @@ package settingdust.lazyyyyy.minecraft
 
 import com.google.common.base.Joiner
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -30,13 +29,91 @@ interface CachingPackResources {
     val `lazyyyyy$cache`: PackResourcesCache
 }
 
-class VanillaPackResourcesCache(
-    roots: List<Path>,
-    val pathsForType: Map<PackType, List<Path>>,
-    pack: PackResources
-) : PackResourcesCache(roots, pack) {
+abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>) {
+    companion object {
+        val JOINER = Joiner.on('/')
+
+        val packTypeByDirectory = PackType.entries.associateByTo(Object2ReferenceOpenHashMap()) { it.directory }
+    }
+
+    protected abstract val loadingJob: Job
+
+    val files: MutableMap<String, Path> = Object2ReferenceOpenHashMap()
+    val namespacePaths: MutableMap<String, MutableSet<Path>> = Object2ReferenceOpenHashMap()
+    val directoryToFiles: MutableMap<String, MutableSet<Path>> = Object2ReferenceOpenHashMap()
+    val namespaces: MutableMap<PackType, MutableSet<String>> = Object2ReferenceOpenHashMap()
+
+    protected val scope = CoroutineScope(Dispatchers.IO)
+
+    init {
+        Lazyyyyy.logger.debug("Loading pack {} {}", pack.packId(), pack, Throwable())
+    }
+
+    fun join(vararg paths: String) = when (paths.size) {
+        0 -> ""
+        1 -> paths[0]
+        else -> JOINER.join(paths)
+    }!!
+
+    fun getNamespaces(type: PackType): Set<String> {
+        if (!loadingJob.isCompleted) runBlocking { loadingJob.join() }
+        return namespaces[type] ?: emptySet()
+    }
+
+    fun getResource(
+        type: PackType,
+        location: ResourceLocation,
+    ) = getResource("${type.directory}/${location.namespace}/${location.path}")
+
+    fun getResource(
+        path: String
+    ): IoSupplier<InputStream>? {
+        if (!loadingJob.isCompleted) runBlocking { loadingJob.join() }
+        val path = files[path] ?: return null
+        return try {
+            IoSupplier.create(path)
+        } catch (_: IOException) {
+            null
+        }
+    }
+
     @OptIn(ExperimentalPathApi::class)
-    override fun loadCache() = scope.launch {
+    fun listResources(type: PackType, namespace: String, prefix: String, output: PackResources.ResourceOutput) {
+        if (!loadingJob.isCompleted) runBlocking { loadingJob.join() }
+        val namespacePath = namespacePaths["${type.directory}/$namespace"] ?: return
+        val filesInDir = directoryToFiles["${type.directory}/$namespace/$prefix"] ?: return
+        for (path in filesInDir) {
+            val relativePath = namespacePath.firstNotNullOfOrNull {
+                try {
+                    it.relativize(path)
+                } catch (_: IllegalArgumentException) {
+                    null
+                }
+            } ?: error("Can't find namespace path for $path in pack ${pack.packId()}")
+            val relativeString = JOINER.join(relativePath)
+            val location = ResourceLocation.tryBuild(namespace, relativeString)
+            if (location != null) {
+                output.accept(location, IoSupplier.create(path))
+            } else {
+                Lazyyyyy.logger.warn("Invalid path $namespace:$path in pack ${pack.packId()}, ignoring")
+            }
+        }
+    }
+}
+
+class VanillaPackResourcesCache(
+    pack: PackResources,
+    roots: List<Path>,
+    val pathsForType: Map<PackType, List<Path>>
+) : PackResourcesCache(pack, roots) {
+    override val loadingJob: Job
+
+    init {
+        loadingJob = loadCache()
+    }
+
+    @OptIn(ExperimentalPathApi::class)
+    fun loadCache() = scope.launch {
         val time = measureTime {
             val jobs = mutableListOf<Job>()
             val files: MutableMap<String, Path> = ConcurrentHashMap()
@@ -113,29 +190,13 @@ class VanillaPackResourcesCache(
     }
 }
 
-open class PackResourcesCache(val roots: List<Path>, val pack: PackResources) {
-    companion object {
-        val JOINER = Joiner.on('/')
+open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : PackResourcesCache(pack, roots) {
+    constructor(root: Path, pack: PackResources) : this(pack, listOf(root))
 
-        val packTypeByDirectory = PackType.entries.associateByTo(Object2ReferenceOpenHashMap()) { it.directory }
-    }
-
-    constructor(root: Path, pack: PackResources) : this(listOf(root), pack)
-
-    val files: MutableMap<String, Path> = Object2ReferenceOpenHashMap()
-    val namespacePaths: MutableMap<String, MutableSet<Path>> = Object2ReferenceOpenHashMap()
-    val directoryToFiles: MutableMap<String, MutableSet<Path>> = Object2ReferenceOpenHashMap()
-    val namespaces: MutableMap<PackType, MutableSet<String>> = Reference2ReferenceOpenHashMap()
-
-    val scope = CoroutineScope(Dispatchers.IO)
-    val loadingJob = loadCache()
-
-    init {
-        Lazyyyyy.logger.debug("Loading pack {}", pack, Throwable())
-    }
+    override val loadingJob = loadCache()
 
     @OptIn(ExperimentalPathApi::class)
-    open fun loadCache() = scope.launch {
+    fun loadCache() = scope.launch {
         val time = measureTime {
             val jobs = mutableListOf<Job>()
             val files: MutableMap<String, Path> = ConcurrentHashMap()
@@ -182,63 +243,12 @@ open class PackResourcesCache(val roots: List<Path>, val pack: PackResources) {
             }
             jobs.joinAll()
 
-            this@PackResourcesCache.files.putAll(files)
-            this@PackResourcesCache.namespacePaths.putAll(namespacePaths)
-            this@PackResourcesCache.directoryToFiles.putAll(directoryToFiles)
-            this@PackResourcesCache.namespaces.putAll(namespaces)
+            this@SimplePackResourcesCache.files.putAll(files)
+            this@SimplePackResourcesCache.namespacePaths.putAll(namespacePaths)
+            this@SimplePackResourcesCache.directoryToFiles.putAll(directoryToFiles)
+            this@SimplePackResourcesCache.namespaces.putAll(namespaces)
         }
         if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache pack ${pack.packId()} in $time")
         else Lazyyyyy.logger.debug("Cache pack ${pack.packId()} in $time")
-    }
-
-    fun join(vararg paths: String) = when (paths.size) {
-        0 -> ""
-        1 -> paths[0]
-        else -> JOINER.join(paths)
-    }
-
-    fun getNamespaces(type: PackType): Set<String> {
-        if (!loadingJob.isCompleted) runBlocking { loadingJob.join() }
-        return namespaces[type] ?: emptySet()
-    }
-
-    fun getResource(
-        type: PackType,
-        location: ResourceLocation,
-    ) = getResource("${type.directory}/${location.namespace}/${location.path}")
-
-    fun getResource(
-        path: String
-    ): IoSupplier<InputStream>? {
-        if (!loadingJob.isCompleted) runBlocking { loadingJob.join() }
-        val path = files[path] ?: return null
-        return try {
-            IoSupplier.create(path)
-        } catch (_: IOException) {
-            null
-        }
-    }
-
-    @OptIn(ExperimentalPathApi::class)
-    fun listResources(type: PackType, namespace: String, prefix: String, output: PackResources.ResourceOutput) {
-        if (!loadingJob.isCompleted) runBlocking { loadingJob.join() }
-        val namespacePath = namespacePaths["${type.directory}/$namespace"] ?: return
-        val filesInDir = directoryToFiles["${type.directory}/$namespace/$prefix"] ?: return
-        for (path in filesInDir) {
-            val relativePath = namespacePath.firstNotNullOfOrNull {
-                try {
-                    it.relativize(path)
-                } catch (_: IllegalArgumentException) {
-                    null
-                }
-            } ?: error("Can't find namespace path for $path in pack ${pack.packId()}")
-            val relativeString = JOINER.join(relativePath)
-            val location = ResourceLocation.tryBuild(namespace, relativeString)
-            if (location != null) {
-                output.accept(location, IoSupplier.create(path))
-            } else {
-                Lazyyyyy.logger.warn("Invalid path $namespace:$path in pack ${pack.packId()}, ignoring")
-            }
-        }
     }
 }

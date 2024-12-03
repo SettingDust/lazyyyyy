@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import settingdust.lazyyyyy.minecraft.CachingPackResources;
-import settingdust.lazyyyyy.minecraft.PackResourcesCache;
+import settingdust.lazyyyyy.minecraft.SimplePackResourcesCache;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,12 +31,12 @@ public abstract class FilePackResourcesMixin implements CachingPackResources {
     private File file;
 
     @Unique
-    private PackResourcesCache lazyyyyy$cache;
+    private SimplePackResourcesCache lazyyyyy$cache;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void lazyyyyy$init(final CallbackInfo ci) throws IOException {
         //        PackResourcesCache.INSTANCE.track((PackResources) this);
-        lazyyyyy$cache = new PackResourcesCache(
+        lazyyyyy$cache = new SimplePackResourcesCache(
             FileSystems.newFileSystem(file.toPath()).getPath(""),
             (PackResources) this
         );
@@ -71,7 +71,7 @@ public abstract class FilePackResourcesMixin implements CachingPackResources {
     }
 
     @Override
-    public @NotNull PackResourcesCache getLazyyyyy$cache() {
+    public @NotNull SimplePackResourcesCache getLazyyyyy$cache() {
         return lazyyyyy$cache;
     }
 }

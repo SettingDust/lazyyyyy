@@ -38,7 +38,7 @@ public class VanillaPackResourcesMixin implements CachingPackResources {
         Map<PackType, List<Path>> pathsForType,
         final CallbackInfo ci
     ) {
-        lazyyyyy$cache = new VanillaPackResourcesCache(rootPaths, pathsForType, (PackResources) this);
+        lazyyyyy$cache = new VanillaPackResourcesCache((PackResources) this, rootPaths, pathsForType);
     }
 
     @Override

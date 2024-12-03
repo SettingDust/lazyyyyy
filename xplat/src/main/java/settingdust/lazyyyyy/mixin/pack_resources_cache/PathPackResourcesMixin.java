@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import settingdust.lazyyyyy.minecraft.CachingPackResources;
-import settingdust.lazyyyyy.minecraft.PackResourcesCache;
+import settingdust.lazyyyyy.minecraft.SimplePackResourcesCache;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -24,11 +24,11 @@ import java.util.Set;
 @Mixin(PathPackResources.class)
 public class PathPackResourcesMixin implements CachingPackResources {
     @Unique
-    private PackResourcesCache lazyyyyy$cache;
+    private SimplePackResourcesCache lazyyyyy$cache;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void lazyyyyy$init(String string, Path path, boolean bl, final CallbackInfo ci) {
-        lazyyyyy$cache = new PackResourcesCache(path, (PackResources) this);
+        lazyyyyy$cache = new SimplePackResourcesCache(path, (PackResources) this);
     }
 
     @WrapMethod(method = "getNamespaces")
@@ -69,7 +69,7 @@ public class PathPackResourcesMixin implements CachingPackResources {
     }
 
     @Override
-    public @NotNull PackResourcesCache getLazyyyyy$cache() {
+    public @NotNull SimplePackResourcesCache getLazyyyyy$cache() {
         return lazyyyyy$cache;
     }
 }
