@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2024-12-03
+### :sparkles: New Features
+- [`4d0a516`](https://github.com/SettingDust/lazyyyyy/commit/4d0a5166c5e981ca0f4165001f2a3dda2d48199c) - **pack-resources-cache**: add cache for vanilla pack resource *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :bug: Bug Fixes
+- [`593472c`](https://github.com/SettingDust/lazyyyyy/commit/593472c07ea2cfb60c460e0a04cc2759f3623281) - runnable without ModernFix *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`25cedd1`](https://github.com/SettingDust/lazyyyyy/commit/25cedd150b38e682dccad08b787ce77ba44a76a5) - **pack-resources-cache**: respect the roots order for files *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :zap: Performance Improvements
+- [`4c52270`](https://github.com/SettingDust/lazyyyyy/commit/4c522702547f29d27028257239a710f209b215e6) - **pack-resources-cache**: optimize the cache loader *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.5.0] - 2024-12-02
 ### :sparkles: New Features
 - [`564811f`](https://github.com/SettingDust/lazyyyyy/commit/564811fd4ac9223a97fc9e7445912b1b39228eb6) - **pack-resources-cache**: add cache for file, folder and folder on forge *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -77,3 +89,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.2]: https://github.com/SettingDust/lazyyyyy/compare/0.3.1...0.3.2
 [0.4.0]: https://github.com/SettingDust/lazyyyyy/compare/0.3.2...0.4.0
 [0.5.0]: https://github.com/SettingDust/lazyyyyy/compare/0.4.1...0.5.0
+[0.5.1]: https://github.com/SettingDust/lazyyyyy/compare/0.5.0...0.5.1
