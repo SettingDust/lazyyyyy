@@ -16,7 +16,7 @@ public class UsesForCursesModule_ClientMixin {
     @WrapMethod(method = "modelLayers", remap = false)
     private void lazyyyyy$avoidAddIfDummy(final ZAddModelLayers event, final Operation<Void> original) {
         var renderer = (EntityRenderer<?>) event.getRenderer(EntityType.ARMOR_STAND);
-        if (renderer instanceof DummyLivingEntityRenderer) return;
+        if (renderer == null || renderer instanceof DummyLivingEntityRenderer) return;
         original.call(event);
     }
 }
