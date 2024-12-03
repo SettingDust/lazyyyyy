@@ -66,7 +66,9 @@ class VanillaPackResourcesCache(
                             jobs.add(launch {
                                 val relativePath = root.relativize(file)
                                 val pathString = JOINER.join(relativePath)
-                                files["${type.directory}/$pathString"] = file
+                                val fileKey = "${type.directory}/$pathString"
+                                if (fileKey in files) return@launch
+                                files[fileKey] = file
                                 if (relativePath.nameCount >= 2) {
                                     var pathString = StringBuilder(type.directory)
                                     for (i in 0 until relativePath.nameCount - 1) {
