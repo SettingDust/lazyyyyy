@@ -13,7 +13,6 @@
         "lazy_entity_renderers.EntityRendererAccessor",
         "pack_resources_cache.FilePackResourcesMixin",
         "pack_resources_cache.PathPackResourcesMixin",
-        "pack_resources_cache.SimpleReloadInstanceMixin",
         "pack_resources_cache.VanillaPackResourcesMixin",
         "toomanyplayers.async_networking.TooManyPlayersMixin",
         "yacl.lazy_animated_image.AnimatedDynamicTextureImageMixin"

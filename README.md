@@ -18,7 +18,7 @@ Take advantage from index for trading the cpu time with the memory and disk.
     - Load when trying to play it. Won't play before loaded
 - (MoreMcmeta) Optimize the memory usage
 - Pack resource cache
-    - Like how ModernFix works but for more pack types.
+    - Like how ModernFix works but for more pack types. Will disable the same function in ModernFix.
   
   
 ![yourkit](https://www.yourkit.com/images/yklogo.png)  
