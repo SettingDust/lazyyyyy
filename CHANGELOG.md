@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.2] - 2024-12-03
+### :recycle: Refactors
+- [`04219fe`](https://github.com/SettingDust/lazyyyyy/commit/04219fe5a5ac48751cd1b8aeaffbe556f4e5c0ea) - **pack-resources-cache**: move cache shared logic to new abstract class *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.5.1] - 2024-12-03
 ### :sparkles: New Features
 - [`4d0a516`](https://github.com/SettingDust/lazyyyyy/commit/4d0a5166c5e981ca0f4165001f2a3dda2d48199c) - **pack-resources-cache**: add cache for vanilla pack resource *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -90,3 +95,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.4.0]: https://github.com/SettingDust/lazyyyyy/compare/0.3.2...0.4.0
 [0.5.0]: https://github.com/SettingDust/lazyyyyy/compare/0.4.1...0.5.0
 [0.5.1]: https://github.com/SettingDust/lazyyyyy/compare/0.5.0...0.5.1
+[0.5.2]: https://github.com/SettingDust/lazyyyyy/compare/0.5.1...0.5.2
