@@ -17,17 +17,42 @@ dependencies {
     forge(catalog.lexforge)
     minecraft(catalog.minecraft)
     mappings(loom.officialMojangMappings())
+}
 
-    implementation(catalog.mixinextras.common)
-    annotationProcessor(catalog.mixinextras.common)
+loom {
+    accessWidenerPath = project(":xplat").file("src/main/resources/$id.accesswidener")
 
-    implementation(project(":xplat", "namedElements")) { isTransitive = false }
+    forge {
+        convertAccessWideners = true
+
+        mixinConfig("$id.forge.mixins.json")
+    }
+
+    addRemapConfiguration("modForgeRuntimeLibrary") {
+        targetConfigurationName = "forgeRuntimeLibrary"
+        onCompileClasspath = true
+        onRuntimeClasspath = true
+    }
+
+// TODO https://github.com/architectury/architectury-loom/issues/242
+//    mixin {
+//        defaultRefmapName = "$id.forge.refmap.json"
+//    }
+}
+
+dependencies {
+    catalog.mixinextras.common.let {
+        compileOnly(it)
+        annotationProcessor(it)
+    }
+
+    implementation(catalog.mixinextras.lexforge)
+
+    implementation(project(":xplat:xplat-lexforge", "namedElements")) { isTransitive = false }
     include(project(":xplat:xplat-lexforge")) { isTransitive = false }
 
-    minecraftLibraries(catalog.sinytra.connector)
-    modImplementation(catalog.forgified.fabric.api) {
-        exclude(module = "fabric-loader")
-    }
+    modImplementation(catalog.sinytra.connector)
+    modImplementation(catalog.forgified.fabric.api) { exclude(module = "fabric-loader") }
     implementation(catalog.kotlin.forge)
 
     catalog.mixin.constraints.let {
@@ -49,20 +74,6 @@ dependencies {
     modImplementation(catalog.zeta)
 
     modImplementation(catalog.bigbrain)
-}
-
-loom {
-    accessWidenerPath = project(":xplat").file("src/main/resources/$id.accesswidener")
-
-    forge {
-        convertAccessWideners = true
-
-        mixinConfig("$id.forge.mixins.json")
-    }
-// TODO https://github.com/architectury/architectury-loom/issues/242
-//    mixin {
-//        defaultRefmapName = "$id.forge.refmap.json"
-//    }
 }
 
 tasks {

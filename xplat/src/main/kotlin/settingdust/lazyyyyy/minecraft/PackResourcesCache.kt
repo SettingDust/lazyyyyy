@@ -104,12 +104,14 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
 class VanillaPackResourcesCache(
     pack: PackResources,
     roots: List<Path>,
-    val pathsForType: Map<PackType, List<Path>>
+    pathsForType: Map<PackType, List<Path>>
 ) : PackResourcesCache(pack, roots) {
     override val loadingJob: Job
+    private val pathsForType: Map<PackType, List<Path>>
 
     init {
         loadingJob = loadCache()
+        this.pathsForType = pathsForType
     }
 
     @OptIn(ExperimentalPathApi::class)
@@ -146,11 +148,10 @@ class VanillaPackResourcesCache(
                                 val fileKey = "${type.directory}/$pathString"
                                 if (fileKey in files) return@launch
                                 files[fileKey] = file
-                                if (relativePath.nameCount >= 2) {
-                                    var pathString = StringBuilder(type.directory)
-                                    for (i in 0 until relativePath.nameCount - 1) {
-                                        val path = relativePath.getName(i)
-                                        pathString.append('/').append(path.name)
+                                if (relativePath.nameCount >= 3) {
+                                    var pathString = StringBuilder(type.directory).append('/').append(relativePath.getName(0).name)
+                                    for (i in 1 until relativePath.nameCount - 1) {
+                                        pathString.append('/').append(relativePath.getName(i).name)
                                         directoryToFiles.getOrPut(pathString.toString()) { ConcurrentHashMap.newKeySet() }
                                             .add(file)
                                     }
@@ -227,9 +228,9 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                             val relativePath = root.relativize(file)
                             val pathString = JOINER.join(relativePath)
                             files[pathString] = file
-                            if (relativePath.nameCount >= 3) {
-                                var pathString = StringBuilder(relativePath.getName(0).name)
-                                for (i in 1 until relativePath.nameCount - 1) {
+                            if (relativePath.nameCount >= 4) {
+                                var pathString = StringBuilder(relativePath.getName(0).name).append('/').append(relativePath.getName(1).name)
+                                for (i in 2 until relativePath.nameCount - 1) {
                                     val path = relativePath.getName(i)
                                     pathString.append('/').append(path.name)
                                     directoryToFiles.getOrPut(pathString.toString()) { ConcurrentHashMap.newKeySet() }
