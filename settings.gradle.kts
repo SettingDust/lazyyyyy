@@ -121,6 +121,8 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     val fusion = "1.1.1"
     library("fusion-fabric", "maven.modrinth", "fusion-connected-textures").version("$fusion-fabric-mc1.20.1")
     library("fusion-forge", "maven.modrinth", "fusion-connected-textures").version("$fusion-forge-mc1.20.1")
+
+    library("bigbrain", "maven.modrinth", "big-brain").version("1.20.1-1.7.4")
 }
 
 plugins {

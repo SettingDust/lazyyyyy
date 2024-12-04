@@ -23,10 +23,7 @@ public final class FasterClassProviderWrapper implements IClassProvider {
      */
     @Override
     public Class<?> findClass(final String name, final boolean initialize) throws ClassNotFoundException {
-        var clazz = wrapped.findClass(
-            name,
-            initialize
-        );
+        var clazz = wrapped.findClass(name, initialize);
         var isPluginClazz = clazz.isInstance(IMixinConfigPlugin.class);
         if (!isPluginClazz) return clazz;
         var stackTrace = Thread.currentThread().getStackTrace();
@@ -42,7 +39,12 @@ public final class FasterClassProviderWrapper implements IClassProvider {
             for (final var config : configs) {
                 FasterMixinServiceWrapper.configToRefmap.computeIfAbsent(
                     config, (ignored) -> {
-                        FasterMixinServiceWrapper.LOGGER.debug("Config {} find refmap {} from plugin {}", config.getName(), refmap, name);
+                        FasterMixinServiceWrapper.LOGGER.debug(
+                            "Config {} find refmap {} from plugin {}",
+                            config.getName(),
+                            refmap,
+                            name
+                        );
                         return refmap;
                     }
                 );

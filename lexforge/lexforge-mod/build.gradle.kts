@@ -47,6 +47,8 @@ dependencies {
 
     modImplementation(catalog.quark)
     modImplementation(catalog.zeta)
+
+    modImplementation(catalog.bigbrain)
 }
 
 loom {
