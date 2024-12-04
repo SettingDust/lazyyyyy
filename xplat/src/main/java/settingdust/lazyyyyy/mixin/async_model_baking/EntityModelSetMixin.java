@@ -15,6 +15,6 @@ public class EntityModelSetMixin {
         final ModelLayerLocation modelLayerLocation,
         final Operation<ModelPart> original
     ) {
-        return new AsyncModelPart(() -> original.call(modelLayerLocation));
+        return new AsyncModelPart(modelLayerLocation, () -> original.call(modelLayerLocation));
     }
 }

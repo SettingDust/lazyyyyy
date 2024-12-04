@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import net.minecraft.client.model.geom.ModelLayerLocation
 import net.minecraft.client.model.geom.ModelPart
 import net.minecraft.client.model.geom.PartPose
 import net.minecraft.util.RandomSource
@@ -13,11 +14,14 @@ import settingdust.lazyyyyy.Lazyyyyy
 import kotlin.time.measureTimedValue
 
 @Suppress("UsePropertyAccessSyntax", "HasPlatformType")
-class AsyncModelPart(val provider: () -> ModelPart) : ModelPart(emptyList(), emptyMap()) {
+class AsyncModelPart(
+    val location: ModelLayerLocation,
+    val provider: () -> ModelPart
+) : ModelPart(emptyList(), emptyMap()) {
     private val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) { provider() }
     val wrapped by lazy {
         val value = measureTimedValue { runBlocking { loading.await() } }
-        Lazyyyyy.logger.debug("ModelPart {} loaded in {}ms", value.value, value.duration)
+        Lazyyyyy.logger.debug("ModelPart {} loaded in {}", location, value.duration)
         value.value
     }
 
