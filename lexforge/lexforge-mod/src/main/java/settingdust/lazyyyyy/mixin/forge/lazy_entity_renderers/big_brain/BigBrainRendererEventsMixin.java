@@ -17,17 +17,20 @@ import tallestegg.bigbrain.client.renderers.layers.DrownedGlowLayer;
 public class BigBrainRendererEventsMixin {
     @WrapWithCondition(
         method = "addRenderLayers",
+        remap = false,
         at = @At(
             value = "INVOKE",
+            remap = true,
             target = "Lnet/minecraft/client/renderer/entity/DrownedRenderer;addLayer(Lnet/minecraft/client/renderer/entity/layers/RenderLayer;)Z"
         )
     )
-    private static boolean lazyyyyy$cancelAddIfNull(final DrownedRenderer instance, final RenderLayer renderLayer) {
+    private static boolean lazyyyyy$cancelAddIfNull(final DrownedRenderer instance, final RenderLayer<?, ?> renderLayer) {
         return instance != null;
     }
 
     @WrapOperation(
         method = "addRenderLayers",
+        remap = false,
         at = @At(value = "NEW", target = "tallestegg/bigbrain/client/renderers/layers/DrownedGlowLayer")
     )
     private static DrownedGlowLayer<?, ?> lazyyyyy$cancelNewIfNull(
