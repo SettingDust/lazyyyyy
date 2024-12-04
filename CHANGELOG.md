@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.4] - 2024-12-04
+### :sparkles: New Features
+- [`f4cfecc`](https://github.com/SettingDust/lazyyyyy/commit/f4cfeccc388b1c07dbe66f4f0986f1ac7c6fcc50) - **lazy-entity-renderers**: compat with big brain *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :bug: Bug Fixes
+- [`f79f4b1`](https://github.com/SettingDust/lazyyyyy/commit/f79f4b17079bb9e81590cf763872ce668d8c8230) - **lazy-entity-renderers**: missing remap on mixins *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`13000c6`](https://github.com/SettingDust/lazyyyyy/commit/13000c6654be32efdfc76bc4bf8197e3cda5ab66) - **async-model-baking**: assign location to the debug log *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`00a0d0e`](https://github.com/SettingDust/lazyyyyy/commit/00a0d0e2c743c2ba169bf16fe176c0709c79b694) - **pack-resources-cache**: remove directories without prefix *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.5.3] - 2024-12-03
 ### :bug: Bug Fixes
 - [`49129d9`](https://github.com/SettingDust/lazyyyyy/commit/49129d99ff94e067e73e15ada17b39772fbed13c) - **lazy-entity-renderers**: the quark fix missin condition *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -102,3 +114,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.5.1]: https://github.com/SettingDust/lazyyyyy/compare/0.5.0...0.5.1
 [0.5.2]: https://github.com/SettingDust/lazyyyyy/compare/0.5.1...0.5.2
 [0.5.3]: https://github.com/SettingDust/lazyyyyy/compare/0.5.2...0.5.3
+[0.5.4]: https://github.com/SettingDust/lazyyyyy/compare/0.5.3...0.5.4
