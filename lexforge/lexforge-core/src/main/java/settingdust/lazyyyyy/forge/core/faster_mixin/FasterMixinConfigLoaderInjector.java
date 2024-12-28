@@ -26,6 +26,10 @@ public class FasterMixinConfigLoaderInjector implements ITransformationService {
 
     @Override
     public void initialize(final IEnvironment environment) {
+    }
+
+    @Override
+    public void onLoad(final IEnvironment env, final Set<String> otherServices) {
         try {
             LOGGER.info("Initializing");
 
@@ -44,10 +48,6 @@ public class FasterMixinConfigLoaderInjector implements ITransformationService {
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void onLoad(final IEnvironment env, final Set<String> otherServices) {
     }
 
     @Override

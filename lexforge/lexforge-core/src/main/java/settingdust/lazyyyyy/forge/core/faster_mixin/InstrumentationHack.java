@@ -64,6 +64,7 @@ public class InstrumentationHack {
 
         ModuleClassLoaderReflection.setConfiguration(bootstrapClassLoader, configuration);
         // Make modlauncher aware of added packages
+        // FIXME Causing ConcurrentModificationException since the {@link net.minecraftforge.fml.earlydisplay.DisplayWindow.start} is loading lwjgl in async
         var packageLookupField = ModuleClassLoader.class.getDeclaredField("packageLookup");
         Map<String, ResolvedModule> packageLookup = UnsafeHacks.getField(packageLookupField, bootstrapClassLoader);
 
