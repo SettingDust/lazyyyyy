@@ -59,9 +59,9 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         this.mixinPackage = mixinPackage
         if (config["pack_resources_cache"] == true) {
             try {
-                ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["mixin.perf.resourcepacks"] = "lazyyyyy"
+                ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ReloadableResourceManagerMixin"] = "lazyyyyy"
+                ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ForgePathPackResourcesMixin"] = "lazyyyyy"
             } catch (_: NoClassDefFoundError) {
-                logger.debug("Failed to disable resource pack caching, ModernFix is not installed.")
             }
         }
     }

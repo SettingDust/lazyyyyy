@@ -17,5 +17,7 @@
     "client": [
         "lazy_entity_renderers.EntityRenderDispatcherMixin"
     ],
-    "defaultRequire": 1
+    "injectors": {
+        "defaultRequire": 1
+    }
 }

@@ -19,7 +19,7 @@
         "main": [
             {
                 "adapter": "kotlin",
-                "value": "settingdust.lazyyyyy.EntrypointKt::init"
+                "value": "settingdust.lazyyyyy.Lazyyyyy::init"
             }
         ]
     },

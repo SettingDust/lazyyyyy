@@ -17,7 +17,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     plugin("shadow", "com.gradleup.shadow").version("8.+")
 
-    plugin("architectury-loom", "dev.architectury.loom").version("1.7.+")
+    plugin("architectury-loom", "dev.architectury.loom").version("1.9.+")
     plugin("architectury-plugin", "architectury-plugin").version("3.+")
 
     plugin("explosion", "lol.bai.explosion").version("0.2.0")
@@ -25,7 +25,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     val minecraft = "1.20.1"
     version("minecraft", minecraft)
 
-    val kotlin = "2.0.21"
+    val kotlin = "2.1.0"
     version("kotlin", kotlin)
     plugin("kotlin-jvm", "org.jetbrains.kotlin.jvm").version(kotlin)
     plugin("kotlin-plugin-serialization", "org.jetbrains.kotlin.plugin.serialization").version(kotlin)
@@ -40,7 +40,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
         kotlinxSerialization
     )
 
-    library("kotlinx-coroutines", "org.jetbrains.kotlinx", "kotlinx-coroutines-core").version("1.9.0")
+    library("kotlinx-coroutines", "org.jetbrains.kotlinx", "kotlinx-coroutines-core").version("1.10.1")
 
     // https://modrinth.com/mod/kinecraft-serialization/versions
     library("kinecraft-serialization", "maven.modrinth", "kinecraft-serialization").version("1.16.0")
@@ -52,7 +52,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     version("fabric-api", "0.92.2+$minecraft")
     library("fabric-loader", "net.fabricmc", "fabric-loader").version("0.16.9")
     library("fabric-api", "net.fabricmc.fabric-api", "fabric-api").version("0.92.2+$minecraft")
-    library("fabric-kotlin", "net.fabricmc", "fabric-language-kotlin").version("1.12.3+kotlin.$kotlin")
+    library("fabric-kotlin", "net.fabricmc", "fabric-language-kotlin").version("1.13.0+kotlin.$kotlin")
 
     // https://linkie.shedaniel.dev/dependencies?loader=forge
     version("lexforge", "47.3.12")

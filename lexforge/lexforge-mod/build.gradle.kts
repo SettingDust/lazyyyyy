@@ -48,7 +48,7 @@ dependencies {
 
     implementation(catalog.mixinextras.lexforge)
 
-    implementation(project(":xplat:xplat-lexforge", "namedElements")) { isTransitive = false }
+    implementation(project(":xplat", "namedElements")) { isTransitive = false }
     include(project(":xplat:xplat-lexforge")) { isTransitive = false }
 
     modImplementation(catalog.sinytra.connector)
