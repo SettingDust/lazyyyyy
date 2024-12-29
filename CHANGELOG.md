@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.5] - 2024-12-29
+### :bug: Bug Fixes
+- [`3e036b0`](https://github.com/SettingDust/lazyyyyy/commit/3e036b0206cbc966c6139195c954ed3f108e9804) - **faster-mixin**: work without connector *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :zap: Performance Improvements
+- [`c8117c0`](https://github.com/SettingDust/lazyyyyy/commit/c8117c0078f7a255701323a6c41d056325ce7004) - **faster-mixin**: faster pack cache & disable modernfix resourcepack perf *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`0070b0b`](https://github.com/SettingDust/lazyyyyy/commit/0070b0b601a5f17b2f0c07755b4c5fda20c189f8) - **pack-resources-cache**: faster pack cache & disable modernfix resourcepack perf *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`69825fc`](https://github.com/SettingDust/lazyyyyy/commit/69825fca7fd4f090a293cc1395608ff383afd91e) - **deps**: bump org.gradle.toolchains.foojay-resolver-convention *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
+
+
 ## [0.5.4] - 2024-12-04
 ### :sparkles: New Features
 - [`f4cfecc`](https://github.com/SettingDust/lazyyyyy/commit/f4cfeccc388b1c07dbe66f4f0986f1ac7c6fcc50) - **lazy-entity-renderers**: compat with big brain *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -115,3 +127,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.5.2]: https://github.com/SettingDust/lazyyyyy/compare/0.5.1...0.5.2
 [0.5.3]: https://github.com/SettingDust/lazyyyyy/compare/0.5.2...0.5.3
 [0.5.4]: https://github.com/SettingDust/lazyyyyy/compare/0.5.3...0.5.4
+[0.5.5]: https://github.com/SettingDust/lazyyyyy/compare/0.5.4...0.5.5
