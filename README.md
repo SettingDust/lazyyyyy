@@ -7,7 +7,7 @@ Mainly through asynchronous and lazy loading so that unnecessary logic doesn't p
 Take advantage from index for trading the cpu time with the memory and disk.  
 
 ## Features
-- **Faster mixin config loading**
+- **Faster mixin config loading**. Need Sinytra Connector or Mixin Booster on Forge to work.
 - (YACL) [**YACL image resource lazy and async loading.** ](https://github.com/isXander/YetAnotherConfigLib/issues/218)
     - Load when trying to render it. Won't render before loaded
 - (Kiwi) **Faster manifest finding**

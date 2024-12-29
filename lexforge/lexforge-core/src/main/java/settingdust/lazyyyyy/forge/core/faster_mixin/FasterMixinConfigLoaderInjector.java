@@ -17,6 +17,12 @@ public class FasterMixinConfigLoaderInjector implements ITransformationService {
     public static final Logger LOGGER = LogManager.getLogger();
 
     public FasterMixinConfigLoaderInjector() {
+        LOGGER.info("Constructing");
+        try {
+            InstrumentationHack.inject();
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -26,11 +32,9 @@ public class FasterMixinConfigLoaderInjector implements ITransformationService {
 
     @Override
     public void initialize(final IEnvironment environment) {
+        // Run after Connector, MixinBooster. Forge builtin mixin isn't supporting "mixin.service"
+        LOGGER.info("Initializing");
         try {
-            LOGGER.info("Initializing");
-
-            InstrumentationHack.inject();
-
             var initServiceMethod = MixinService.class.getDeclaredMethod("initService");
             initServiceMethod.setAccessible(true);
             var getInstanceMethod = MixinService.class.getDeclaredMethod("getInstance");
