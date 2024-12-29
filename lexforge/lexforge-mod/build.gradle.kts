@@ -34,10 +34,9 @@ loom {
         onRuntimeClasspath = true
     }
 
-// TODO https://github.com/architectury/architectury-loom/issues/242
-//    mixin {
-//        defaultRefmapName = "$id.forge.refmap.json"
-//    }
+    mixin {
+        defaultRefmapName = "$id.forge.refmap.json"
+    }
 }
 
 dependencies {
@@ -45,6 +44,7 @@ dependencies {
         compileOnly(it)
         annotationProcessor(it)
     }
+    include(catalog.mixinextras.lexforge)
 
     implementation(catalog.mixinextras.lexforge)
 
@@ -79,7 +79,5 @@ dependencies {
 tasks {
     jar {
         from(loom.accessWidenerPath)
-
-        rename("$id-${project.name}-${project.path.substring(1).replace(':', '_')}-refmap.json", "$id.forge.refmap.json")
     }
 }

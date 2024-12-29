@@ -121,18 +121,16 @@ class VanillaPackResourcesCache(
                                 if (fileKey in files) return@launch
                                 files[fileKey] = file
                                 if (relativePath.nameCount >= 3) {
+                                    val namespace = relativePath.getName(0).name
                                     var pathString =
-                                        StringBuilder(type.directory).append('/').append(relativePath.getName(0).name)
+                                        StringBuilder(type.directory).append('/').append(namespace)
+                                    val namespaceRoot = root.resolve(namespace).let {
+                                        if (file.isAbsolute) it.toAbsolutePath() else it
+                                    }
                                     for (i in 1 until relativePath.nameCount - 1) {
                                         pathString.append('/').append(relativePath.getName(i).name)
-                                        val directory = file.subpath(0, i + root.nameCount)
                                         directoryToFiles.getOrPut(pathString.toString()) { ConcurrentHashMap.newKeySet() }
-                                            .add(
-                                                file to JOINER.join(
-                                                    (if (file.isAbsolute) directory.toAbsolutePath() else directory)
-                                                        .relativize(file)
-                                                )
-                                            )
+                                            .add(file to JOINER.join(namespaceRoot.relativize(file)))
                                     }
                                 }
                             })
@@ -204,15 +202,13 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                             val pathString = JOINER.join(relativePath)
                             files[pathString] = file
                             if (relativePath.nameCount >= 4) {
+                                val namespaceRoot = root.resolve(relativePath.subpath(0, 2)).let {
+                                    if (file.isAbsolute) it.toAbsolutePath() else it
+                                }
                                 for (i in 2 until relativePath.nameCount - 1) {
                                     val directory = file.subpath(0, i + root.nameCount)
                                     directoryToFiles.getOrPut(directory.toString()) { ConcurrentHashMap.newKeySet() }
-                                        .add(
-                                            file to JOINER.join(
-                                                (if (file.isAbsolute) directory.toAbsolutePath() else directory)
-                                                    .relativize(file)
-                                            )
-                                        )
+                                        .add(file to JOINER.join(namespaceRoot.relativize(file)))
                                 }
                             }
                         })
