@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.6] - 2024-12-29
+### :bug: Bug Fixes
+- [`dc973ee`](https://github.com/SettingDust/lazyyyyy/commit/dc973ee1984f2874daf2c467544fab4db34bda9a) - **faster-mixin**: working with mixin booster or connector *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.5.5] - 2024-12-29
 ### :bug: Bug Fixes
 - [`3e036b0`](https://github.com/SettingDust/lazyyyyy/commit/3e036b0206cbc966c6139195c954ed3f108e9804) - **faster-mixin**: work without connector *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -128,3 +133,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.5.3]: https://github.com/SettingDust/lazyyyyy/compare/0.5.2...0.5.3
 [0.5.4]: https://github.com/SettingDust/lazyyyyy/compare/0.5.3...0.5.4
 [0.5.5]: https://github.com/SettingDust/lazyyyyy/compare/0.5.4...0.5.5
+[0.5.6]: https://github.com/SettingDust/lazyyyyy/compare/0.5.5...0.5.6
