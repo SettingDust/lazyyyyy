@@ -5,7 +5,6 @@ import cpw.mods.cl.ModuleClassLoader;
 import cpw.mods.jarhandling.SecureJar;
 import cpw.mods.modlauncher.Launcher;
 import net.bytebuddy.agent.ByteBuddyAgent;
-import net.minecraftforge.fml.unsafe.UnsafeHacks;
 import settingdust.lazyyyyy.forge.core.faster_mixin.ModuleClassLoaderReflection;
 
 import java.io.IOException;
@@ -55,7 +54,7 @@ public class ClassLoaderInjector {
     /**
      * https://github.com/Sinytra/MixinTransmogrifier/blob/agentful/src/main/java/io/github/steelwoolmc/mixintransmog/InstrumentationHack.java
      */
-    public static void injectMcBootstrap() throws Throwable {
+    public static void injectMcBootstrap() {
         LazyyyyyHacksInjector.LOGGER.info("Injecting mc bootstrap");
         var mcBootstrapJar = SELF_PATH.resolve("lazyyyyy-lexforge-mc-bootstrap.jar");
         var mixinJar = SecureJar.from(mcBootstrapJar);
@@ -84,8 +83,10 @@ public class ClassLoaderInjector {
 
         ModuleClassLoaderReflection.setPackageLookup(bootstrapClassLoader, new HashMap<>(packageLookup));
 
-        var resolvedRootsField = ModuleClassLoader.class.getDeclaredField("resolvedRoots");
-        Map<String, ModuleReference> resolvedRoots = UnsafeHacks.getField(resolvedRootsField, bootstrapClassLoader);
+        Map<String, ModuleReference> resolvedRoots =
+            new ConcurrentHashMap<>(ModuleClassLoaderReflection.getResolvedRoots(bootstrapClassLoader));
+        ModuleClassLoaderReflection.setResolvedRoots(bootstrapClassLoader, resolvedRoots);
         resolvedRoots.put(resolvedModule.reference().descriptor().name(), resolvedModule.reference());
+        ModuleClassLoaderReflection.setResolvedRoots(bootstrapClassLoader, new HashMap<>(resolvedRoots));
     }
 }
