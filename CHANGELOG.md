@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.8] - 2024-12-31
+### :sparkles: New Features
+- [`29a60ad`](https://github.com/SettingDust/lazyyyyy/commit/29a60adac4a419f424d499126a267f75a7592798) - **faster-module**: try to implement with reflection *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`1704e79`](https://github.com/SettingDust/lazyyyyy/commit/1704e795a7c9f51d0cfb4f9e2af86d16d265f97c) - **faster-module**: inject the classes with instrumentation *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :bug: Bug Fixes
+- [`ec8231a`](https://github.com/SettingDust/lazyyyyy/commit/ec8231af41874274e1b66c9aceaf04769f8c22cd) - **faster-mixin**: try to fix ConcurrentModificationException with async `DisplayWindow.start` *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.5.7] - 2024-12-29
 ### :bug: Bug Fixes
 - [`05645b5`](https://github.com/SettingDust/lazyyyyy/commit/05645b534b5d0819daa5ab8b41c216ca8722664b) - **faster-mixin**: try to fix concurrent exception with lwjgl *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -140,3 +149,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.5.5]: https://github.com/SettingDust/lazyyyyy/compare/0.5.4...0.5.5
 [0.5.6]: https://github.com/SettingDust/lazyyyyy/compare/0.5.5...0.5.6
 [0.5.7]: https://github.com/SettingDust/lazyyyyy/compare/0.5.6...0.5.7
+[0.5.8]: https://github.com/SettingDust/lazyyyyy/compare/0.5.7...0.5.8
