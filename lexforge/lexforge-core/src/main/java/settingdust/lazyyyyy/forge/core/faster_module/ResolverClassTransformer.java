@@ -39,7 +39,7 @@ public class ResolverClassTransformer implements ClassFileTransformer {
                     method.instructions.set(
                         methodInsn, new MethodInsnNode(
                             Opcodes.INVOKESTATIC,
-                            "settingdust/lazyyyyy/forge/core/faster_module/BootstrapHooks",
+                            "settingdust/lazyyyyy/forge/core/BootstrapHooks",
                             "filterAutomaticModules",
                             "(Ljava/util/Map;)Ljava/util/Collection;",
                             false

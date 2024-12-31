@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.lang.module.ModuleReference;
 import java.lang.module.ResolvedModule;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarFile;
@@ -27,8 +29,13 @@ public class ClassLoaderInjector {
 
     public static void injectBootstrap() throws IOException {
         LazyyyyyHacksInjector.LOGGER.info("Injecting bootstrap");
-        var bootstrapJarPath = SELF_PATH.resolve("lazyyyyy-lexforge-mc-bootstrap.jar");
-        try (var bootstrapJar = new JarFile(bootstrapJarPath.toFile())) {
+        var bootstrapJarPath = SELF_PATH.resolve("lazyyyyy-lexforge-bootstrap.jar");
+        var exportedJarPath = Paths.get(".lazyyyyy", "lazyyyyy-lexforge-bootstrap.jar");
+        if (Files.notExists(exportedJarPath)) {
+            try {Files.createDirectory(exportedJarPath.getParent());} catch (IOException ignored) {}
+            Files.copy(bootstrapJarPath, exportedJarPath);
+        }
+        try (var bootstrapJar = new JarFile(exportedJarPath.toFile())) {
             Instrumentation instrumentation;
             try {
                 instrumentation = ByteBuddyAgent.getInstrumentation();
@@ -39,6 +46,7 @@ public class ClassLoaderInjector {
                 );
                 return;
             }
+            instrumentation.appendToBootstrapClassLoaderSearch(bootstrapJar);
         }
     }
 

@@ -38,6 +38,7 @@ public class LazyyyyyHacksInjector implements ITransformationService {
                     t
                 );
             }
+            ClassLoaderInjector.injectBootstrap();
             FasterModuleInstrumentationHack.replaceModuleResolver();
             ClassLoaderInjector.injectMcBootstrap();
         } catch (Throwable e) {

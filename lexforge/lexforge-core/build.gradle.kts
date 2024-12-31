@@ -35,9 +35,11 @@ dependencies {
 tasks {
     jar {
         val mcBootstrapJar = project(":lexforge:lexforge-mc-bootstrap").tasks.jar.flatMap { it.archiveFile }
-        from(mcBootstrapJar)
+        val bootstrapJar = project(":lexforge:lexforge-bootstrap").tasks.jar.flatMap { it.archiveFile }
+        from(mcBootstrapJar, bootstrapJar)
         doFirst {
             rename(mcBootstrapJar.get().asFile.name, "lazyyyyy-lexforge-mc-bootstrap.jar")
+            rename(bootstrapJar.get().asFile.name, "lazyyyyy-lexforge-bootstrap.jar")
         }
 
         manifest {

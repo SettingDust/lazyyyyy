@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.forge.core.faster_module;
+package settingdust.lazyyyyy.forge.core;
 
 import java.lang.module.ResolvedModule;
 import java.util.Collection;
