@@ -138,4 +138,4 @@ include(":xplat:xplat-lexforge")
 
 include(":lexforge:lexforge-core")
 include(":lexforge:lexforge-mod")
-include(":lexforge:lexforge-mixin")
+include(":lexforge:lexforge-mc-bootstrap")

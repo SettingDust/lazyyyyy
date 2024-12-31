@@ -5,9 +5,14 @@ plugins {
     alias(catalog.plugins.kotlin.jvm) apply false
     alias(catalog.plugins.kotlin.plugin.serialization) apply false
 
+    alias(catalog.plugins.shadow) apply false
+
     alias(catalog.plugins.git.version)
 
     alias(catalog.plugins.explosion) apply false
+
+    alias(catalog.plugins.architectury.loom) apply false
+    alias(catalog.plugins.architectury.plugin) apply false
 }
 
 val archive_name: String by rootProject.properties

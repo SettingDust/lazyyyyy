@@ -1,4 +1,6 @@
 plugins {
+    alias(catalog.plugins.shadow)
+
     alias(catalog.plugins.architectury.plugin)
     alias(catalog.plugins.architectury.loom)
 }
@@ -23,19 +25,44 @@ dependencies {
     implementation(catalog.kotlin.forge)
 
     include(project(":lexforge:lexforge-mod"))
-    implementation(project(":lexforge:lexforge-mixin"))
+    implementation(project(":lexforge:lexforge-mc-bootstrap"))
+
+    shadow("net.bytebuddy:byte-buddy-agent:1.5.11") {
+        isTransitive = false
+    }
 }
 
 tasks {
     jar {
-        val mixinJar = project(":lexforge:lexforge-mixin").tasks.jar.flatMap { it.archiveFile }
-        from(mixinJar)
-        doFirst { rename(mixinJar.get().asFile.name, "lazyyyyy-lexforge-mixin.jar") }
+        val mcBootstrapJar = project(":lexforge:lexforge-mc-bootstrap").tasks.jar.flatMap { it.archiveFile }
+        from(mcBootstrapJar)
+        doFirst {
+            rename(mcBootstrapJar.get().asFile.name, "lazyyyyy-lexforge-mc-bootstrap.jar")
+        }
 
         manifest {
             attributes(
                 "FMLModType" to "LIBRARY"
             )
         }
+    }
+
+    shadowJar {
+        archiveClassifier = "dev-shadow"
+        configurations = listOf(project.configurations.shadow.get())
+        destinationDirectory = jar.flatMap { it.destinationDirectory }
+
+        // FIXME Workaround for https://github.com/GradleUp/shadow/issues/111
+        from(jar)
+
+        manifest {
+            attributes(
+                "FMLModType" to "LIBRARY"
+            )
+        }
+    }
+
+    remapJar {
+        inputFile = shadowJar.flatMap { it.archiveFile }
     }
 }

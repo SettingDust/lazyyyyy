@@ -1,45 +1,54 @@
-package settingdust.lazyyyyy.forge.core.faster_mixin;
+package settingdust.lazyyyyy.forge.core;
 
 import cpw.mods.cl.JarModuleFinder;
 import cpw.mods.cl.ModuleClassLoader;
 import cpw.mods.jarhandling.SecureJar;
 import cpw.mods.modlauncher.Launcher;
+import net.bytebuddy.agent.ByteBuddyAgent;
 import net.minecraftforge.fml.unsafe.UnsafeHacks;
-import sun.misc.Unsafe;
+import settingdust.lazyyyyy.forge.core.faster_mixin.ModuleClassLoaderReflection;
 
-import java.lang.invoke.MethodHandles;
+import java.io.IOException;
+import java.lang.instrument.Instrumentation;
 import java.lang.module.ModuleReference;
 import java.lang.module.ResolvedModule;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarFile;
 
 import static cpw.mods.modlauncher.api.LamdbaExceptionUtils.uncheck;
 
-/**
- * https://github.com/Sinytra/MixinTransmogrifier/blob/agentful/src/main/java/io/github/steelwoolmc/mixintransmog/InstrumentationHack.java
- */
-public class InstrumentationHack {
-    private static final MethodHandles.Lookup TRUSTED_LOOKUP = uncheck(() -> {
-        var theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
-        theUnsafe.setAccessible(true);
-        var unsafe = (Unsafe) theUnsafe.get(null);
-        var hackfield = MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
-        return (MethodHandles.Lookup) unsafe.getObject(
-            unsafe.staticFieldBase(hackfield),
-            unsafe.staticFieldOffset(hackfield)
-        );
-    });
-
+public class ClassLoaderInjector {
     private static final Path SELF_PATH = uncheck(() -> {
-        var jarLocation = InstrumentationHack.class.getProtectionDomain().getCodeSource().getLocation();
+        var jarLocation = ClassLoaderInjector.class.getProtectionDomain().getCodeSource().getLocation();
         return Path.of(jarLocation.toURI());
     });
 
-    public static void inject() throws Throwable {
-        FasterMixinConfigLoaderInjector.LOGGER.info("Injecting mixin modifier");
-        var mixinJarPath = SELF_PATH.resolve("lazyyyyy-lexforge-mixin.jar");
-        var mixinJar = SecureJar.from(mixinJarPath);
+    public static void injectBootstrap() throws IOException {
+        LazyyyyyHacksInjector.LOGGER.info("Injecting bootstrap");
+        var bootstrapJarPath = SELF_PATH.resolve("lazyyyyy-lexforge-mc-bootstrap.jar");
+        try (var bootstrapJar = new JarFile(bootstrapJarPath.toFile())) {
+            Instrumentation instrumentation;
+            try {
+                instrumentation = ByteBuddyAgent.getInstrumentation();
+            } catch (Throwable t) {
+                LazyyyyyHacksInjector.LOGGER.error(
+                    "No bytebuddy agent, the bootstrap jar can't be injected",
+                    t
+                );
+                return;
+            }
+        }
+    }
+
+    /**
+     * https://github.com/Sinytra/MixinTransmogrifier/blob/agentful/src/main/java/io/github/steelwoolmc/mixintransmog/InstrumentationHack.java
+     */
+    public static void injectMcBootstrap() throws Throwable {
+        LazyyyyyHacksInjector.LOGGER.info("Injecting mc bootstrap");
+        var mcBootstrapJar = SELF_PATH.resolve("lazyyyyy-lexforge-mc-bootstrap.jar");
+        var mixinJar = SecureJar.from(mcBootstrapJar);
 
         var jarModuleFinder = JarModuleFinder.of(mixinJar);
 
@@ -48,9 +57,9 @@ public class InstrumentationHack {
         var configuration = parentConfiguration.resolve(
             jarModuleFinder,
             JarModuleFinder.of(),
-            Set.of("lazyyyyy.lexforge.mixin")
+            Set.of("lazyyyyy.lexforge.mc.bootstrap")
         );
-        var resolvedModule = configuration.findModule("lazyyyyy.lexforge.mixin").orElseThrow();
+        var resolvedModule = configuration.findModule("lazyyyyy.lexforge.mc.bootstrap").orElseThrow();
 
         //                // Add readability edge to the unnamed module, where classes from added packages are defined
         //                var handle = TRUSTED_LOOKUP.findVirtual(
