@@ -15,8 +15,10 @@ import java.lang.module.ResolvedModule;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
 
 import static cpw.mods.modlauncher.api.LamdbaExceptionUtils.uncheck;
@@ -69,25 +71,18 @@ public class ClassLoaderInjector {
         );
         var resolvedModule = configuration.findModule("lazyyyyy.lexforge.mc.bootstrap").orElseThrow();
 
-        //                // Add readability edge to the unnamed module, where classes from added packages are defined
-        //                var handle = TRUSTED_LOOKUP.findVirtual(
-        //                    Module.class,
-        //                    "implAddReads",
-        //                    MethodType.methodType(void.class, Module.class)
-        //                );
-        //
-        //                handle.invokeExact(resolvedModule.reference().open(), resolvedModule.getClassLoader().getUnnamedModule());
-
-
         ModuleClassLoaderReflection.setConfiguration(bootstrapClassLoader, configuration);
         // Make modlauncher aware of added packages
         // FIXME Causing ConcurrentModificationException since the {@link net.minecraftforge.fml.earlydisplay.DisplayWindow.start} is loading lwjgl in async
-        var packageLookupField = ModuleClassLoader.class.getDeclaredField("packageLookup");
-        Map<String, ResolvedModule> packageLookup = UnsafeHacks.getField(packageLookupField, bootstrapClassLoader);
+        Map<String, ResolvedModule> packageLookup =
+            new ConcurrentHashMap<>(ModuleClassLoaderReflection.getPackageLookup(bootstrapClassLoader));
+        ModuleClassLoaderReflection.setPackageLookup(bootstrapClassLoader, packageLookup);
 
         for (String pkg : mixinJar.getPackages()) {
             packageLookup.put(pkg, resolvedModule);
         }
+
+        ModuleClassLoaderReflection.setPackageLookup(bootstrapClassLoader, new HashMap<>(packageLookup));
 
         var resolvedRootsField = ModuleClassLoader.class.getDeclaredField("resolvedRoots");
         Map<String, ModuleReference> resolvedRoots = UnsafeHacks.getField(resolvedRootsField, bootstrapClassLoader);
