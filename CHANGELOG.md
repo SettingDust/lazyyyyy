@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.9] - 2024-12-31
+### :bug: Bug Fixes
+- [`b3af601`](https://github.com/SettingDust/lazyyyyy/commit/b3af601616806589d7b1fb235b8968853c6d2ffc) - try to fix ConcurrentModificationException again for lwjgl font *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.5.8] - 2024-12-31
 ### :sparkles: New Features
 - [`29a60ad`](https://github.com/SettingDust/lazyyyyy/commit/29a60adac4a419f424d499126a267f75a7592798) - **faster-module**: try to implement with reflection *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -150,3 +155,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.5.6]: https://github.com/SettingDust/lazyyyyy/compare/0.5.5...0.5.6
 [0.5.7]: https://github.com/SettingDust/lazyyyyy/compare/0.5.6...0.5.7
 [0.5.8]: https://github.com/SettingDust/lazyyyyy/compare/0.5.7...0.5.8
+[0.5.9]: https://github.com/SettingDust/lazyyyyy/compare/0.5.8...0.5.9
