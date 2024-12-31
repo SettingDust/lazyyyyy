@@ -19,7 +19,9 @@ Take advantage from index for trading the cpu time with the memory and disk.
 - (MoreMcmeta) Optimize the memory usage
 - Pack resource cache
     - Like how ModernFix works but for more pack types. Will disable the same function in ModernFix.
-  
+- **Faster module configure**
+    - Backport https://github.com/openjdk/jdk/pull/16818 from java 22 to java 17. Need jvm supporting runtime agent. Use OpenJDK, please.
+    - https://github.com/openjdk/jdk/pull/15926 for reference
   
 ![yourkit](https://www.yourkit.com/images/yklogo.png)  
 YourKit supports open source projects with innovative and intelligent tools
