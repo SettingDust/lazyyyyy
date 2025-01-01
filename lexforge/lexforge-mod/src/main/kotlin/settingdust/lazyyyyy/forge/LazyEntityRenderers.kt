@@ -12,6 +12,10 @@ import settingdust.lazyyyyy.minecraft.LazyPlayerRenderer
 fun Map<EntityType<*>, EntityRenderer<*>>.filterLazyRenderers() =
     filterTo(hashMapOf()) { it.value !is LazyEntityRenderer }
 
+/**
+ * Not using since many mods are casting the renderer if exists. Need to use mixin to compat with them.
+ * Leave the renderer to null and fix the mods no checking is easier.
+ */
 fun Map<EntityType<*>, EntityRenderer<*>>.replaceWithDummyLivingEntity(context: EntityRendererProvider.Context) =
     mapValues { (_, renderer) -> if (renderer is LazyEntityRenderer) DummyLivingEntityRenderer(context) else renderer }
 

@@ -74,6 +74,9 @@ dependencies {
     modImplementation(catalog.zeta)
 
     modImplementation(catalog.bigbrain)
+
+    modImplementation(catalog.bovinesAndButtercups.forge)
+
 }
 
 tasks {

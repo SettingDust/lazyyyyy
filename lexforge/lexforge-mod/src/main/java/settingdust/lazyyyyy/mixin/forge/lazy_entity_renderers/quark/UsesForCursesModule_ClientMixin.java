@@ -8,15 +8,14 @@ import net.minecraft.world.entity.EntityType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.violetmoon.quark.content.client.module.UsesForCursesModule;
 import org.violetmoon.zeta.client.event.load.ZAddModelLayers;
-import settingdust.lazyyyyy.minecraft.DummyLivingEntityRenderer;
 
 @IfModLoaded("quark")
 @Mixin(UsesForCursesModule.Client.class)
 public class UsesForCursesModule_ClientMixin {
     @WrapMethod(method = "modelLayers", remap = false)
-    private void lazyyyyy$avoidAddIfDummy(final ZAddModelLayers event, final Operation<Void> original) {
+    private void lazyyyyy$avoidAddIfNull(final ZAddModelLayers event, final Operation<Void> original) {
         var renderer = (EntityRenderer<?>) event.getRenderer(EntityType.ARMOR_STAND);
-        if (renderer == null || renderer instanceof DummyLivingEntityRenderer) return;
+        if (renderer == null) return;
         original.call(event);
     }
 }

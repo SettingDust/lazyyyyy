@@ -8,6 +8,7 @@
     "mixins": [
         "kiwi.faster_annotation.AnnotatedTypeLoaderMixin",
         "lazy_entity_renderers.big_brain.BigBrainRendererEventsMixin",
+        "lazy_entity_renderers.bovines_and_buttercups.BovinesAndButtercupsClientForgeMixin",
         "lazy_entity_renderers.quark.UsesForCursesModule_ClientMixin",
         "pack_resources_cache.PathPackResourcesMixin",
         "pack_resources_cache.ResourcePackLoaderMixin",
