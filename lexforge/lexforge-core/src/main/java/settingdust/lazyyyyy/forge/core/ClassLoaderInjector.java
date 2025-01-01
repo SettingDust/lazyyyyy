@@ -17,7 +17,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
 
 import static cpw.mods.modlauncher.api.LamdbaExceptionUtils.uncheck;
@@ -72,10 +71,8 @@ public class ClassLoaderInjector {
 
         ModuleClassLoaderReflection.setConfiguration(bootstrapClassLoader, configuration);
         // Make modlauncher aware of added packages
-        // FIXME Causing ConcurrentModificationException since the {@link net.minecraftforge.fml.earlydisplay.DisplayWindow.start} is loading lwjgl in async
         Map<String, ResolvedModule> packageLookup =
-            new ConcurrentHashMap<>(ModuleClassLoaderReflection.getPackageLookup(bootstrapClassLoader));
-        ModuleClassLoaderReflection.setPackageLookup(bootstrapClassLoader, packageLookup);
+            new HashMap<>(ModuleClassLoaderReflection.getPackageLookup(bootstrapClassLoader));
 
         for (String pkg : mixinJar.getPackages()) {
             packageLookup.put(pkg, resolvedModule);
@@ -84,8 +81,7 @@ public class ClassLoaderInjector {
         ModuleClassLoaderReflection.setPackageLookup(bootstrapClassLoader, new HashMap<>(packageLookup));
 
         Map<String, ModuleReference> resolvedRoots =
-            new ConcurrentHashMap<>(ModuleClassLoaderReflection.getResolvedRoots(bootstrapClassLoader));
-        ModuleClassLoaderReflection.setResolvedRoots(bootstrapClassLoader, resolvedRoots);
+            new HashMap<>(ModuleClassLoaderReflection.getResolvedRoots(bootstrapClassLoader));
         resolvedRoots.put(resolvedModule.reference().descriptor().name(), resolvedModule.reference());
         ModuleClassLoaderReflection.setResolvedRoots(bootstrapClassLoader, new HashMap<>(resolvedRoots));
     }
