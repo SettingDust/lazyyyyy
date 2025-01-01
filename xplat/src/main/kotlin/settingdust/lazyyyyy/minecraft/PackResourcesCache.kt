@@ -87,7 +87,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
     fun listResources(type: PackType, namespace: String, prefix: String, output: PackResources.ResourceOutput) {
         waitForLoading()
         val filesInDir = directoryToFiles["${type.directory}/$namespace/$prefix"] ?: return
-        runBlocking(Dispatchers.Default) {
+        runBlocking(Dispatchers.IO) {
             filesInDir.asFlow().concurrent()
                 .mapNotNull { (path, relativeString) ->
                     val location = ResourceLocation.tryBuild(namespace, relativeString)
@@ -109,22 +109,20 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
 class VanillaPackResourcesCache(
     pack: PackResources,
     roots: List<Path>,
-    pathsForType: Map<PackType, List<Path>>
+    private val pathsForType: Map<PackType, List<Path>>
 ) : PackResourcesCache(pack, roots) {
     override val loadingJob: Job
-    private val pathsForType: Map<PackType, List<Path>>
 
     init {
         loadingJob = loadCache()
-        this.pathsForType = pathsForType
     }
 
     @OptIn(ExperimentalPathApi::class)
     fun loadCache() = CoroutineScope(SupervisorJob() + CoroutineName("Vanilla Pack Cache")).launch {
         val time = measureTime {
             val jobs = mutableListOf<Job>()
-            val files: MutableMap<String, Path> = ConcurrentHashMap()
-            val directoryToFiles: MutableMap<String, MutableSet<Pair<Path, String>>> = ConcurrentHashMap()
+            val files: ConcurrentHashMap<String, Path> = ConcurrentHashMap()
+            val directoryToFiles: ConcurrentHashMap<String, MutableSet<Pair<Path, String>>> = ConcurrentHashMap()
             pathsForType.asSequence().asFlow().concurrent()
                 .flatMap { (type, paths) -> paths.asFlow().map { type to it } }
                 .collect { (type, root) ->
@@ -146,7 +144,8 @@ class VanillaPackResourcesCache(
                                 }
                                 for (i in 1 until relativePath.nameCount - 1) {
                                     pathString.append('/').append(relativePath.getName(i).name)
-                                    directoryToFiles.getOrPut(pathString.toString()) { ConcurrentHashMap.newKeySet() }
+                                    directoryToFiles
+                                        .computeIfAbsent(pathString.toString()) { ConcurrentHashMap.newKeySet() }
                                         .add(file to JOINER.join(namespaceRoot.relativize(file)))
                                 }
                             })
@@ -205,7 +204,7 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                         jobs.add(launch {
                             if (relativePath.nameCount != 2) return@launch
                             namespaces
-                                .getOrPut(type) { ConcurrentHashMap.newKeySet() }
+                                .computeIfAbsent(type) { ConcurrentHashMap.newKeySet() }
                                 .add(relativePath.name)
                         })
                         FileVisitResult.CONTINUE
@@ -225,7 +224,8 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                             }
                             for (i in 2 until relativePath.nameCount - 1) {
                                 val directory = file.subpath(0, i + root.nameCount)
-                                directoryToFiles.getOrPut(directory.toString()) { ConcurrentHashMap.newKeySet() }
+                                directoryToFiles
+                                    .computeIfAbsent(directory.toString()) { ConcurrentHashMap.newKeySet() }
                                     .add(file to JOINER.join(namespaceRoot.relativize(file)))
                             }
                         })
