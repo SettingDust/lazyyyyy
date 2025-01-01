@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.10] - 2025-01-01
+### :bug: Bug Fixes
+- [`8822068`](https://github.com/SettingDust/lazyyyyy/commit/8822068256617d0de2a34a24067ff0cb3096a997) - **pack-resources-cache**: race condition since kotlin `getOrPut` isn't working with concurrent *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :zap: Performance Improvements
+- [`78f3398`](https://github.com/SettingDust/lazyyyyy/commit/78f3398873572cca2b1deae1ecadedc10863c566) - **pack-resources-cache**: cache the entries more concurrent *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`37a01da`](https://github.com/SettingDust/lazyyyyy/commit/37a01da6c1f66ed28e8631a4cd7e3a34f0fccfbc) - simply the concurrent exception fix *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.5.9] - 2024-12-31
 ### :bug: Bug Fixes
 - [`b3af601`](https://github.com/SettingDust/lazyyyyy/commit/b3af601616806589d7b1fb235b8968853c6d2ffc) - try to fix ConcurrentModificationException again for lwjgl font *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -156,3 +167,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.5.7]: https://github.com/SettingDust/lazyyyyy/compare/0.5.6...0.5.7
 [0.5.8]: https://github.com/SettingDust/lazyyyyy/compare/0.5.7...0.5.8
 [0.5.9]: https://github.com/SettingDust/lazyyyyy/compare/0.5.8...0.5.9
+[0.5.10]: https://github.com/SettingDust/lazyyyyy/compare/0.5.9...0.5.10
