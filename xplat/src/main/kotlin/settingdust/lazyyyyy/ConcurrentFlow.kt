@@ -146,6 +146,10 @@ fun <T, R> ConcurrentFlow<T>.map(
     transform: suspend (T) -> R,
 ): ConcurrentFlow<R> = ConcurrentMap(this, transform)
 
+fun <T, R> ConcurrentFlow<T>.mapNotNull(
+    transform: suspend (T) -> R?,
+): ConcurrentFlow<R> = map(transform).filterNotNull()
+
 private class ConcurrentFilter<T>(
     private val upstream: ConcurrentFlow<T>,
     private val predicate: suspend (T) -> Boolean,
