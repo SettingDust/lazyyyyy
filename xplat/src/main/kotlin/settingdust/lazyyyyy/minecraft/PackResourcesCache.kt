@@ -2,6 +2,7 @@ package settingdust.lazyyyyy.minecraft
 
 import com.google.common.base.Joiner
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -118,67 +119,71 @@ class VanillaPackResourcesCache(
     }
 
     @OptIn(ExperimentalPathApi::class)
-    fun loadCache() = CoroutineScope(SupervisorJob() + CoroutineName("Vanilla Pack Cache")).launch {
-        val time = measureTime {
-            val jobs = mutableListOf<Job>()
-            val files: ConcurrentHashMap<String, Path> = ConcurrentHashMap()
-            val directoryToFiles: ConcurrentHashMap<String, MutableSet<Pair<Path, String>>> = ConcurrentHashMap()
-            pathsForType.asSequence().asFlow().concurrent()
-                .flatMap { (type, paths) -> paths.asFlow().map { type to it } }
-                .collect { (type, root) ->
+    fun loadCache() =
+        CoroutineScope(SupervisorJob() + CoroutineName("Vanilla Pack Cache") + CoroutineExceptionHandler { context, throwable ->
+            if (throwable is Exception || throwable is Error)
+                Lazyyyyy.logger.error("Error loading vanilla pack cache in $context", throwable)
+        }).launch {
+            val time = measureTime {
+                val jobs = mutableListOf<Job>()
+                val files: ConcurrentHashMap<String, Path> = ConcurrentHashMap()
+                val directoryToFiles: ConcurrentHashMap<String, MutableSet<Pair<Path, String>>> = ConcurrentHashMap()
+                pathsForType.asSequence().asFlow().concurrent()
+                    .flatMap { (type, paths) -> paths.asFlow().map { type to it } }
+                    .collect { (type, root) ->
+                        root.visitFileTree(fileVisitor {
+                            onVisitFile { file, attributes ->
+                                val relativePath by lazy { root.relativize(file) }
+                                jobs.add(launch {
+                                    val pathString = JOINER.join(relativePath)
+                                    val fileKey = "${type.directory}/$pathString"
+                                    files.putIfAbsent(fileKey, file)
+                                })
+                                jobs.add(launch {
+                                    if (relativePath.nameCount < 3) return@launch
+                                    val namespace = relativePath.getName(0).name
+                                    var pathString =
+                                        StringBuilder(type.directory).append('/').append(namespace)
+                                    val namespaceRoot = root.resolve(namespace).let {
+                                        if (file.isAbsolute) it.toAbsolutePath() else it
+                                    }
+                                    for (i in 1 until relativePath.nameCount - 1) {
+                                        pathString.append('/').append(relativePath.getName(i).name)
+                                        directoryToFiles
+                                            .computeIfAbsent(pathString.toString()) { ConcurrentHashMap.newKeySet() }
+                                            .add(file to JOINER.join(namespaceRoot.relativize(file)))
+                                    }
+                                })
+                                FileVisitResult.CONTINUE
+                            }
+                        })
+                    }
+
+                roots.asFlow().concurrent().collect { root ->
                     root.visitFileTree(fileVisitor {
+                        onPreVisitDirectory { directory, attributes ->
+                            if (directory.nameCount == 1 && directory.name in packTypeByDirectory) FileVisitResult.SKIP_SUBTREE
+                            else FileVisitResult.CONTINUE
+                        }
+
                         onVisitFile { file, attributes ->
-                            val relativePath by lazy { root.relativize(file) }
                             jobs.add(launch {
+                                val relativePath = root.relativize(file)
                                 val pathString = JOINER.join(relativePath)
-                                val fileKey = "${type.directory}/$pathString"
-                                files.putIfAbsent(fileKey, file)
-                            })
-                            jobs.add(launch {
-                                if (relativePath.nameCount < 3) return@launch
-                                val namespace = relativePath.getName(0).name
-                                var pathString =
-                                    StringBuilder(type.directory).append('/').append(namespace)
-                                val namespaceRoot = root.resolve(namespace).let {
-                                    if (file.isAbsolute) it.toAbsolutePath() else it
-                                }
-                                for (i in 1 until relativePath.nameCount - 1) {
-                                    pathString.append('/').append(relativePath.getName(i).name)
-                                    directoryToFiles
-                                        .computeIfAbsent(pathString.toString()) { ConcurrentHashMap.newKeySet() }
-                                        .add(file to JOINER.join(namespaceRoot.relativize(file)))
-                                }
+                                files[pathString] = file
                             })
                             FileVisitResult.CONTINUE
                         }
                     })
                 }
 
-            roots.asFlow().concurrent().collect { root ->
-                root.visitFileTree(fileVisitor {
-                    onPreVisitDirectory { directory, attributes ->
-                        if (directory.nameCount == 1 && directory.name in packTypeByDirectory) FileVisitResult.SKIP_SUBTREE
-                        else FileVisitResult.CONTINUE
-                    }
-
-                    onVisitFile { file, attributes ->
-                        jobs.add(launch {
-                            val relativePath = root.relativize(file)
-                            val pathString = JOINER.join(relativePath)
-                            files[pathString] = file
-                        })
-                        FileVisitResult.CONTINUE
-                    }
-                })
+                jobs.joinAll()
+                this@VanillaPackResourcesCache.files.putAll(files)
+                this@VanillaPackResourcesCache.directoryToFiles.putAll(directoryToFiles)
             }
-
-            jobs.joinAll()
-            this@VanillaPackResourcesCache.files.putAll(files)
-            this@VanillaPackResourcesCache.directoryToFiles.putAll(directoryToFiles)
+            if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache vanilla pack ${pack.packId()} in $time")
+            else Lazyyyyy.logger.debug("Cache vanilla pack ${pack.packId()} in $time")
         }
-        if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache vanilla pack ${pack.packId()} in $time")
-        else Lazyyyyy.logger.debug("Cache vanilla pack ${pack.packId()} in $time")
-    }
 }
 
 open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : PackResourcesCache(pack, roots) {
@@ -187,59 +192,64 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
     override val loadingJob = loadCache()
 
     @OptIn(ExperimentalPathApi::class)
-    fun loadCache() = CoroutineScope(SupervisorJob() + CoroutineName("Simple Pack Cache #${pack.packId()}")).launch {
-        val time = measureTime {
-            val jobs = mutableListOf<Job>()
-            val files: MutableMap<String, Path> = ConcurrentHashMap()
-            val directoryToFiles: MutableMap<String, MutableSet<Pair<Path, String>>> = ConcurrentHashMap()
-            val namespaces: MutableMap<PackType, MutableSet<String>> = ConcurrentHashMap()
-            roots.asFlow().concurrent().collect { root ->
-                root.visitFileTree(fileVisitor {
-                    onPreVisitDirectory { directory, attributes ->
-                        val relativePath = root.relativize(directory)
-                        val rootPath = relativePath.firstOrNull() ?: return@onPreVisitDirectory FileVisitResult.CONTINUE
-                        if (rootPath.name.isEmpty()) return@onPreVisitDirectory FileVisitResult.CONTINUE
-                        val type = packTypeByDirectory[rootPath.name]
-                        if (type == null) return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
-                        jobs.add(launch {
-                            if (relativePath.nameCount != 2) return@launch
-                            namespaces
-                                .computeIfAbsent(type) { ConcurrentHashMap.newKeySet() }
-                                .add(relativePath.name)
-                        })
-                        FileVisitResult.CONTINUE
-                    }
+    fun loadCache() =
+        CoroutineScope(SupervisorJob() + CoroutineName("Simple Pack Cache #${pack.packId()}") + CoroutineExceptionHandler { context, throwable ->
+            if (throwable is Exception || throwable is Error)
+                Lazyyyyy.logger.error("Error loading pack cache in $context", throwable)
+        }).launch {
+            val time = measureTime {
+                val jobs = mutableListOf<Job>()
+                val files: MutableMap<String, Path> = ConcurrentHashMap()
+                val directoryToFiles: MutableMap<String, MutableSet<Pair<Path, String>>> = ConcurrentHashMap()
+                val namespaces: MutableMap<PackType, MutableSet<String>> = ConcurrentHashMap()
+                roots.asFlow().concurrent().collect { root ->
+                    root.visitFileTree(fileVisitor {
+                        onPreVisitDirectory { directory, attributes ->
+                            val relativePath = root.relativize(directory)
+                            val rootPath =
+                                relativePath.firstOrNull() ?: return@onPreVisitDirectory FileVisitResult.CONTINUE
+                            if (rootPath.name.isEmpty()) return@onPreVisitDirectory FileVisitResult.CONTINUE
+                            val type = packTypeByDirectory[rootPath.name]
+                            if (type == null) return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
+                            jobs.add(launch {
+                                if (relativePath.nameCount != 2) return@launch
+                                namespaces
+                                    .computeIfAbsent(type) { ConcurrentHashMap.newKeySet() }
+                                    .add(relativePath.name)
+                            })
+                            FileVisitResult.CONTINUE
+                        }
 
-                    onVisitFile { file, attributes ->
-                        val relativePath by lazy { root.relativize(file) }
-                        jobs.add(launch {
-                            val pathString = JOINER.join(relativePath)
-                            files[pathString] = file
-                        })
-                        jobs.add(launch {
-                            if (relativePath.nameCount < 4)
-                                return@launch
-                            val namespaceRoot = root.resolve(relativePath.subpath(0, 2)).let {
-                                if (file.isAbsolute) it.toAbsolutePath() else it
-                            }
-                            for (i in 2 until relativePath.nameCount - 1) {
-                                val directory = file.subpath(0, i + root.nameCount)
-                                directoryToFiles
-                                    .computeIfAbsent(directory.toString()) { ConcurrentHashMap.newKeySet() }
-                                    .add(file to JOINER.join(namespaceRoot.relativize(file)))
-                            }
-                        })
-                        FileVisitResult.CONTINUE
-                    }
-                })
+                        onVisitFile { file, attributes ->
+                            val relativePath by lazy { root.relativize(file) }
+                            jobs.add(launch {
+                                val pathString = JOINER.join(relativePath)
+                                files[pathString] = file
+                            })
+                            jobs.add(launch {
+                                if (relativePath.nameCount < 4)
+                                    return@launch
+                                val namespaceRoot = root.resolve(relativePath.subpath(0, 2)).let {
+                                    if (file.isAbsolute) it.toAbsolutePath() else it
+                                }
+                                for (i in 2 until relativePath.nameCount - 1) {
+                                    val directory = file.subpath(0, i + root.nameCount)
+                                    directoryToFiles
+                                        .computeIfAbsent(directory.toString()) { ConcurrentHashMap.newKeySet() }
+                                        .add(file to JOINER.join(namespaceRoot.relativize(file)))
+                                }
+                            })
+                            FileVisitResult.CONTINUE
+                        }
+                    })
+                }
+                jobs.joinAll()
+
+                this@SimplePackResourcesCache.files.putAll(files)
+                this@SimplePackResourcesCache.directoryToFiles.putAll(directoryToFiles)
+                this@SimplePackResourcesCache.namespaces.putAll(namespaces)
             }
-            jobs.joinAll()
-
-            this@SimplePackResourcesCache.files.putAll(files)
-            this@SimplePackResourcesCache.directoryToFiles.putAll(directoryToFiles)
-            this@SimplePackResourcesCache.namespaces.putAll(namespaces)
+            if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache pack ${pack.packId()} in $time")
+            else Lazyyyyy.logger.debug("Cache pack ${pack.packId()} in $time")
         }
-        if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache pack ${pack.packId()} in $time")
-        else Lazyyyyy.logger.debug("Cache pack ${pack.packId()} in $time")
-    }
 }
