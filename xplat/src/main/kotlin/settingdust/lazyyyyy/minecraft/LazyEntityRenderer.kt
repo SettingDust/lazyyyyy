@@ -9,12 +9,15 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.minecraft.client.Minecraft
 import net.minecraft.client.model.EntityModel
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
 import net.minecraft.client.renderer.culling.Frustum
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.LivingEntityRenderer
@@ -25,11 +28,15 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.phys.Vec3
 import settingdust.lazyyyyy.Lazyyyyy
 import settingdust.lazyyyyy.collect
 import settingdust.lazyyyyy.concurrent
+import settingdust.lazyyyyy.mixin.lazy_entity_renderers.BlockEntityRenderDispatcherAccessor
+import settingdust.lazyyyyy.mixin.lazy_entity_renderers.EntityRenderDispatcherAccessor
 import settingdust.lazyyyyy.mixin.lazy_entity_renderers.EntityRendererAccessor
 import java.util.function.BiConsumer
 
@@ -57,8 +64,12 @@ class LazyEntityRenderer<T : Entity>(
 
     val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) { wrapped() }.also { loading ->
         loading.invokeOnCompletion {
-            if (it != null) return@invokeOnCompletion
+            if (it != null) {
+                Lazyyyyy.logger.error("Failed to create entity renderer for $type", it)
+                return@invokeOnCompletion
+            }
             val renderer = loading.getCompleted()
+            Minecraft.getInstance().entityRenderDispatcher.renderers[type] = renderer
             if (renderer is LivingEntityRenderer<*, *>) {
                 runBlocking { onAddLayer.emit(Triple(type, context, renderer)) }
             }
@@ -138,12 +149,11 @@ class LazyPlayerRenderer(
             MutableSharedFlow<Triple<String, EntityRendererProvider.Context, EntityRenderer<AbstractClientPlayer>>>()
     }
 
-    val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) { wrapped() }.also { loading ->
-        loading.invokeOnCompletion {
-            if (it != null) return@invokeOnCompletion
-            val renderer = loading.getCompleted()
-            runBlocking { onAddLayer.emit(Triple(type, context, renderer)) }
-        }
+    val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) {
+        val renderer = wrapped()
+        Minecraft.getInstance().entityRenderDispatcher.playerRenderers[type] = renderer
+        runBlocking { onAddLayer.emit(Triple(type, context, renderer)) }
+        renderer
     }
 
     private fun <R> handle(loaded: EntityRenderer<AbstractClientPlayer>.() -> R, loading: () -> R) =
@@ -215,11 +225,21 @@ class LazyPlayerRenderer(
 
 class DummyPlayerRenderer(context: EntityRendererProvider.Context) : PlayerRenderer(context, false)
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LazyBlockEntityRenderer<T : BlockEntity>(
+    val type: BlockEntityType<T>,
     val context: BlockEntityRendererProvider.Context,
     val wrapped: () -> BlockEntityRenderer<T>
 ) : BlockEntityRenderer<T> {
-    private val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) { wrapped() }
+    val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) { wrapped() }.also { loading ->
+        loading.invokeOnCompletion {
+            if (it != null) {
+                Lazyyyyy.logger.error("Failed to create block entity renderer for $type", it)
+                return@invokeOnCompletion
+            }
+            Minecraft.getInstance().blockEntityRenderDispatcher.renderers[type] = loading.getCompleted()
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun <R> handle(loaded: BlockEntityRenderer<T>.() -> R, loading: () -> R) =
@@ -246,4 +266,44 @@ class LazyBlockEntityRenderer<T : BlockEntity>(
 
     override fun shouldRender(blockEntity: T, vec3: Vec3) =
         handle({ shouldRender(blockEntity, vec3) }, { super.shouldRender(blockEntity, vec3) })
+}
+
+class ObservableMap<K, V>(val original: Map<K, V>, val onGet: (K) -> V?) : HashMap<K, V>() {
+    init {
+        putAll(original)
+    }
+
+    override fun get(key: K): V? {
+        return onGet(key) ?: super.get(key)
+    }
+}
+
+var EntityRenderDispatcher.renderers: MutableMap<EntityType<*>, EntityRenderer<*>>
+    get() = (this as EntityRenderDispatcherAccessor).renderers
+    set(value) {
+        (this as EntityRenderDispatcherAccessor).renderers = value
+    }
+
+var EntityRenderDispatcher.playerRenderers: MutableMap<String, EntityRenderer<out Player>>
+    get() = (this as EntityRenderDispatcherAccessor).playerRenderers
+    set(value) {
+        (this as EntityRenderDispatcherAccessor).playerRenderers = value
+    }
+
+val BlockEntityRenderDispatcher.renderers: MutableMap<BlockEntityType<*>, BlockEntityRenderer<*>>
+    get() = (this as BlockEntityRenderDispatcherAccessor).renderers
+
+fun Map<EntityType<*>, EntityRenderer<*>>.observeEntityRenderers() = ObservableMap(this) {
+    val renderer = this[it]
+    if (renderer is LazyEntityRenderer<*>) runBlocking { renderer.loading.await() } else renderer
+}
+
+fun Map<String, EntityRenderer<out Player>>.observePlayerRenderers() = ObservableMap(this) {
+    val renderer = this[it]
+    if (renderer is LazyPlayerRenderer) runBlocking { renderer.loading.await() } else renderer
+}
+
+fun Map<BlockEntityType<*>, BlockEntityRenderer<*>>.observeBlockEntityRenderers() = ObservableMap(this) {
+    val renderer = this[it]
+    if (renderer is LazyBlockEntityRenderer<*>) runBlocking { renderer.loading.await() } else renderer
 }

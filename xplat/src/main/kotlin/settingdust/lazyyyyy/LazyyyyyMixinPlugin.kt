@@ -21,8 +21,7 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         private set
 
     val defaultConfig = mapOf<String, Boolean>(
-        // Meanness since the renderers are lazy
-        "async_model_baking" to false,
+        "async_model_baking" to true,
         "axiom.async_check_commercial" to true,
         "entity_sound_features.async_sound_events" to true,
         "lazy_entity_renderers" to true,

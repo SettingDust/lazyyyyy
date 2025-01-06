@@ -94,11 +94,11 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     library("entity-features-sound-fabric", "maven.modrinth", "esf").version("$esf-fabric")
     library("entity-features-sound-forge", "maven.modrinth", "esf").version("$esf-forge")
 
-    val emf = "2.2.6"
+    val emf = "2.4.1"
     library("entity-features-model-fabric", "maven.modrinth", "entity-model-features").version("$emf-fabric")
     library("entity-features-model-forge", "maven.modrinth", "entity-model-features").version("$emf-forge")
 
-    val etf = "6.2.8"
+    val etf = "6.2.9"
     library("entity-features-texture-fabric", "maven.modrinth", "entitytexturefeatures").version("$etf-fabric")
     library("entity-features-texture-forge", "maven.modrinth", "entitytexturefeatures").version("$etf-forge")
 
