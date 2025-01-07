@@ -46,6 +46,8 @@ dependencies {
     modImplementation(catalog.modernfix.forge)
 
     modImplementation(catalog.fusion.forge)
+
+    modImplementation("curse.maven:catalogue-459701:4766090")
 }
 
 sourceSets {

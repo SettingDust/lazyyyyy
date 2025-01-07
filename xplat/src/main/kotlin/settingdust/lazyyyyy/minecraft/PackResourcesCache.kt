@@ -41,7 +41,7 @@ interface CachingPackResources {
 
 abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>) {
     companion object {
-        val JOINER = Joiner.on('/')
+        val JOINER = Joiner.on('/').useForNull("null")
 
         val packTypeByDirectory = PackType.entries.associateByTo(Object2ReferenceOpenHashMap()) { it.directory }
     }
@@ -56,10 +56,10 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         Lazyyyyy.logger.debug("Loading pack {} {}", pack.packId(), pack, Throwable())
     }
 
-    fun join(vararg paths: String) = when (paths.size) {
+    fun join(vararg paths: String?) = when (paths.size) {
         0 -> ""
-        1 -> paths[0]
-        else -> JOINER.join(paths)
+        1 -> paths[0] ?: "null"
+        else -> JOINER.join(paths.iterator())
     }!!
 
     fun getNamespaces(type: PackType): Set<String> {
