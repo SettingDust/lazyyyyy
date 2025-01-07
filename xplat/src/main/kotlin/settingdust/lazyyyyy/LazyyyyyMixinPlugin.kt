@@ -67,7 +67,7 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
 
     override fun shouldApplyMixin(targetClassName: String, mixinClassName: String): Boolean {
         if (!mixinClassName.startsWith(mixinPackage)) return super.shouldApplyMixin(targetClassName, mixinClassName)
-        val relativeName = mixinClassName.removePrefix("${mixinPackage}.")
+        val relativeName = mixinClassName.removePrefix("${mixinPackage}.").removePrefix("forge.")
         val disabled =
             config.asSequence()
                 .any { entry -> relativeName.startsWith(entry.key) && !entry.value }
