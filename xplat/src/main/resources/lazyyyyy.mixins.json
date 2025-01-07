@@ -6,27 +6,26 @@
     "refmap": "lazyyyyy.refmap.json",
     "plugin": "settingdust.lazyyyyy.LazyyyyyMixinPlugin",
     "mixins": [
-        "entity_sound_features.async_sound_events.ESFAccessor",
-        "entity_sound_features.async_sound_events.ESFVariantSupplierMixin",
-        "entity_sound_features.async_sound_events.WeighedSoundEventsMixin",
-        "entity_texture_features.async_compat.ETFManagerMixin",
-        "lazy_entity_renderers.EntityRendererAccessor",
         "pack_resources_cache.FilePackResourcesMixin",
         "pack_resources_cache.PathPackResourcesMixin",
         "pack_resources_cache.VanillaPackResourcesMixin",
-        "toomanyplayers.async_networking.TooManyPlayersMixin",
-        "yacl.lazy_animated_image.AnimatedDynamicTextureImageMixin"
+        "toomanyplayers.async_networking.TooManyPlayersMixin"
     ],
     "client": [
         "async_model_baking.EntityModelSetMixin",
         "async_model_baking.ModelPartAccessor",
+        "entity_sound_features.async_sound_events.ESFAccessor",
+        "entity_sound_features.async_sound_events.ESFVariantSupplierMixin",
         "entity_sound_features.async_sound_events.WeighedSoundEventsMixin",
+        "entity_texture_features.async_compat.ETFManagerMixin",
         "lazy_entity_renderers.BlockEntityRenderDispatcherAccessor",
         "lazy_entity_renderers.BlockEntityRenderDispatcherMixin",
         "lazy_entity_renderers.BlockEntityRenderersMixin",
         "lazy_entity_renderers.EntityRenderDispatcherAccessor",
+        "lazy_entity_renderers.EntityRendererAccessor",
         "lazy_entity_renderers.EntityRenderersMixin",
-        "moremcmeta.avoid_duplicate_sprites.TextureAtlasMixin"
+        "moremcmeta.avoid_duplicate_sprites.TextureAtlasMixin",
+        "yacl.lazy_animated_image.AnimatedDynamicTextureImageMixin"
     ],
     "injectors": {
         "defaultRequire": 1
