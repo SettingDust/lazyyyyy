@@ -25,7 +25,6 @@
         "lazy_entity_renderers.BlockEntityRenderDispatcherMixin",
         "lazy_entity_renderers.BlockEntityRenderersMixin",
         "lazy_entity_renderers.EntityRenderDispatcherAccessor",
-        "lazy_entity_renderers.EntityRenderDispatcherMixin",
         "lazy_entity_renderers.EntityRenderersMixin",
         "moremcmeta.avoid_duplicate_sprites.TextureAtlasMixin"
     ],

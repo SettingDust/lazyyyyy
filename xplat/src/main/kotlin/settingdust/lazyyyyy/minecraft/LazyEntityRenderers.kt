@@ -293,16 +293,6 @@ var EntityRenderDispatcher.playerRenderers: MutableMap<String, EntityRenderer<ou
 val BlockEntityRenderDispatcher.renderers: MutableMap<BlockEntityType<*>, BlockEntityRenderer<*>>
     get() = (this as BlockEntityRenderDispatcherAccessor).renderers
 
-fun Map<EntityType<*>, EntityRenderer<*>>.observeEntityRenderers() = ObservableMap(this) {
-    val renderer = this[it]
-    if (renderer is LazyEntityRenderer<*>) runBlocking { renderer.loading.await() } else renderer
-}
-
-fun Map<String, EntityRenderer<out Player>>.observePlayerRenderers() = ObservableMap(this) {
-    val renderer = this[it]
-    if (renderer is LazyPlayerRenderer) runBlocking { renderer.loading.await() } else renderer
-}
-
 fun Map<BlockEntityType<*>, BlockEntityRenderer<*>>.observeBlockEntityRenderers() = ObservableMap(this) {
     val renderer = this[it]
     if (renderer is LazyBlockEntityRenderer<*>) runBlocking { renderer.loading.await() } else renderer

@@ -14,7 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import settingdust.lazyyyyy.minecraft.LazyEntityRenderer;
-import settingdust.lazyyyyy.minecraft.LazyEntityRendererKt;
+import settingdust.lazyyyyy.minecraft.LazyEntityRenderersKt;
 import settingdust.lazyyyyy.minecraft.LazyPlayerRenderer;
 
 import java.util.Map;
@@ -35,7 +35,7 @@ public class EntityRenderersMixin {
         EntityRendererProvider.Context context,
         @Local ImmutableMap.Builder<EntityType<?>, EntityRenderer<?>> builder
     ) {
-        LazyEntityRendererKt.createEntityRenderersAsync(instance, consumer);
+        LazyEntityRenderersKt.createEntityRenderersAsync(instance, consumer);
     }
 
     @WrapOperation(

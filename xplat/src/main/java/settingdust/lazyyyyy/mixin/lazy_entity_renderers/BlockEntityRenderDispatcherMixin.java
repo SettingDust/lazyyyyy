@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import settingdust.lazyyyyy.minecraft.LazyEntityRendererKt;
+import settingdust.lazyyyyy.minecraft.LazyEntityRenderersKt;
 
 import java.util.Map;
 
@@ -22,6 +22,6 @@ public class BlockEntityRenderDispatcherMixin {
      */
     @Inject(method = "onResourceManagerReload", at = @At("TAIL"))
     private void lazyyyyy$observeRenderers(final ResourceManager resourceManager, final CallbackInfo ci) {
-        renderers = LazyEntityRendererKt.observeBlockEntityRenderers(renderers);
+        renderers = LazyEntityRenderersKt.observeBlockEntityRenderers(renderers);
     }
 }
