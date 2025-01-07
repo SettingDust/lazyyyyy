@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.2] - 2025-01-07
+### :bug: Bug Fixes
+- [`db18586`](https://github.com/SettingDust/lazyyyyy/commit/db18586e09156f2a7a5ee24ac4d30036f3ccf73c) - **pack-resources-cache**: avoid crash when joining null paths *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.6.1] - 2025-01-07
 ### :bug: Bug Fixes
 - [`796dc4e`](https://github.com/SettingDust/lazyyyyy/commit/796dc4ee42b322b68fc09ca8810d336c797a2e43) - crash causing by client mixins called on server side *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -187,3 +192,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.5.10]: https://github.com/SettingDust/lazyyyyy/compare/0.5.9...0.5.10
 [0.6.0]: https://github.com/SettingDust/lazyyyyy/compare/0.5.10...0.6.0
 [0.6.1]: https://github.com/SettingDust/lazyyyyy/compare/0.6.0...0.6.1
+[0.6.2]: https://github.com/SettingDust/lazyyyyy/compare/0.6.1...0.6.2
