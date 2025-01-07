@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-01-07
+### :sparkles: New Features
+- [`3396602`](https://github.com/SettingDust/lazyyyyy/commit/3396602be33e41287e795a7dbd46de8908b2cad3) - **lazy-entity-renderers**: supporting bovines-and-buttercups *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :bug: Bug Fixes
+- [`841d785`](https://github.com/SettingDust/lazyyyyy/commit/841d7852cd67db7773a976cdb8554eb051f4cf37) - **pack-resources-cache**: error when loading cache causing stuck sometime *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`2f97e56`](https://github.com/SettingDust/lazyyyyy/commit/2f97e56f9ab2d54310bd5686d6e39afaee4e14b3) - **lazy-entity-renderers**: fix duplicating layers if mod iterate over all the renderers *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`bfe4396`](https://github.com/SettingDust/lazyyyyy/commit/bfe43967e2930b64d51ce999a3a5d124cf49edb9) - **lazy-entity-renderers**: allowing model depends on another in constructor by load the model if getting it *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`e4739b0`](https://github.com/SettingDust/lazyyyyy/commit/e4739b0b46d2be965e5a0f591f25e9f5af095687) - **lazy-entity-renderers**: split out the renderers to compat with mods iterate the renderers *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`616dba1`](https://github.com/SettingDust/lazyyyyy/commit/616dba1f8348b2f9349aaecc82e71f5caad2b8fa) - mixin config working with forge mixins *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.5.10] - 2025-01-01
 ### :bug: Bug Fixes
 - [`8822068`](https://github.com/SettingDust/lazyyyyy/commit/8822068256617d0de2a34a24067ff0cb3096a997) - **pack-resources-cache**: race condition since kotlin `getOrPut` isn't working with concurrent *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -168,3 +180,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.5.8]: https://github.com/SettingDust/lazyyyyy/compare/0.5.7...0.5.8
 [0.5.9]: https://github.com/SettingDust/lazyyyyy/compare/0.5.8...0.5.9
 [0.5.10]: https://github.com/SettingDust/lazyyyyy/compare/0.5.9...0.5.10
+[0.6.0]: https://github.com/SettingDust/lazyyyyy/compare/0.5.10...0.6.0
