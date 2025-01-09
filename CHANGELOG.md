@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.4] - 2025-01-09
+### :bug: Bug Fixes
+- [`760120b`](https://github.com/SettingDust/lazyyyyy/commit/760120bae7ff6ccc7a4ff162710a0db7ef09e4dd) - **pack-resources-cache**: builtin pack in mods aren't working *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.6.3] - 2025-01-09
 ### :bug: Bug Fixes
 - [`cc6fc63`](https://github.com/SettingDust/lazyyyyy/commit/cc6fc63909624c9fd85a9f16c71c16aa8d7a2bfa) - make the renderers map mutable *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -202,3 +207,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.6.1]: https://github.com/SettingDust/lazyyyyy/compare/0.6.0...0.6.1
 [0.6.2]: https://github.com/SettingDust/lazyyyyy/compare/0.6.1...0.6.2
 [0.6.3]: https://github.com/SettingDust/lazyyyyy/compare/0.6.2...0.6.3
+[0.6.4]: https://github.com/SettingDust/lazyyyyy/compare/0.6.3...0.6.4
