@@ -72,7 +72,6 @@ fun Map<EntityType<*>, EntityRenderer<*>>.filterLazyRenderers() =
 fun Map<EntityType<*>, EntityRenderer<*>>.replaceWithDummyLivingEntity(context: EntityRendererProvider.Context) =
     mapValues { (_, renderer) -> if (renderer is LazyEntityRenderer) DummyLivingEntityRenderer(context) else renderer }
 
-
 /**
  * Some mods are using the player renderer without condition
  * https://github.com/WayofTime/BloodMagic/blob/1.20.1/src/main/java/wayoftime/bloodmagic/client/ClientEvents.java#L250-L256

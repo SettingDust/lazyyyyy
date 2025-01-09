@@ -47,6 +47,8 @@ dependencies {
     modImplementation(catalog.modernfix.fabric)
 
     modImplementation(catalog.fusion.fabric)
+
+    modImplementation(catalog.continuity.fabric)
 }
 
 tasks {

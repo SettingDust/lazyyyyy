@@ -48,6 +48,8 @@ dependencies {
     modImplementation(catalog.fusion.forge)
 
     modImplementation("curse.maven:catalogue-459701:4766090")
+
+    modImplementation(catalog.continuity.forge)
 }
 
 sourceSets {

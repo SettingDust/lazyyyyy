@@ -129,6 +129,10 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     val bovinesAndButtercups = "1.11.2"
     library("bovinesAndButtercups-forge", "maven.modrinth", "bovines-and-buttercups").version("$bovinesAndButtercups+1.20.1-forge")
+
+    val continuity = "3.0.0"
+    library("continuity-fabric", "maven.modrinth", "continuity").version("$continuity+1.20.1")
+    library("continuity-forge", "maven.modrinth", "continuity").version("$continuity+1.20.1.forge")
 }
 
 plugins {

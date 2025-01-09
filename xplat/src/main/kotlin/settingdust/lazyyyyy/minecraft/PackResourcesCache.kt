@@ -48,9 +48,12 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
 
     protected abstract val loadingJob: Job
 
-    val files: MutableMap<String, Path> = Object2ReferenceOpenHashMap()
-    val directoryToFiles: MutableMap<String, MutableSet<Pair<Path, String>>> = Object2ReferenceOpenHashMap()
-    val namespaces: MutableMap<PackType, MutableSet<String>> = Object2ReferenceOpenHashMap()
+    var files: MutableMap<String, Path> = Object2ReferenceOpenHashMap()
+        protected set
+    var directoryToFiles: MutableMap<String, MutableSet<Pair<Path, String>>> = Object2ReferenceOpenHashMap()
+        protected set
+    var namespaces: MutableMap<PackType, MutableSet<String>> = Object2ReferenceOpenHashMap()
+        protected set
 
     init {
         Lazyyyyy.logger.debug("Loading pack {} {}", pack.packId(), pack, Throwable())
@@ -233,7 +236,7 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                                     if (file.isAbsolute) it.toAbsolutePath() else it
                                 }
                                 for (i in 2 until relativePath.nameCount - 1) {
-                                    val directory = file.subpath(0, i + root.nameCount)
+                                    val directory = relativePath.subpath(0, i)
                                     directoryToFiles
                                         .computeIfAbsent(directory.toString()) { ConcurrentHashMap.newKeySet() }
                                         .add(file to JOINER.join(namespaceRoot.relativize(file)))
