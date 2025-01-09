@@ -2,7 +2,11 @@ package settingdust.lazyyyyy.minecraft
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.model.geom.ModelLayerLocation
@@ -18,9 +22,11 @@ class AsyncModelPart(
     val location: ModelLayerLocation,
     val provider: () -> ModelPart
 ) : ModelPart(emptyList(), emptyMap()) {
-    private val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) { provider() }
+    private val loading =
+        CoroutineScope(Dispatchers.IO + CoroutineName("Lazy ModelPart $location"))
+            .async(start = CoroutineStart.LAZY) { provider() }
     val wrapped by lazy {
-        val value = measureTimedValue { runBlocking { loading.await() } }
+        val value = measureTimedValue { runBlocking(Dispatchers.IO) { loading.await() } }
         Lazyyyyy.logger.debug("ModelPart {} loaded in {}", location, value.duration)
         value.value
     }

@@ -1,7 +1,9 @@
 package settingdust.lazyyyyy
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 fun executeOffThread(block: Runnable) {
-    Lazyyyyy.scope.launch { block.run() }
+    CoroutineScope(Dispatchers.IO).launch { block.run() }
 }

@@ -2,7 +2,10 @@ package settingdust.lazyyyyy.yacl
 
 import dev.isxander.yacl3.gui.image.ImageRenderer
 import dev.isxander.yacl3.gui.image.ImageRendererFactory
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -15,9 +18,9 @@ import java.nio.file.Path
 import kotlin.io.path.inputStream
 
 class AsyncImageRenderer(val original: Lazy<ImageRendererFactory.ImageSupplier>) : ImageRenderer {
-    private val loading = Lazyyyyy.scope.async(start = CoroutineStart.LAZY) {
-        original.value.completeImage()
-    }
+    private val loading =
+        CoroutineScope(Dispatchers.IO + CoroutineName("YACL Image Renderer"))
+            .async(start = CoroutineStart.LAZY) { original.value.completeImage() }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun <T> getOrStart(completed: (ImageRenderer) -> T, loading: () -> T) = if (this.loading.isCompleted) {

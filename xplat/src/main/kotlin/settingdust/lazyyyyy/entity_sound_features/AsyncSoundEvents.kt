@@ -4,6 +4,8 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceMap
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectIterator
 import it.unimi.dsi.fastutil.objects.ObjectSet
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -90,7 +92,7 @@ class WrappedObject2ReferenceOpenHashMap<K, V>(val wrapped: Object2ReferenceMap<
 fun asyncGetVariantSupplier(
     wrapped: () -> ESFVariantSupplier?,
     consumer: Consumer<ESFVariantSupplier?>
-)= Lazyyyyy.scope.launch(Dispatchers.IO, start = CoroutineStart.LAZY) {
+)= CoroutineScope(Dispatchers.IO + CoroutineName("Lazy ESF Variant")).launch(start = CoroutineStart.LAZY) {
     consumer.accept(wrapped())
 }
 
