@@ -30,6 +30,7 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         "yacl.lazy_animated_image" to true,
         "kiwi.faster_annotation" to true,
         "pack_resources_cache" to true,
+        "avoid_redundant_list_resources" to true
     )
 
     var config = defaultConfig.toMutableMap()
@@ -58,8 +59,10 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         this.mixinPackage = mixinPackage
         if (config["pack_resources_cache"] == true) {
             try {
-                ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ReloadableResourceManagerMixin"] = "lazyyyyy"
-                ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ForgePathPackResourcesMixin"] = "lazyyyyy"
+                ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ReloadableResourceManagerMixin"] =
+                    "lazyyyyy"
+                ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ForgePathPackResourcesMixin"] =
+                    "lazyyyyy"
             } catch (_: NoClassDefFoundError) {
             }
         }

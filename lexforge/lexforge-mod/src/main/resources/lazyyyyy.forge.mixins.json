@@ -6,6 +6,7 @@
     "refmap": "lazyyyyy.forge.refmap.json",
     "plugin": "settingdust.lazyyyyy.LazyyyyyMixinPlugin",
     "mixins": [
+        "avoid_redundant_list_resources.DelegatingPackResourcesMixin",
         "kiwi.faster_annotation.AnnotatedTypeLoaderMixin",
         "pack_resources_cache.PathPackResourcesMixin",
         "pack_resources_cache.ResourcePackLoaderMixin",
