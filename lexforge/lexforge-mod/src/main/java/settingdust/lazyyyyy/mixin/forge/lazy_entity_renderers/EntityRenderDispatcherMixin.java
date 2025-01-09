@@ -2,6 +2,7 @@ package settingdust.lazyyyyy.mixin.forge.lazy_entity_renderers;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -19,6 +20,7 @@ import settingdust.lazyyyyy.forge.LazyEntityRenderDispatcher;
 import settingdust.lazyyyyy.forge.LazyEntityRenderersForgeKt;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @Mixin(EntityRenderDispatcher.class)
@@ -46,7 +48,7 @@ public class EntityRenderDispatcherMixin implements LazyEntityRenderDispatcher {
         )
     )
     private Map<EntityType<?>, EntityRenderer<?>> lazyyyyy$initLazyEntityRenderers(final Map<EntityType<?>, EntityRenderer<?>> original) {
-        lazyyyyy$renderers = original;
+        lazyyyyy$renderers = new Reference2ReferenceOpenHashMap<>(original);
         return LazyEntityRenderersForgeKt.filterLazyRenderers(original);
     }
 
@@ -61,7 +63,7 @@ public class EntityRenderDispatcherMixin implements LazyEntityRenderDispatcher {
         final Map<String, EntityRenderer<? extends Player>> original,
         @Local EntityRendererProvider.Context context
     ) {
-        lazyyyyy$playerRenderers = original;
+        lazyyyyy$playerRenderers = new Reference2ReferenceOpenHashMap<>(original);
         return LazyEntityRenderersForgeKt.replaceWithDummyPlayer(original, context);
     }
 
