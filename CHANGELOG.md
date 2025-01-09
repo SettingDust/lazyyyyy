@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.3] - 2025-01-09
+### :bug: Bug Fixes
+- [`cc6fc63`](https://github.com/SettingDust/lazyyyyy/commit/cc6fc63909624c9fd85a9f16c71c16aa8d7a2bfa) - make the renderers map mutable *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`4d23c62`](https://github.com/SettingDust/lazyyyyy/commit/4d23c62ce892fee04d623649586295c2efa0725b) - get rid of global coroutine scope *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.6.2] - 2025-01-07
 ### :bug: Bug Fixes
 - [`db18586`](https://github.com/SettingDust/lazyyyyy/commit/db18586e09156f2a7a5ee24ac4d30036f3ccf73c) - **pack-resources-cache**: avoid crash when joining null paths *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -193,3 +201,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.6.0]: https://github.com/SettingDust/lazyyyyy/compare/0.5.10...0.6.0
 [0.6.1]: https://github.com/SettingDust/lazyyyyy/compare/0.6.0...0.6.1
 [0.6.2]: https://github.com/SettingDust/lazyyyyy/compare/0.6.1...0.6.2
+[0.6.3]: https://github.com/SettingDust/lazyyyyy/compare/0.6.2...0.6.3
