@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.1] - 2025-01-11
+### :bug: Bug Fixes
+- [`38f0f15`](https://github.com/SettingDust/lazyyyyy/commit/38f0f15ba76776b9f767c20a153410ad08701aaa) - **lazy-entity-renderers**: add workaround to Embeddium + Supplementaries sign post crash *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.7.0] - 2025-01-11
 ### :sparkles: New Features
 - [`35e8114`](https://github.com/SettingDust/lazyyyyy/commit/35e81141186d2a5e6e2ced7ec2ec0bd67205b349) - optimize forge DelegatingPackResources redundant list resources *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -217,3 +222,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.6.3]: https://github.com/SettingDust/lazyyyyy/compare/0.6.2...0.6.3
 [0.6.4]: https://github.com/SettingDust/lazyyyyy/compare/0.6.3...0.6.4
 [0.7.0]: https://github.com/SettingDust/lazyyyyy/compare/0.6.4...0.7.0
+[0.7.1]: https://github.com/SettingDust/lazyyyyy/compare/0.7.0...0.7.1
