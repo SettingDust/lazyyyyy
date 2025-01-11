@@ -33,6 +33,10 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         "avoid_redundant_list_resources" to true
     )
 
+    val conflictings = mapOf<String, MutableSet<String>>(
+        "async_model_baking" to mutableSetOf("duclib")
+    )
+
     var config = defaultConfig.toMutableMap()
         private set
     private val json = Json {
@@ -51,6 +55,11 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
             config = defaultConfig.toMutableMap()
             config.putAll(json.decodeFromStream(configPath.inputStream()))
         }
+        for ((feature, mods) in conflictings) {
+            val conflicting = mods.firstOrNull { PlatformService.isModLoaded(it) } ?: continue
+            logger.warn("Disabling feature $feature due to conflicting mod $conflicting")
+            config[feature] = false
+        }
         json.encodeToStream(config, configPath.outputStream())
     }
 
@@ -63,6 +72,7 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
                     "lazyyyyy"
                 ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ForgePathPackResourcesMixin"] =
                     "lazyyyyy"
+                logger.info("Disabled ModernFix resourcepacks ")
             } catch (_: NoClassDefFoundError) {
             }
         }
