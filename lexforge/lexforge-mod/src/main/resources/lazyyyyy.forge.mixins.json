@@ -8,6 +8,7 @@
     "mixins": [
         "avoid_redundant_list_resources.DelegatingPackResourcesMixin",
         "kiwi.faster_annotation.AnnotatedTypeLoaderMixin",
+        "lazy_entity_renderers.supplementaries.SignPostBlockTileRendererMixin",
         "pack_resources_cache.PathPackResourcesMixin",
         "pack_resources_cache.ResourcePackLoaderMixin",
         "pack_resources_cache.sinytra_connector.ModNioResourcePackMixin",

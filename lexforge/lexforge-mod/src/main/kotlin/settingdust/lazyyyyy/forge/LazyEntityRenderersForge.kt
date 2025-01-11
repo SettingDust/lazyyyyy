@@ -24,7 +24,7 @@ object LazyEntityRenderersForge {
     init {
         CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
             launch {
-                LazyEntityRenderer.onAddLayer.collect { (type, context, renderer) ->
+                LazyEntityRenderer.onLoaded.collect { (type, context, renderer) ->
                     val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
                     entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
                     val originalRenderers = entityRenderDispatcher.renderers
@@ -42,7 +42,7 @@ object LazyEntityRenderersForge {
             }
 
             launch {
-                LazyPlayerRenderer.onAddLayer.collect { (type, context, renderer) ->
+                LazyPlayerRenderer.onLoaded.collect { (type, context, renderer) ->
                     val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
                     entityRenderDispatcher.`lazyyyyy$playerRenderers`[type] = renderer
                     val originalRenderers = entityRenderDispatcher.playerRenderers

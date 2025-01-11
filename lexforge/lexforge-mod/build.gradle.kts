@@ -79,6 +79,8 @@ dependencies {
 
     modImplementation(catalog.bovinesAndButtercups.forge)
 
+    modImplementation("maven.modrinth:supplementaries:1.20-3.1.10-forge")
+    modImplementation("maven.modrinth:moonlight:forge_1.20-2.13.48")
 }
 
 tasks {

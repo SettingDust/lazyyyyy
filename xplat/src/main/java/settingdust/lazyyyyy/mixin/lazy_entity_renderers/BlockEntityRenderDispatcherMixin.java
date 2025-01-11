@@ -17,9 +17,6 @@ import java.util.Map;
 public class BlockEntityRenderDispatcherMixin {
     @Shadow private Map<BlockEntityType<?>, BlockEntityRenderer<?>> renderers;
 
-    /**
-     * Inject at the tail for executing after forge add layers event
-     */
     @Inject(method = "onResourceManagerReload", at = @At("TAIL"))
     private void lazyyyyy$observeRenderers(final ResourceManager resourceManager, final CallbackInfo ci) {
         renderers = LazyEntityRenderersKt.observeBlockEntityRenderers(renderers);

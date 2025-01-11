@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -13,7 +14,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import settingdust.lazyyyyy.minecraft.LazyBlockEntityRenderer;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Mixin(BlockEntityRenderers.class)
@@ -38,6 +38,6 @@ public class BlockEntityRenderersMixin {
 
     @ModifyReturnValue(method = "createEntityRenderers", at = @At("TAIL"))
     private static Map<BlockEntityType<?>, BlockEntityRenderer<?>> lazyyyyy$mutableRenderers(final Map<BlockEntityType<?>, BlockEntityRenderer<?>> original) {
-        return new HashMap<>(original);
+        return new Reference2ReferenceOpenHashMap<>(original);
     }
 }
