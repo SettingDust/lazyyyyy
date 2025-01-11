@@ -49,7 +49,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
 
     var files: MutableMap<String, Path> = ConcurrentHashMap()
         protected set
-    var directoryToFiles: MutableMap<String, MutableSet<Pair<Path, String>>> = ConcurrentHashMap()
+    var directoryToFiles: MutableMap<String, MutableMap<Path, String>> = ConcurrentHashMap()
         protected set
     var namespaces: MutableMap<PackType, MutableSet<String>> = ConcurrentHashMap()
         protected set
@@ -87,7 +87,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         waitForLoading()
         val filesInDir = directoryToFiles["${type.directory}/$namespace/$prefix"] ?: return
         runBlocking(Dispatchers.IO) {
-            filesInDir.asFlow().concurrent()
+            filesInDir.asSequence().asFlow().concurrent()
                 .mapNotNull { (path, relativeString) ->
                     val location = ResourceLocation.tryBuild(namespace, relativeString)
                     if (location == null) Lazyyyyy.logger.warn("Invalid path $namespace:$path in pack ${pack.packId()}, ignoring")
@@ -124,8 +124,6 @@ class VanillaPackResourcesCache(
         }).launch {
             val time = measureTime {
                 val jobs = mutableListOf<Job>()
-                val files: ConcurrentHashMap<String, Path> = ConcurrentHashMap()
-                val directoryToFiles: ConcurrentHashMap<String, MutableSet<Pair<Path, String>>> = ConcurrentHashMap()
                 pathsForType.asSequence().asFlow().concurrent()
                     .flatMap { (type, paths) -> paths.asFlow().map { type to it } }
                     .collect { (type, root) ->
@@ -148,8 +146,8 @@ class VanillaPackResourcesCache(
                                     for (i in 1 until relativePath.nameCount - 1) {
                                         pathString.append('/').append(relativePath.getName(i).name)
                                         directoryToFiles
-                                            .computeIfAbsent(pathString.toString()) { ConcurrentHashMap.newKeySet() }
-                                            .add(file to JOINER.join(namespaceRoot.relativize(file)))
+                                            .computeIfAbsent(pathString.toString()) { ConcurrentHashMap() }
+                                            .put(file, JOINER.join(namespaceRoot.relativize(file)))
                                     }
                                 })
                                 FileVisitResult.CONTINUE
@@ -176,8 +174,6 @@ class VanillaPackResourcesCache(
                 }
 
                 jobs.joinAll()
-                this@VanillaPackResourcesCache.files.putAll(files)
-                this@VanillaPackResourcesCache.directoryToFiles.putAll(directoryToFiles)
             }
             if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache vanilla pack ${pack.packId()} in $time")
             else Lazyyyyy.logger.debug("Cache vanilla pack ${pack.packId()} in $time")
@@ -197,9 +193,6 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
         }).launch {
             val time = measureTime {
                 val jobs = mutableListOf<Job>()
-                val files: MutableMap<String, Path> = ConcurrentHashMap()
-                val directoryToFiles: MutableMap<String, MutableSet<Pair<Path, String>>> = ConcurrentHashMap()
-                val namespaces: MutableMap<PackType, MutableSet<String>> = ConcurrentHashMap()
                 roots.asFlow().concurrent().collect { root ->
                     root.visitFileTree(fileVisitor {
                         onPreVisitDirectory { directory, attributes ->
@@ -233,8 +226,8 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                                 for (i in 2 until relativePath.nameCount) {
                                     val directory = relativePath.subpath(0, i)
                                     directoryToFiles
-                                        .computeIfAbsent(directory.toString()) { ConcurrentHashMap.newKeySet() }
-                                        .add(file to JOINER.join(namespaceRoot.relativize(file)))
+                                        .computeIfAbsent(directory.toString()) { ConcurrentHashMap() }
+                                        .put(file, JOINER.join(namespaceRoot.relativize(file)))
                                 }
                             })
                             FileVisitResult.CONTINUE
@@ -242,10 +235,6 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                     })
                 }
                 jobs.joinAll()
-
-                this@SimplePackResourcesCache.files.putAll(files)
-                this@SimplePackResourcesCache.directoryToFiles.putAll(directoryToFiles)
-                this@SimplePackResourcesCache.namespaces.putAll(namespaces)
             }
             if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache pack ${pack.packId()} in $time")
             else Lazyyyyy.logger.debug("Cache pack ${pack.packId()} in $time")

@@ -49,6 +49,9 @@ dependencies {
     modImplementation(catalog.fusion.fabric)
 
     modImplementation(catalog.continuity.fabric)
+
+    implementation(catalog.caffeine)
+    implementation(catalog.caffeine.coroutines)
 }
 
 tasks {

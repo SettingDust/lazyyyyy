@@ -124,7 +124,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     library("bigbrain", "maven.modrinth", "big-brain").version("1.20.1-1.7.4")
 
-    library("aedile", "com.sksamuel.aedile", "aedile-core").version("2.0.1")
+    library("caffeine-coroutines", "dev.hsbrysk", "caffeine-coroutines").version("1.2.1")
     library("caffeine", "com.github.ben-manes.caffeine", "caffeine").version("3.1.8")
 
     val bovinesAndButtercups = "1.11.2"
