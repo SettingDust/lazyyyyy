@@ -7,7 +7,6 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.joinAll
@@ -46,24 +45,20 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         val packTypeByDirectory = PackType.entries.associateByTo(Object2ReferenceOpenHashMap()) { it.directory }
     }
 
-    protected abstract val loadingJob: Job
+    protected abstract var loadingJob: Job
 
-    var files: MutableMap<String, Path> = Object2ReferenceOpenHashMap()
+    var files: MutableMap<String, Path> = ConcurrentHashMap()
         protected set
-    var directoryToFiles: MutableMap<String, MutableSet<Pair<Path, String>>> = Object2ReferenceOpenHashMap()
+    var directoryToFiles: MutableMap<String, MutableSet<Pair<Path, String>>> = ConcurrentHashMap()
         protected set
-    var namespaces: MutableMap<PackType, MutableSet<String>> = Object2ReferenceOpenHashMap()
+    var namespaces: MutableMap<PackType, MutableSet<String>> = ConcurrentHashMap()
         protected set
-
-    init {
-        Lazyyyyy.logger.debug("Loading pack {} {}", pack.packId(), pack, Throwable())
-    }
 
     fun join(vararg paths: String?) = when (paths.size) {
         0 -> ""
         1 -> paths[0] ?: "null"
         else -> JOINER.join(paths.iterator())
-    }!!
+    } ?: error("Paths shouldn't be null '${paths.joinToString()}'")
 
     fun getNamespaces(type: PackType): Set<String> {
         waitForLoading()
@@ -115,7 +110,7 @@ class VanillaPackResourcesCache(
     roots: List<Path>,
     private val pathsForType: Map<PackType, List<Path>>
 ) : PackResourcesCache(pack, roots) {
-    override val loadingJob: Job
+    override var loadingJob: Job
 
     init {
         loadingJob = loadCache()
@@ -123,7 +118,7 @@ class VanillaPackResourcesCache(
 
     @OptIn(ExperimentalPathApi::class)
     fun loadCache() =
-        CoroutineScope(SupervisorJob() + CoroutineName("Vanilla Pack Cache") + CoroutineExceptionHandler { context, throwable ->
+        CoroutineScope(Dispatchers.IO + CoroutineName("Vanilla Pack Cache") + CoroutineExceptionHandler { context, throwable ->
             if (throwable is Exception || throwable is Error)
                 Lazyyyyy.logger.error("Error loading vanilla pack cache in $context", throwable)
         }).launch {
@@ -192,11 +187,11 @@ class VanillaPackResourcesCache(
 open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : PackResourcesCache(pack, roots) {
     constructor(root: Path, pack: PackResources) : this(pack, listOf(root))
 
-    override val loadingJob = loadCache()
+    override var loadingJob = loadCache()
 
     @OptIn(ExperimentalPathApi::class)
     fun loadCache() =
-        CoroutineScope(SupervisorJob() + CoroutineName("Simple Pack Cache #${pack.packId()}") + CoroutineExceptionHandler { context, throwable ->
+        CoroutineScope(Dispatchers.IO + CoroutineName("Simple Pack Cache #${pack.packId()}") + CoroutineExceptionHandler { context, throwable ->
             if (throwable is Exception || throwable is Error)
                 Lazyyyyy.logger.error("Error loading pack cache in $context", throwable)
         }).launch {
@@ -235,7 +230,7 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                                 val namespaceRoot = root.resolve(relativePath.subpath(0, 2)).let {
                                     if (file.isAbsolute) it.toAbsolutePath() else it
                                 }
-                                for (i in 2 until relativePath.nameCount - 1) {
+                                for (i in 2 until relativePath.nameCount) {
                                     val directory = relativePath.subpath(0, i)
                                     directoryToFiles
                                         .computeIfAbsent(directory.toString()) { ConcurrentHashMap.newKeySet() }

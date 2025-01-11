@@ -15,11 +15,11 @@ import java.util.Map;
 
 @Mixin(DelegatingPackResources.class)
 public class DelegatingPackResourcesMixin {
-    @Shadow
+    @Shadow(remap = false)
     @Final
     private Map<String, List<PackResources>> namespacesAssets;
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     private Map<String, List<PackResources>> namespacesData;
 
@@ -27,6 +27,7 @@ public class DelegatingPackResourcesMixin {
         method = "listResources",
         at = @At(
             value = "FIELD",
+            remap = false,
             target = "Lnet/minecraftforge/resource/DelegatingPackResources;delegates:Ljava/util/List;"
         )
     )

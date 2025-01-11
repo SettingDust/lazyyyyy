@@ -44,11 +44,13 @@ dependencies {
         compileOnly(it)
         annotationProcessor(it)
     }
-    include(catalog.mixinextras.lexforge)
 
-    implementation(catalog.mixinextras.lexforge)
+    catalog.mixinextras.lexforge.let {
+        include(it)
+        implementation(it)
+    }
 
-    implementation(project(":xplat", "namedElements")) { isTransitive = false }
+    implementation(project(":xplat")) { isTransitive = false }
     include(project(":xplat:xplat-lexforge")) { isTransitive = false }
 
     modImplementation(catalog.sinytra.connector)
