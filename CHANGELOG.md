@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.2] - 2025-01-11
+### :bug: Bug Fixes
+- [`afd8286`](https://github.com/SettingDust/lazyyyyy/commit/afd8286d8eb0e5243d2d8212c25b13dc829e1b80) - handle the conflicting in mixin plugin *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`4fe2578`](https://github.com/SettingDust/lazyyyyy/commit/4fe257898a98e96e1570389370dce9338bebb762) - **pack-resources-cache**: simply the cache *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.7.1] - 2025-01-11
 ### :bug: Bug Fixes
 - [`38f0f15`](https://github.com/SettingDust/lazyyyyy/commit/38f0f15ba76776b9f767c20a153410ad08701aaa) - **lazy-entity-renderers**: add workaround to Embeddium + Supplementaries sign post crash *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -223,3 +231,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.6.4]: https://github.com/SettingDust/lazyyyyy/compare/0.6.3...0.6.4
 [0.7.0]: https://github.com/SettingDust/lazyyyyy/compare/0.6.4...0.7.0
 [0.7.1]: https://github.com/SettingDust/lazyyyyy/compare/0.7.0...0.7.1
+[0.7.2]: https://github.com/SettingDust/lazyyyyy/compare/0.7.1...0.7.2
