@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.3] - 2025-01-12
+### :bug: Bug Fixes
+- [`144fc07`](https://github.com/SettingDust/lazyyyyy/commit/144fc07e48af0db0cc88aa986f6f4cfd68d91d7b) - **lazy-entity-renderers**: compat with what_are_you_voting_for_2023 *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.7.2] - 2025-01-11
 ### :bug: Bug Fixes
 - [`afd8286`](https://github.com/SettingDust/lazyyyyy/commit/afd8286d8eb0e5243d2d8212c25b13dc829e1b80) - handle the conflicting in mixin plugin *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -232,3 +237,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.7.0]: https://github.com/SettingDust/lazyyyyy/compare/0.6.4...0.7.0
 [0.7.1]: https://github.com/SettingDust/lazyyyyy/compare/0.7.0...0.7.1
 [0.7.2]: https://github.com/SettingDust/lazyyyyy/compare/0.7.1...0.7.2
+[0.7.3]: https://github.com/SettingDust/lazyyyyy/compare/0.7.2...0.7.3
