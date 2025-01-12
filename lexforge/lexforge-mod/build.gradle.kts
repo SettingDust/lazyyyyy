@@ -84,6 +84,8 @@ dependencies {
 
     modImplementation("curse.maven:recrafted-creatures-835564:5853646")
     modImplementation("curse.maven:duclib-823186:5258376")
+
+    modImplementation("maven.modrinth:what-are-you-voting-for-2023:1.2.5-forge,1.20.1")
 }
 
 tasks {
