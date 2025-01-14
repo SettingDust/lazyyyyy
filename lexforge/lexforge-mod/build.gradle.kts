@@ -86,6 +86,8 @@ dependencies {
     modImplementation("curse.maven:duclib-823186:5258376")
 
     modImplementation("maven.modrinth:what-are-you-voting-for-2023:1.2.5-forge,1.20.1")
+
+    modImplementation(rootProject.files("libs/taniwha-forge-1.20.0-5.4.9.jar"))
 }
 
 tasks {
