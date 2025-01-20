@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.5] - 2025-01-20
+### :bug: Bug Fixes
+- [`189f865`](https://github.com/SettingDust/lazyyyyy/commit/189f86575b6da50da1904beee7cb2aa7c9819898) - **lazy-entity-renderers**: crash with EMF for concurrent model loading *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`6910264`](https://github.com/SettingDust/lazyyyyy/commit/691026457c15c66166e11a5cc01a90300f1fda13) - **deps**: bump net.bytebuddy:byte-buddy-agent from 1.5.11 to 1.15.11 *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
+
+
 ## [0.7.4] - 2025-01-14
 ### :bug: Bug Fixes
 - [`668c3fd`](https://github.com/SettingDust/lazyyyyy/commit/668c3fd09eccd266689324885be43d97905ed3ce) - **lazy-entity-renderers**: compat with taniwha *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -244,3 +252,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.7.2]: https://github.com/SettingDust/lazyyyyy/compare/0.7.1...0.7.2
 [0.7.3]: https://github.com/SettingDust/lazyyyyy/compare/0.7.2...0.7.3
 [0.7.4]: https://github.com/SettingDust/lazyyyyy/compare/0.7.3...0.7.4
+[0.7.5]: https://github.com/SettingDust/lazyyyyy/compare/0.7.4...0.7.5
