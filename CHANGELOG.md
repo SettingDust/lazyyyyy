@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.6] - 2025-01-20
+### :bug: Bug Fixes
+- [`a468d68`](https://github.com/SettingDust/lazyyyyy/commit/a468d68a293cbd8b3e8b86e410df7484c2f70459) - **lazy-entity-renderers**: crash with invalid mixin *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.7.5] - 2025-01-20
 ### :bug: Bug Fixes
 - [`189f865`](https://github.com/SettingDust/lazyyyyy/commit/189f86575b6da50da1904beee7cb2aa7c9819898) - **lazy-entity-renderers**: crash with EMF for concurrent model loading *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -253,3 +258,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.7.3]: https://github.com/SettingDust/lazyyyyy/compare/0.7.2...0.7.3
 [0.7.4]: https://github.com/SettingDust/lazyyyyy/compare/0.7.3...0.7.4
 [0.7.5]: https://github.com/SettingDust/lazyyyyy/compare/0.7.4...0.7.5
+[0.7.6]: https://github.com/SettingDust/lazyyyyy/compare/0.7.5...0.7.6
