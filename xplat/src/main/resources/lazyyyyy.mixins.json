@@ -6,6 +6,7 @@
     "refmap": "lazyyyyy.refmap.json",
     "plugin": "settingdust.lazyyyyy.LazyyyyyMixinPlugin",
     "mixins": [
+        "lazy_entity_renderers.entity_model_features.EMFManagerMixin",
         "pack_resources_cache.FilePackResourcesMixin",
         "pack_resources_cache.PathPackResourcesMixin",
         "pack_resources_cache.VanillaPackResourcesMixin",
@@ -17,7 +18,7 @@
         "entity_sound_features.async_sound_events.ESFAccessor",
         "entity_sound_features.async_sound_events.ESFVariantSupplierMixin",
         "entity_sound_features.async_sound_events.WeighedSoundEventsMixin",
-        "entity_texture_features.async_compat.ETFManagerMixin",
+        "entity_sound_features.async_sound_events.entity_texture_features.ETFManagerMixin",
         "lazy_entity_renderers.BlockEntityRenderDispatcherAccessor",
         "lazy_entity_renderers.BlockEntityRenderDispatcherMixin",
         "lazy_entity_renderers.BlockEntityRenderersMixin",
