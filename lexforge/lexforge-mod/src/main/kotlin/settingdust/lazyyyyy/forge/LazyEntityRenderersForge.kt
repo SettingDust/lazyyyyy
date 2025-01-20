@@ -13,7 +13,6 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.player.Player
 import net.minecraftforge.client.event.EntityRenderersEvent
 import net.minecraftforge.fml.ModLoader
-import settingdust.lazyyyyy.Lazyyyyy
 import settingdust.lazyyyyy.minecraft.DummyLivingEntityRenderer
 import settingdust.lazyyyyy.minecraft.DummyPlayerRenderer
 import settingdust.lazyyyyy.minecraft.LazyEntityRenderer
@@ -26,41 +25,37 @@ object LazyEntityRenderersForge {
         CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
             launch {
                 LazyEntityRenderer.onLoaded.collect { (type, context, renderer) ->
-                    launch(Lazyyyyy.mainThreadContext) {
-                        val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
-                        entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
-                        val originalRenderers = entityRenderDispatcher.renderers
-                        entityRenderDispatcher.renderers = mutableMapOf(type to renderer)
-                        ModLoader.get()
-                            .postEvent(
-                                EntityRenderersEvent.AddLayers(
-                                    entityRenderDispatcher.renderers,
-                                    emptyMap(),
-                                    context
-                                )
+                    val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
+                    entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
+                    val originalRenderers = entityRenderDispatcher.renderers
+                    entityRenderDispatcher.renderers = mutableMapOf(type to renderer)
+                    ModLoader.get()
+                        .postEvent(
+                            EntityRenderersEvent.AddLayers(
+                                entityRenderDispatcher.renderers,
+                                emptyMap(),
+                                context
                             )
-                        entityRenderDispatcher.renderers = originalRenderers
-                    }
+                        )
+                    entityRenderDispatcher.renderers = originalRenderers
                 }
             }
 
             launch {
                 LazyPlayerRenderer.onLoaded.collect { (type, context, renderer) ->
-                    launch(Lazyyyyy.mainThreadContext) {
-                        val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
-                        entityRenderDispatcher.`lazyyyyy$playerRenderers`[type] = renderer
-                        val originalRenderers = entityRenderDispatcher.playerRenderers
-                        entityRenderDispatcher.playerRenderers = mutableMapOf(type to renderer)
-                        ModLoader.get()
-                            .postEvent(
-                                EntityRenderersEvent.AddLayers(
-                                    emptyMap(),
-                                    entityRenderDispatcher.playerRenderers,
-                                    context
-                                )
+                    val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
+                    entityRenderDispatcher.`lazyyyyy$playerRenderers`[type] = renderer
+                    val originalRenderers = entityRenderDispatcher.playerRenderers
+                    entityRenderDispatcher.playerRenderers = mutableMapOf(type to renderer)
+                    ModLoader.get()
+                        .postEvent(
+                            EntityRenderersEvent.AddLayers(
+                                emptyMap(),
+                                entityRenderDispatcher.playerRenderers,
+                                context
                             )
-                        entityRenderDispatcher.playerRenderers = originalRenderers
-                    }
+                        )
+                    entityRenderDispatcher.playerRenderers = originalRenderers
                 }
             }
         }
