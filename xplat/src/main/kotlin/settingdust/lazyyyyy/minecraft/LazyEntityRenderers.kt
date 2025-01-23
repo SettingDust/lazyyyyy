@@ -63,7 +63,7 @@ class LazyEntityRenderer<T : Entity>(
 ) : EntityRenderer<T>(context) {
     companion object {
         val onLoaded =
-            MutableSharedFlow<Triple<EntityType<*>, EntityRendererProvider.Context, EntityRenderer<*, *>>>()
+            MutableSharedFlow<Triple<EntityType<*>, EntityRendererProvider.Context, EntityRenderer<*>>>()
     }
 
     val loading = CoroutineScope(Dispatchers.IO + CoroutineName("Lazy Entity Renderer $type"))
