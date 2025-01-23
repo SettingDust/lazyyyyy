@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.LivingEntityRenderer
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.player.Player
 import net.minecraftforge.client.event.EntityRenderersEvent
@@ -27,6 +28,7 @@ object LazyEntityRenderersForge {
                 LazyEntityRenderer.onLoaded.collect { (type, context, renderer) ->
                     val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
                     entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
+                    if (renderer !is LivingEntityRenderer<*, *>) return@collect
                     val originalRenderers = entityRenderDispatcher.renderers
                     entityRenderDispatcher.renderers = mutableMapOf(type to renderer)
                     ModLoader.get()

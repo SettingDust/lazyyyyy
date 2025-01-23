@@ -25,6 +25,7 @@
         "lazy_entity_renderers.EntityRenderDispatcherAccessor",
         "lazy_entity_renderers.EntityRendererAccessor",
         "lazy_entity_renderers.EntityRenderersMixin",
+        "lazy_entity_renderers.LivingEntityRendererAccessor",
         "moremcmeta.avoid_duplicate_sprites.TextureAtlasMixin",
         "yacl.lazy_animated_image.AnimatedDynamicTextureImageMixin"
     ],
