@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.8] - 2025-01-23
+### :bug: Bug Fixes
+- [`4fbc880`](https://github.com/SettingDust/lazyyyyy/commit/4fbc8808dc1285db057216c92a0a3d4acadcdf84) - **lazy-entity-renderers**: avoid concurrent modification exception when render layers *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`ba35c45`](https://github.com/SettingDust/lazyyyyy/commit/ba35c45611fbf154cb521ebd3c6fd0e0390f7c19) - **lazy-entity-renderers**: wrong type argument *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.7.6] - 2025-01-20
 ### :bug: Bug Fixes
 - [`a468d68`](https://github.com/SettingDust/lazyyyyy/commit/a468d68a293cbd8b3e8b86e410df7484c2f70459) - **lazy-entity-renderers**: crash with invalid mixin *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -259,3 +265,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.7.4]: https://github.com/SettingDust/lazyyyyy/compare/0.7.3...0.7.4
 [0.7.5]: https://github.com/SettingDust/lazyyyyy/compare/0.7.4...0.7.5
 [0.7.6]: https://github.com/SettingDust/lazyyyyy/compare/0.7.5...0.7.6
+[0.7.8]: https://github.com/SettingDust/lazyyyyy/compare/0.7.7...0.7.8
