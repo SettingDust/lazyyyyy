@@ -19,7 +19,7 @@ import traben.entity_model_features.EMFManager;
 public class EMFManagerMixin {
 
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     @Mutable
     private Object2IntOpenHashMap<ModelLayerLocation> amountOfLayerAttempts;

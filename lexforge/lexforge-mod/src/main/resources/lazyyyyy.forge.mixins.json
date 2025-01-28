@@ -13,7 +13,8 @@
         "pack_resources_cache.PathPackResourcesMixin",
         "pack_resources_cache.ResourcePackLoaderMixin",
         "pack_resources_cache.sinytra_connector.ModNioResourcePackMixin",
-        "prismlib.faster_colors_loader.WebColorsMixin"
+        "prismlib.faster_colors_loader.WebColorsMixin",
+        "weaponmaster.faster_initilize.PartsMixin"
     ],
     "client": [
         "lazy_entity_renderers.EntityRenderDispatcherMixin",

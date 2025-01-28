@@ -19,7 +19,7 @@ import traben.entity_texture_features.features.texture_handlers.ETFDirectory;
 @IfModLoaded("entity_texture_features")
 @Mixin(ETFManager.class)
 public class ETFManagerMixin {
-    @Shadow
+    @Shadow(remap = false)
     @Final
     @Mutable
     public Object2ReferenceOpenHashMap<@NotNull ResourceLocation, @NotNull ETFDirectory> ETF_DIRECTORY_CACHE;

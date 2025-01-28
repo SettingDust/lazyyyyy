@@ -17,6 +17,8 @@ dependencies {
     minecraft(catalog.minecraft)
     mappings(loom.officialMojangMappings())
 
+    implementation(project(":xplat"))
+
     implementation(catalog.sinytra.connector)
     modImplementation(catalog.forgified.fabric.api) {
         exclude(module = "fabric-loader")

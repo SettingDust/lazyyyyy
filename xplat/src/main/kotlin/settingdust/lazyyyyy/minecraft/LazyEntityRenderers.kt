@@ -76,7 +76,8 @@ class LazyEntityRenderer<T : Entity>(
                 val renderer = loading.getCompleted()
                 Minecraft.getInstance().entityRenderDispatcher.renderers[type] = renderer
                 if (renderer is LivingEntityRenderer<*, *>) {
-                    (renderer as LivingEntityRendererAccessor).setLayers(CopyOnWriteArrayList((renderer as LivingEntityRendererAccessor).layers))
+                    (renderer as LivingEntityRendererAccessor).layers =
+                        CopyOnWriteArrayList((renderer as LivingEntityRendererAccessor).layers)
                 }
                 runBlocking {
                     onLoaded.emit(Triple(type, context, renderer))
