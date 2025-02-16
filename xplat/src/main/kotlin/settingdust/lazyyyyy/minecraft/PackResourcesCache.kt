@@ -130,10 +130,11 @@ class VanillaPackResourcesCache(
                 Lazyyyyy.logger.error("Error loading vanilla pack cache in $context", throwable)
         }).launch {
             val time = measureTime {
-                val jobs = mutableListOf<Job>()
+                val allJobs = ConcurrentHashMap.newKeySet<Job>()
                 pathsForType.asSequence().asFlow().concurrent()
                     .flatMap { (type, paths) -> paths.asFlow().map { type to it } }
                     .collect { (type, root) ->
+                        val jobs = mutableListOf<Job>()
                         root.visitFileTree(fileVisitor {
                             onVisitFile { file, attributes ->
                                 val relativePath by lazy { root.relativize(file) }
@@ -160,9 +161,11 @@ class VanillaPackResourcesCache(
                                 FileVisitResult.CONTINUE
                             }
                         })
+                        allJobs.addAll(jobs)
                     }
 
                 roots.asFlow().concurrent().collect { root ->
+                    val jobs = mutableListOf<Job>()
                     root.visitFileTree(fileVisitor {
                         onPreVisitDirectory { directory, attributes ->
                             if (directory.nameCount == 1 && directory.name in packTypeByDirectory) FileVisitResult.SKIP_SUBTREE
@@ -178,9 +181,10 @@ class VanillaPackResourcesCache(
                             FileVisitResult.CONTINUE
                         }
                     })
+                    allJobs.addAll(jobs)
                 }
 
-                jobs.joinAll()
+                allJobs.joinAll()
             }
             if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache vanilla pack ${pack.packId()} in $time")
             else Lazyyyyy.logger.debug("Cache vanilla pack ${pack.packId()} in $time")
@@ -199,8 +203,9 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                 Lazyyyyy.logger.error("Error loading pack cache in $context", throwable)
         }).launch {
             val time = measureTime {
-                val jobs = mutableListOf<Job>()
+                val allJobs = ConcurrentHashMap.newKeySet<Job>()
                 roots.asFlow().concurrent().collect { root ->
+                    val jobs = mutableListOf<Job>()
                     root.visitFileTree(fileVisitor {
                         onPreVisitDirectory { directory, attributes ->
                             val relativePath = root.relativize(directory)
@@ -240,8 +245,9 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                             FileVisitResult.CONTINUE
                         }
                     })
+                    allJobs.addAll(jobs)
                 }
-                jobs.joinAll()
+                allJobs.joinAll()
             }
             if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache pack ${pack.packId()} in $time")
             else Lazyyyyy.logger.debug("Cache pack ${pack.packId()} in $time")

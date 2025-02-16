@@ -39,8 +39,9 @@ class TreePackResourcesCache(pack: TreeResourcePack, roots: List<Path>) : Simple
                 Lazyyyyy.logger.error("Error loading pack cache in $context", throwable)
         }).launch {
             val time = measureTime {
-                val jobs = mutableListOf<Job>()
+                val allJobs = ConcurrentHashMap.newKeySet<Job>()
                 roots.asFlow().concurrent().collect { root ->
+                    val jobs = mutableListOf<Job>()
                     root.visitFileTree(fileVisitor {
                         onPreVisitDirectory { directory, attributes ->
                             val relativePath = root.relativize(directory)
@@ -74,8 +75,9 @@ class TreePackResourcesCache(pack: TreeResourcePack, roots: List<Path>) : Simple
                             FileVisitResult.CONTINUE
                         }
                     })
+                    allJobs.addAll(jobs)
                 }
-                jobs.joinAll()
+                allJobs.joinAll()
             }
             if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache tree pack ${pack.packId()} in $time")
             else Lazyyyyy.logger.debug("Cache tree pack ${pack.packId()} in $time")
