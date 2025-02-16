@@ -12,6 +12,7 @@
         "lazy_entity_renderers.what_are_you_voting_for_2023.ClientEventBusSubscriberMixin",
         "pack_resources_cache.PathPackResourcesMixin",
         "pack_resources_cache.ResourcePackLoaderMixin",
+        "pack_resources_cache.dynamic_trees.FlatTreeResourcePackMixin",
         "pack_resources_cache.sinytra_connector.ModNioResourcePackMixin",
         "prismlib.faster_colors_loader.WebColorsMixin",
         "weaponmaster.faster_initilize.PartsMixin"

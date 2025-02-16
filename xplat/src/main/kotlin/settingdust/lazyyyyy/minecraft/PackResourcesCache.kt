@@ -35,8 +35,13 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
 interface CachingPackResources {
-    val `lazyyyyy$cache`: PackResourcesCache
+    val `lazyyyyy$cache`: PackResourcesCache?
 }
+
+val supported = setOf(
+    "com.ferreusveritas.dynamictrees.resources.ModTreeResourcePack",
+    "com.ferreusveritas.dynamictrees.resources.FlatTreeResourcePack"
+)
 
 abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>) {
     companion object {
@@ -60,15 +65,15 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         else -> JOINER.join(paths.iterator())
     } ?: error("Paths shouldn't be null '${paths.joinToString()}'")
 
-    fun getNamespaces(type: PackType): Set<String> {
+    open fun getNamespaces(type: PackType?): Set<String> {
         waitForLoading()
         return namespaces[type] ?: emptySet()
     }
 
     fun getResource(
-        type: PackType,
+        type: PackType?,
         location: ResourceLocation,
-    ) = getResource("${type.directory}/${location.namespace}/${location.path}")
+    ) = getResource("${type?.directory?.let { "${it}/" } ?: ""}${location.namespace}/${location.path}")
 
     fun getResource(
         path: String
@@ -83,9 +88,10 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
     }
 
     @OptIn(ExperimentalPathApi::class)
-    fun listResources(type: PackType, namespace: String, prefix: String, output: PackResources.ResourceOutput) {
+    fun listResources(type: PackType?, namespace: String, prefix: String, output: PackResources.ResourceOutput) {
         waitForLoading()
-        val filesInDir = directoryToFiles["${type.directory}/$namespace/$prefix"] ?: return
+        val filesInDir =
+            directoryToFiles["${type?.directory?.let { "${it}/" } ?: ""}$namespace/$prefix"] ?: return
         runBlocking(Dispatchers.IO) {
             filesInDir.asSequence().asFlow().concurrent()
                 .mapNotNull { (path, relativeString) ->
@@ -186,7 +192,7 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
     override var loadingJob = loadCache()
 
     @OptIn(ExperimentalPathApi::class)
-    fun loadCache() =
+    open fun loadCache() =
         CoroutineScope(Dispatchers.IO + CoroutineName("Simple Pack Cache #${pack.packId()}") + CoroutineExceptionHandler { context, throwable ->
             if (throwable is Exception || throwable is Error)
                 Lazyyyyy.logger.error("Error loading pack cache in $context", throwable)

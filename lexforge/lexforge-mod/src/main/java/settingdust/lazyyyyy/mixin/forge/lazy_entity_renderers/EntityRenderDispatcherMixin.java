@@ -16,11 +16,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import settingdust.lazyyyyy.forge.LazyEntityRenderDispatcher;
-import settingdust.lazyyyyy.forge.LazyEntityRenderersForgeKt;
+import settingdust.lazyyyyy.forge.minecraft.LazyEntityRenderDispatcher;
+import settingdust.lazyyyyy.forge.minecraft.LazyEntityRenderersForgeKt;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 @Mixin(EntityRenderDispatcher.class)

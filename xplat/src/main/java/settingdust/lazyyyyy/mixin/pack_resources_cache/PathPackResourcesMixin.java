@@ -7,7 +7,6 @@ import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.resources.IoSupplier;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -69,7 +68,7 @@ public class PathPackResourcesMixin implements CachingPackResources {
     }
 
     @Override
-    public @NotNull SimplePackResourcesCache getLazyyyyy$cache() {
+    public SimplePackResourcesCache getLazyyyyy$cache() {
         return lazyyyyy$cache;
     }
 }

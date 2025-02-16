@@ -6,12 +6,6 @@
     "refmap": "lazyyyyy.refmap.json",
     "plugin": "settingdust.lazyyyyy.LazyyyyyMixinPlugin",
     "mixins": [
-        "almost_unified.concurrent_recipe_transformer.DuplicationConfigMixin",
-        "almost_unified.concurrent_recipe_transformer.RecipeLink_DuplicateLinkAccessor",
-        "almost_unified.concurrent_recipe_transformer.RecipeLinkAccessor",
-        "almost_unified.concurrent_recipe_transformer.RecipeLinkMixin",
-        "almost_unified.concurrent_recipe_transformer.RecipeTransformerAccessor",
-        "almost_unified.concurrent_recipe_transformer.RecipeTransformerMixin",
         "lazy_entity_renderers.entity_model_features.EMFManagerMixin",
         "pack_resources_cache.FilePackResourcesMixin",
         "pack_resources_cache.PathPackResourcesMixin",

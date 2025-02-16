@@ -23,8 +23,6 @@ Take advantage from index for trading the cpu time with the memory and disk.
     - Backport https://github.com/openjdk/jdk/pull/16818 from java 22 to java 17. Need jvm supporting runtime agent. Use OpenJDK, please.
     - https://github.com/openjdk/jdk/pull/15926 for reference
 - (WeaponMaster) Faster initialize
-- (AlmostUnified) Concurrent recipe transformer. 
-  - Faster recipe loading
 
 ![yourkit](https://www.yourkit.com/images/yklogo.png)  
 YourKit supports open source projects with innovative and intelligent tools

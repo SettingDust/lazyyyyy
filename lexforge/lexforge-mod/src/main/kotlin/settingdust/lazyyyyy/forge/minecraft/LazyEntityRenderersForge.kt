@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.forge
+package settingdust.lazyyyyy.forge.minecraft
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
