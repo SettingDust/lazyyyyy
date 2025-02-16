@@ -7,15 +7,14 @@ import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraftforge.resource.PathPackResources;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import settingdust.lazyyyyy.Lazyyyyy;
 import settingdust.lazyyyyy.minecraft.CachingPackResources;
-import settingdust.lazyyyyy.minecraft.PackResourcesCacheKt;
+import settingdust.lazyyyyy.minecraft.PackResourcesCache;
 import settingdust.lazyyyyy.minecraft.SimplePackResourcesCache;
 
 import java.io.InputStream;
@@ -25,23 +24,11 @@ import java.util.Set;
 @Mixin(PathPackResources.class)
 public abstract class PathPackResourcesMixin implements CachingPackResources {
     @Unique
-    @Nullable
-    protected SimplePackResourcesCache lazyyyyy$cache;
+    protected PackResourcesCache lazyyyyy$cache;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void lazyyyyy$init(final String packId, final boolean isBuiltin, final Path source, final CallbackInfo ci) {
-        // For supporting mods extends PathPackResources
-        // noinspection ConstantValue
-        if (((Class<?>) getClass()) == PathPackResources.class) {
-            lazyyyyy$cache = new SimplePackResourcesCache(source, (PackResources) this);
-        } else {
-            if (!PackResourcesCacheKt.getSupported().contains(getClass().getName()))
-                Lazyyyyy.INSTANCE.getLogger().warn(
-                    "Failed to cache pack {}({}) that isn't a PathPackResources. Please report this to lazyyyyy issue tracker https://github.com/SettingDust/lazyyyyy/issues",
-                    packId,
-                    getClass()
-                );
-        }
+    protected void lazyyyyy$init(final String packId, final boolean isBuiltin, final Path source, final CallbackInfo ci) {
+        lazyyyyy$cache = new SimplePackResourcesCache(source, (PackResources) this);
     }
 
     @WrapOperation(
@@ -55,11 +42,7 @@ public abstract class PathPackResourcesMixin implements CachingPackResources {
     private Set<String> lazyyyyy$getNamespaces(
         final PathPackResources instance, final PackType packType, final Operation<Set<String>> original
     ) {
-        if (lazyyyyy$cache != null) {
-            return lazyyyyy$cache.getNamespaces(packType);
-        } else {
-            return original.call(instance, packType);
-        }
+        return lazyyyyy$cache.getNamespaces(packType);
     }
 
     @WrapMethod(
@@ -69,11 +52,7 @@ public abstract class PathPackResourcesMixin implements CachingPackResources {
         final String[] paths,
         final Operation<IoSupplier<InputStream>> original
     ) {
-        if (lazyyyyy$cache != null) {
-            return lazyyyyy$cache.getResource(lazyyyyy$cache.join(paths));
-        } else {
-            return original.call((Object) paths);
-        }
+        return lazyyyyy$cache.getResource(lazyyyyy$cache.join(paths));
     }
 
     @WrapMethod(method = "listResources")
@@ -84,15 +63,11 @@ public abstract class PathPackResourcesMixin implements CachingPackResources {
         final PackResources.ResourceOutput resourceOutput,
         final Operation<Void> original
     ) {
-        if (lazyyyyy$cache != null) {
-            lazyyyyy$cache.listResources(packType, string, string2, resourceOutput);
-        } else {
-            original.call(packType, string, string2, resourceOutput);
-        }
+        lazyyyyy$cache.listResources(packType, string, string2, resourceOutput);
     }
 
     @Override
-    public @Nullable SimplePackResourcesCache getLazyyyyy$cache() {
+    public @NotNull PackResourcesCache getLazyyyyy$cache() {
         return lazyyyyy$cache;
     }
 }

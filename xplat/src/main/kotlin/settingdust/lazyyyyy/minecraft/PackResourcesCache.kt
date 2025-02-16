@@ -35,10 +35,11 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
 interface CachingPackResources {
-    val `lazyyyyy$cache`: PackResourcesCache?
+    val `lazyyyyy$cache`: PackResourcesCache
 }
 
 val supported = setOf(
+    "net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack",
     "com.ferreusveritas.dynamictrees.resources.ModTreeResourcePack",
     "com.ferreusveritas.dynamictrees.resources.FlatTreeResourcePack"
 )

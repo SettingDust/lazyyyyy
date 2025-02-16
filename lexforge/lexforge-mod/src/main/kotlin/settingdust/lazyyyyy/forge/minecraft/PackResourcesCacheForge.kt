@@ -23,6 +23,11 @@ import kotlin.io.path.visitFileTree
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
+val supported = setOf(
+    "net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack",
+    "net.minecraftforge.resource.PathPackResources"
+)
+
 class TreePackResourcesCache(pack: TreeResourcePack, roots: List<Path>) : SimplePackResourcesCache(pack, roots) {
     constructor(root: Path, pack: TreeResourcePack) : this(pack, listOf(root))
 

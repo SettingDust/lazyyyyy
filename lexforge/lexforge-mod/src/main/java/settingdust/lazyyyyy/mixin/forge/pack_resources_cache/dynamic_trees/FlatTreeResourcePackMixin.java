@@ -10,8 +10,6 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import settingdust.lazyyyyy.forge.minecraft.TreePackResourcesCache;
 import settingdust.lazyyyyy.mixin.forge.pack_resources_cache.PathPackResourcesMixin;
@@ -22,8 +20,13 @@ import java.util.Set;
 
 @Mixin(FlatTreeResourcePack.class)
 public abstract class FlatTreeResourcePackMixin extends PathPackResourcesMixin {
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void lazyyyyy$init(final String packId, final boolean isBuiltin, final Path source, final CallbackInfo ci) {
+    @Override
+    protected void lazyyyyy$init(
+        final String packId,
+        final boolean isBuiltin,
+        final Path source,
+        final CallbackInfo ci
+    ) {
         lazyyyyy$cache = new TreePackResourcesCache(source, (TreeResourcePack) this);
     }
 
@@ -41,30 +44,22 @@ public abstract class FlatTreeResourcePackMixin extends PathPackResourcesMixin {
     @WrapMethod(
         method = "getResource"
     )
-    private IoSupplier<InputStream> lazyyyyy$getRootResource(
+    private IoSupplier<InputStream> lazyyyyy$getResource(
         final PackType packType,
         final ResourceLocation location,
         final Operation<IoSupplier<InputStream>> original
     ) {
-        if (lazyyyyy$cache != null) {
-            return lazyyyyy$cache.getResource(packType, location);
-        } else {
-            return original.call(packType, location);
-        }
+        return lazyyyyy$cache.getResource(packType, location);
     }
 
     @WrapMethod(method = "listResources")
     private void lazyyyyy$listResources(
         final PackType packType,
-        final String string,
-        final String string2,
+        final String namespace,
+        final String path,
         final PackResources.ResourceOutput resourceOutput,
         final Operation<Void> original
     ) {
-        if (lazyyyyy$cache != null) {
-            lazyyyyy$cache.listResources(packType, string, string2, resourceOutput);
-        } else {
-            original.call(packType, string, string2, resourceOutput);
-        }
+        lazyyyyy$cache.listResources(packType, namespace, path, resourceOutput);
     }
 }
