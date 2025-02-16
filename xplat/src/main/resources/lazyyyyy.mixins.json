@@ -23,6 +23,7 @@
         "lazy_entity_renderers.BlockEntityRenderDispatcherMixin",
         "lazy_entity_renderers.BlockEntityRenderersMixin",
         "lazy_entity_renderers.EntityRenderDispatcherAccessor",
+        "lazy_entity_renderers.EntityRenderDispatcherMixin",
         "lazy_entity_renderers.EntityRendererAccessor",
         "lazy_entity_renderers.EntityRenderersMixin",
         "lazy_entity_renderers.LivingEntityRendererAccessor",

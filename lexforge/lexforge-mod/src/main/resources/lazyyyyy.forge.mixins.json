@@ -18,7 +18,6 @@
         "weaponmaster.faster_initilize.PartsMixin"
     ],
     "client": [
-        "lazy_entity_renderers.EntityRenderDispatcherMixin",
         "lazy_entity_renderers.big_brain.BigBrainRendererEventsMixin",
         "lazy_entity_renderers.bovines_and_buttercups.BovinesAndButtercupsClientForgeMixin",
         "lazy_entity_renderers.quark.UsesForCursesModule_ClientMixin",

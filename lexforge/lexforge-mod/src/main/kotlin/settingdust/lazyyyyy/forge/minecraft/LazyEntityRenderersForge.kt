@@ -6,7 +6,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.LivingEntityRenderer
@@ -19,6 +18,8 @@ import settingdust.lazyyyyy.minecraft.DummyPlayerRenderer
 import settingdust.lazyyyyy.minecraft.LazyEntityRenderer
 import settingdust.lazyyyyy.minecraft.LazyPlayerRenderer
 import settingdust.lazyyyyy.minecraft.ObservableMap
+import settingdust.lazyyyyy.minecraft.`lazyyyyy$playerRenderers`
+import settingdust.lazyyyyy.minecraft.`lazyyyyy$renderers`
 import settingdust.lazyyyyy.minecraft.playerRenderers
 
 object LazyEntityRenderersForge {
@@ -30,7 +31,7 @@ object LazyEntityRenderersForge {
                     entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
                     if (renderer !is LivingEntityRenderer<*, *>) return@collect
                     val originalRenderers = entityRenderDispatcher.renderers
-                    entityRenderDispatcher.renderers = mutableMapOf(type to renderer)
+                    entityRenderDispatcher.renderers = mapOf(type to renderer)
                     ModLoader.get()
                         .postEvent(
                             EntityRenderersEvent.AddLayers(
@@ -48,7 +49,7 @@ object LazyEntityRenderersForge {
                     val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
                     entityRenderDispatcher.`lazyyyyy$playerRenderers`[type] = renderer
                     val originalRenderers = entityRenderDispatcher.playerRenderers
-                    entityRenderDispatcher.playerRenderers = mutableMapOf(type to renderer)
+                    entityRenderDispatcher.playerRenderers = mapOf(type to renderer)
                     ModLoader.get()
                         .postEvent(
                             EntityRenderersEvent.AddLayers(
@@ -80,17 +81,6 @@ fun Map<EntityType<*>, EntityRenderer<*>>.replaceWithDummyLivingEntity(context: 
  */
 fun Map<String, EntityRenderer<out Player>>.replaceWithDummyPlayer(context: EntityRendererProvider.Context) =
     mapValues { (_, renderer) -> if (renderer is LazyPlayerRenderer) DummyPlayerRenderer(context) else renderer }
-
-interface LazyEntityRenderDispatcher {
-    val `lazyyyyy$renderers`: MutableMap<EntityType<*>, EntityRenderer<*>>
-    val `lazyyyyy$playerRenderers`: MutableMap<String, EntityRenderer<out Player>>
-}
-
-val EntityRenderDispatcher.`lazyyyyy$renderers`: MutableMap<EntityType<*>, EntityRenderer<*>>
-    get() = (this as LazyEntityRenderDispatcher).`lazyyyyy$renderers`
-
-val EntityRenderDispatcher.`lazyyyyy$playerRenderers`: MutableMap<String, EntityRenderer<out Player>>
-    get() = (this as LazyEntityRenderDispatcher).`lazyyyyy$playerRenderers`
 
 fun Map<EntityType<*>, EntityRenderer<*>>.observeEntityRenderers() = ObservableMap(this) {
     val renderer = Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$renderers`[it]

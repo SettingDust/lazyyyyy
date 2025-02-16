@@ -55,6 +55,11 @@ fun createEntityRenderersAsync(
     }
 }
 
+interface LazyEntityRenderDispatcher {
+    val `lazyyyyy$renderers`: MutableMap<EntityType<*>, EntityRenderer<*>>
+    val `lazyyyyy$playerRenderers`: MutableMap<String, EntityRenderer<out Player>>
+}
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class LazyEntityRenderer<T : Entity>(
     val type: EntityType<T>,
@@ -74,7 +79,7 @@ class LazyEntityRenderer<T : Entity>(
                     return@invokeOnCompletion
                 }
                 val renderer = loading.getCompleted()
-                Minecraft.getInstance().entityRenderDispatcher.renderers[type] = renderer
+                Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
                 if (renderer is LivingEntityRenderer<*, *>) {
                     (renderer as LivingEntityRendererAccessor).layers =
                         CopyOnWriteArrayList((renderer as LivingEntityRendererAccessor).layers)
@@ -161,7 +166,7 @@ class LazyPlayerRenderer(
     val loading = CoroutineScope(Dispatchers.IO + CoroutineName("Lazy Player Renderer $type"))
         .async(start = CoroutineStart.LAZY) {
             val renderer = wrapped()
-            Minecraft.getInstance().entityRenderDispatcher.playerRenderers[type] = renderer
+            Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$playerRenderers`[type] = renderer
             runBlocking { onLoaded.emit(Triple(type, context, renderer)) }
             renderer
         }
@@ -293,13 +298,13 @@ class ObservableMap<K, V>(val original: Map<K, V>, val onGet: (K) -> V?) : HashM
     }
 }
 
-var EntityRenderDispatcher.renderers: MutableMap<EntityType<*>, EntityRenderer<*>>
+var EntityRenderDispatcher.renderers: Map<EntityType<*>, EntityRenderer<*>>
     get() = (this as EntityRenderDispatcherAccessor).renderers
     set(value) {
         (this as EntityRenderDispatcherAccessor).renderers = value
     }
 
-var EntityRenderDispatcher.playerRenderers: MutableMap<String, EntityRenderer<out Player>>
+var EntityRenderDispatcher.playerRenderers: Map<String, EntityRenderer<out Player>>
     get() = (this as EntityRenderDispatcherAccessor).playerRenderers
     set(value) {
         (this as EntityRenderDispatcherAccessor).playerRenderers = value
@@ -312,3 +317,9 @@ fun Map<BlockEntityType<*>, BlockEntityRenderer<*>>.observeBlockEntityRenderers(
     val renderer = this[it]
     if (renderer is LazyBlockEntityRenderer<*>) runBlocking(Dispatchers.IO) { renderer.loading.await() } else renderer
 }
+
+val EntityRenderDispatcher.`lazyyyyy$renderers`: MutableMap<EntityType<*>, EntityRenderer<*>>
+    get() = (this as LazyEntityRenderDispatcher).`lazyyyyy$renderers`
+
+val EntityRenderDispatcher.`lazyyyyy$playerRenderers`: MutableMap<String, EntityRenderer<out Player>>
+    get() = (this as LazyEntityRenderDispatcher).`lazyyyyy$playerRenderers`

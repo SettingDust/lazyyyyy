@@ -2,7 +2,6 @@ package settingdust.lazyyyyy.mixin.forge.lazy_entity_renderers;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -11,28 +10,21 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import settingdust.lazyyyyy.forge.minecraft.LazyEntityRenderDispatcher;
 import settingdust.lazyyyyy.forge.minecraft.LazyEntityRenderersForgeKt;
 
-import java.util.Collections;
 import java.util.Map;
 
-@Mixin(EntityRenderDispatcher.class)
-public class EntityRenderDispatcherMixin implements LazyEntityRenderDispatcher {
+/**
+ * After {@link settingdust.lazyyyyy.mixin.lazy_entity_renderers.EntityRenderDispatcherMixin}
+ */
+@Mixin(value = EntityRenderDispatcher.class, priority = 1001)
+public class EntityRenderDispatcherMixin {
     @Shadow public Map<EntityType<?>, EntityRenderer<?>> renderers;
 
     @Shadow private Map<String, EntityRenderer<? extends Player>> playerRenderers;
-
-    @Unique
-    public Map<EntityType<?>, EntityRenderer<?>> lazyyyyy$renderers = Collections.emptyMap();
-
-    @Unique
-    public Map<String, EntityRenderer<? extends Player>> lazyyyyy$playerRenderers = Collections.emptyMap();
 
 
     /**
@@ -47,7 +39,6 @@ public class EntityRenderDispatcherMixin implements LazyEntityRenderDispatcher {
         )
     )
     private Map<EntityType<?>, EntityRenderer<?>> lazyyyyy$initLazyEntityRenderers(final Map<EntityType<?>, EntityRenderer<?>> original) {
-        lazyyyyy$renderers = new Reference2ReferenceOpenHashMap<>(original);
         return LazyEntityRenderersForgeKt.filterLazyRenderers(original);
     }
 
@@ -62,40 +53,7 @@ public class EntityRenderDispatcherMixin implements LazyEntityRenderDispatcher {
         final Map<String, EntityRenderer<? extends Player>> original,
         @Local EntityRendererProvider.Context context
     ) {
-        lazyyyyy$playerRenderers = new Reference2ReferenceOpenHashMap<>(original);
         return LazyEntityRenderersForgeKt.replaceWithDummyPlayer(original, context);
-    }
-
-    @Redirect(
-        method = "getRenderer",
-        at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;renderers:Ljava/util/Map;"
-        )
-    )
-    private Map<EntityType<?>, EntityRenderer<?>> lazyyyyy$useLazyRenderers(EntityRenderDispatcher instance) {
-        return lazyyyyy$renderers;
-    }
-
-    @Redirect(
-        method = "getRenderer",
-        at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;playerRenderers:Ljava/util/Map;"
-        )
-    )
-    private Map<String, EntityRenderer<? extends Player>> lazyyyyy$useLazyPlayerRenderers(EntityRenderDispatcher instance) {
-        return lazyyyyy$playerRenderers;
-    }
-
-    @Override
-    public Map<EntityType<?>, EntityRenderer<?>> getLazyyyyy$renderers() {
-        return lazyyyyy$renderers;
-    }
-
-    @Override
-    public Map<String, EntityRenderer<? extends Player>> getLazyyyyy$playerRenderers() {
-        return lazyyyyy$playerRenderers;
     }
 
     /**
