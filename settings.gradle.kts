@@ -133,6 +133,10 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     val continuity = "3.0.0"
     library("continuity-fabric", "maven.modrinth", "continuity").version("$continuity+1.20.1")
     library("continuity-forge", "maven.modrinth", "continuity").version("$continuity+1.20.1.forge")
+
+    val almostUnified = "1.20.1-0.9.4"
+    library("almostUnified-fabric", "maven.modrinth", "almost-unified").version("$almostUnified+fabric")
+    library("almostUnified-forge", "maven.modrinth", "almost-unified").version("$almostUnified+forge")
 }
 
 plugins {

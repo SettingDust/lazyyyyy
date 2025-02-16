@@ -52,6 +52,8 @@ dependencies {
 
     implementation(catalog.caffeine)
     implementation(catalog.caffeine.coroutines)
+
+    modImplementation(catalog.almostUnified.fabric)
 }
 
 tasks {

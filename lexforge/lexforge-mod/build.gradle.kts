@@ -90,6 +90,8 @@ dependencies {
     modImplementation(rootProject.files("libs/taniwha-forge-1.20.0-5.4.9.jar"))
 
     modImplementation("maven.modrinth:weapon-master:1.4.3-1.20.1")
+
+    modImplementation("maven.modrinth:dynamictrees:1.20.1-1.4.1")
 }
 
 tasks {
