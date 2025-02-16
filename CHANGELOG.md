@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.10] - 2025-02-16
+### :bug: Bug Fixes
+- [`05a9947`](https://github.com/SettingDust/lazyyyyy/commit/05a99471769ebb1e97bd9a460956f22392c551ef) - forge path pack mixin work for subclass again *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.7.9] - 2025-02-16
 ### :sparkles: New Features
 - [`4029073`](https://github.com/SettingDust/lazyyyyy/commit/40290735f0f22578d7a5883e17e999c615334f58) - **weaponmaster**: optimize the initialize *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -277,3 +282,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.7.6]: https://github.com/SettingDust/lazyyyyy/compare/0.7.5...0.7.6
 [0.7.8]: https://github.com/SettingDust/lazyyyyy/compare/0.7.7...0.7.8
 [0.7.9]: https://github.com/SettingDust/lazyyyyy/compare/0.7.8...0.7.9
+[0.7.10]: https://github.com/SettingDust/lazyyyyy/compare/0.7.9...0.7.10
