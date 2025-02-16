@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.9] - 2025-02-16
+### :sparkles: New Features
+- [`4029073`](https://github.com/SettingDust/lazyyyyy/commit/40290735f0f22578d7a5883e17e999c615334f58) - **weaponmaster**: optimize the initialize *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`7a30879`](https://github.com/SettingDust/lazyyyyy/commit/7a308799f20bb90d3d7724a1dca5436260f54f46) - **pack-resources-cache**: support dynamic trees trees pack *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`3fac76f`](https://github.com/SettingDust/lazyyyyy/commit/3fac76f96c5d1a40b02b77c624f8abe53ea0e07a) - **deps**: bump net.bytebuddy:byte-buddy-agent from 1.16.1 to 1.17.0 *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
+- [`66b584a`](https://github.com/SettingDust/lazyyyyy/commit/66b584a8d93abfae40d9ce8c576d03298f99b536) - **almost-unified**: try to optimize duplicate calculate *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.7.8] - 2025-01-23
 ### :bug: Bug Fixes
 - [`4fbc880`](https://github.com/SettingDust/lazyyyyy/commit/4fbc8808dc1285db057216c92a0a3d4acadcdf84) - **lazy-entity-renderers**: avoid concurrent modification exception when render layers *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -266,3 +276,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.7.5]: https://github.com/SettingDust/lazyyyyy/compare/0.7.4...0.7.5
 [0.7.6]: https://github.com/SettingDust/lazyyyyy/compare/0.7.5...0.7.6
 [0.7.8]: https://github.com/SettingDust/lazyyyyy/compare/0.7.7...0.7.8
+[0.7.9]: https://github.com/SettingDust/lazyyyyy/compare/0.7.8...0.7.9
