@@ -27,7 +27,7 @@ dependencies {
     include(project(":lexforge:lexforge-mod"))
     implementation(project(":lexforge:lexforge-mc-bootstrap"))
 
-    shadow("net.bytebuddy:byte-buddy-agent:1.16.1") {
+    shadow("net.bytebuddy:byte-buddy-agent:1.17.0") {
         isTransitive = false
     }
 }
