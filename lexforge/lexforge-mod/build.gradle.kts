@@ -92,8 +92,6 @@ dependencies {
     modImplementation("maven.modrinth:weapon-master:1.4.3-1.20.1")
 
     modImplementation("maven.modrinth:dynamictrees:1.20.1-1.4.1")
-
-    modImplementation("maven.modrinth:more-mob-variants:1.3.0.1-forge")
 }
 
 tasks {

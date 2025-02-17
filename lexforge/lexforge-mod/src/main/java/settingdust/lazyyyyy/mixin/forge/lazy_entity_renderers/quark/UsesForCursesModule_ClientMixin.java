@@ -1,21 +1,32 @@
 package settingdust.lazyyyyy.mixin.forge.lazy_entity_renderers.quark;
 
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Cancellable;
 import com.moulberry.mixinconstraints.annotations.IfModLoaded;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.violetmoon.quark.content.client.module.UsesForCursesModule;
-import org.violetmoon.zeta.client.event.load.ZAddModelLayers;
 
 @IfModLoaded("quark")
 @Mixin(UsesForCursesModule.Client.class)
 public class UsesForCursesModule_ClientMixin {
-    @WrapMethod(method = "modelLayers", remap = false)
-    private void lazyyyyy$avoidAddIfNull(final ZAddModelLayers event, final Operation<Void> original) {
-        var renderer = (EntityRenderer<?>) event.getRenderer(EntityType.ARMOR_STAND);
-        if (renderer == null) return;
-        original.call(event);
+    @ModifyExpressionValue(
+        method = "modelLayers",
+        remap = false,
+        at = @At(
+            value = "INVOKE",
+            target = "Lorg/violetmoon/zeta/client/event/load/ZAddModelLayers;getRenderer(Lnet/minecraft/world/entity/EntityType;)Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;"
+        )
+    )
+    private LivingEntityRenderer<?, ?> lazyyyyy$avoidAddIfNull(
+        final LivingEntityRenderer<?, ?> original,
+        @Cancellable CallbackInfo ci
+    ) {
+        if (original == null) {
+            ci.cancel();
+        }
+        return original;
     }
 }
