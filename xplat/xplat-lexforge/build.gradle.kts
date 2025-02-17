@@ -54,6 +54,8 @@ dependencies {
     modImplementation(catalog.continuity.forge)
 
     modImplementation(catalog.almostUnified.forge)
+
+    modImplementation(catalog.badOptimizations)
 }
 
 sourceSets {

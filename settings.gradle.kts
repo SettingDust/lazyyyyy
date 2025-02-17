@@ -137,6 +137,9 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     val almostUnified = "1.20.1-0.9.4"
     library("almostUnified-fabric", "maven.modrinth", "almost-unified").version("$almostUnified+fabric")
     library("almostUnified-forge", "maven.modrinth", "almost-unified").version("$almostUnified+forge")
+
+    val badOptimizations  = "2.2.1-1.20.1"
+    library("badOptimizations", "maven.modrinth", "badoptimizations").version(badOptimizations)
 }
 
 plugins {
