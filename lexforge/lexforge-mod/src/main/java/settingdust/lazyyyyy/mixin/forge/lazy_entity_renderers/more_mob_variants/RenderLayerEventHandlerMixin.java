@@ -11,12 +11,13 @@ import org.spongepowered.asm.mixin.injection.At;
 public class RenderLayerEventHandlerMixin {
     @ModifyExpressionValue(
         method = "addLayerToRenderer",
+        remap = false,
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraftforge/client/event/EntityRenderersEvent$AddLayers;getRenderer(Lnet/minecraft/world/entity/EntityType;)Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;"
         )
     )
-    private static LivingEntityRenderer lazyyyyy$avoidCrash(@Nullable final LivingEntityRenderer original) {
+    private static LivingEntityRenderer<?, ?> lazyyyyy$avoidCrash(@Nullable final LivingEntityRenderer<?, ?> original) {
         if (!(original instanceof LivingEntityRenderer)) return null;
         return original;
     }
