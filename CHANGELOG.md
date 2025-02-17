@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.12] - 2025-02-17
+### :bug: Bug Fixes
+- [`9125803`](https://github.com/SettingDust/lazyyyyy/commit/9125803aba74af5878f167150a8fd6942d035fcc) - **pack-resources-cache**: rare concurrent crash when cache packs *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`b266a01`](https://github.com/SettingDust/lazyyyyy/commit/b266a01d51db53ff804e56432b1e9e64125b66ea) - **lazy-entity-renderers**: crash with more mob variants *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`272766f`](https://github.com/SettingDust/lazyyyyy/commit/272766faa8b789adbe180e29088e3688a88c44a0) - **lazy-entity-renderers**: forge entity render dispatcher isn't applied *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`a2bb866`](https://github.com/SettingDust/lazyyyyy/commit/a2bb8660634677d0b32d2e4643f7aece687edc4b) - **lazy-entity-renderers**: assign correct renderers to lazyyyyy *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`2cb04c1`](https://github.com/SettingDust/lazyyyyy/commit/2cb04c1745ad1ffed25658ac3bf10c443671370e) - **deps**: bump net.bytebuddy:byte-buddy-agent from 1.17.0 to 1.17.1 *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
+
+
 ## [0.7.11] - 2025-02-16
 ### :bug: Bug Fixes
 - [`7a9a178`](https://github.com/SettingDust/lazyyyyy/commit/7a9a1789edc5966f23c4f8981ab64f019f3d9b28) - **lazy-entity-renderers**: avoid concurrent modification when iterate renderers in add layer *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -289,3 +300,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.7.9]: https://github.com/SettingDust/lazyyyyy/compare/0.7.8...0.7.9
 [0.7.10]: https://github.com/SettingDust/lazyyyyy/compare/0.7.9...0.7.10
 [0.7.11]: https://github.com/SettingDust/lazyyyyy/compare/0.7.10...0.7.11
+[0.7.12]: https://github.com/SettingDust/lazyyyyy/compare/0.7.11...0.7.12
