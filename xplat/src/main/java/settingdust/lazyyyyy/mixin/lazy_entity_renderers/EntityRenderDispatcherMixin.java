@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,10 +25,6 @@ public class EntityRenderDispatcherMixin implements LazyEntityRenderDispatcher {
     public Map<String, EntityRenderer<? extends Player>> lazyyyyy$playerRenderers = Collections.emptyMap();
 
 
-    /**
-     * Need to replace the field instead of modify the param since some mods may iterate the field
-     * <a href="https://github.com/ochotonida/artifacts/blob/1.20.1/forge/src/main/java/artifacts/forge/ArtifactsForgeClient.java#L62">artifacts iterating</a>
-     */
     @ModifyExpressionValue(
         method = "onResourceManagerReload",
         at = @At(
@@ -75,12 +72,12 @@ public class EntityRenderDispatcherMixin implements LazyEntityRenderDispatcher {
     }
 
     @Override
-    public Map<EntityType<?>, EntityRenderer<?>> getLazyyyyy$renderers() {
+    public @NotNull Map<EntityType<?>, EntityRenderer<?>> getLazyyyyy$renderers() {
         return lazyyyyy$renderers;
     }
 
     @Override
-    public Map<String, EntityRenderer<? extends Player>> getLazyyyyy$playerRenderers() {
+    public @NotNull Map<String, EntityRenderer<? extends Player>> getLazyyyyy$playerRenderers() {
         return lazyyyyy$playerRenderers;
     }
 }
