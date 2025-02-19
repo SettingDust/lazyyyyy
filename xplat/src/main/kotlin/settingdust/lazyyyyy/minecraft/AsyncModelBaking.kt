@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.model.geom.ModelLayerLocation
@@ -14,6 +15,8 @@ import net.minecraft.client.model.geom.PartPose
 import net.minecraft.util.RandomSource
 import org.joml.Vector3f
 import settingdust.lazyyyyy.Lazyyyyy
+import settingdust.lazyyyyy.mixin.async_model_baking.ModelPartAccessor
+import settingdust.lazyyyyy.util.DelegatingMap
 import kotlin.time.measureTimedValue
 
 @Suppress("UsePropertyAccessSyntax", "HasPlatformType")
@@ -21,8 +24,14 @@ class AsyncModelPart(
     val location: ModelLayerLocation,
     val provider: () -> ModelPart
 ) : ModelPart(emptyList(), emptyMap()) {
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val loading =
         CoroutineScope(Dispatchers.IO + CoroutineName("Lazy ModelPart $location")).async(start = CoroutineStart.LAZY) { provider() }
+            .also { loading->
+                loading.invokeOnCompletion {
+                    (this@AsyncModelPart as ModelPartAccessor).children = DelegatingMap((loading.getCompleted() as ModelPartAccessor).children)
+                }
+            }
     val wrapped by lazy {
         val value = measureTimedValue { runBlocking(Dispatchers.IO) { loading.await() } }
         Lazyyyyy.logger.debug("ModelPart {} loaded in {}", location, value.duration)
