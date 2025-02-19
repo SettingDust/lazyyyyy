@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.14] - 2025-02-19
+### :bug: Bug Fixes
+- [`a02c3b0`](https://github.com/SettingDust/lazyyyyy/commit/a02c3b0f1e6acc63d02dc81afb603eb7f5933ad2) - **async-model-baking**: crash with mods accessing children field of model part *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.7.13] - 2025-02-17
 ### :sparkles: New Features
 - [`dbf5ac0`](https://github.com/SettingDust/lazyyyyy/commit/dbf5ac03047cd837f0d92764731a41100003250e) - **lazy-entity-renderers**: disable badoptimizations renderer cache *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -307,3 +312,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.7.11]: https://github.com/SettingDust/lazyyyyy/compare/0.7.10...0.7.11
 [0.7.12]: https://github.com/SettingDust/lazyyyyy/compare/0.7.11...0.7.12
 [0.7.13]: https://github.com/SettingDust/lazyyyyy/compare/0.7.12...0.7.13
+[0.7.14]: https://github.com/SettingDust/lazyyyyy/compare/0.7.13...0.7.14
