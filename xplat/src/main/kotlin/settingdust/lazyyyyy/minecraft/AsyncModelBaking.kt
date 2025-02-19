@@ -19,6 +19,12 @@ import settingdust.lazyyyyy.mixin.async_model_baking.ModelPartAccessor
 import settingdust.lazyyyyy.util.DelegatingMap
 import kotlin.time.measureTimedValue
 
+var ModelPart.children: MutableMap<String, ModelPart>
+    get() = (this as ModelPartAccessor).children
+    set(value) {
+        (this as ModelPartAccessor).children = value
+    }
+
 @Suppress("UsePropertyAccessSyntax", "HasPlatformType")
 class AsyncModelPart(
     val location: ModelLayerLocation,
@@ -27,9 +33,9 @@ class AsyncModelPart(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val loading =
         CoroutineScope(Dispatchers.IO + CoroutineName("Lazy ModelPart $location")).async(start = CoroutineStart.LAZY) { provider() }
-            .also { loading->
+            .also { loading ->
                 loading.invokeOnCompletion {
-                    (this@AsyncModelPart as ModelPartAccessor).children = DelegatingMap((loading.getCompleted() as ModelPartAccessor).children)
+                    children = DelegatingMap(loading.getCompleted().children)
                 }
             }
     val wrapped by lazy {
