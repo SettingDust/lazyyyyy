@@ -81,6 +81,12 @@ allprojects {
             }
         }
 
+        maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/") {
+            content {
+                includeGroupAndSubgroups("fuzs")
+            }
+        }
+
         maven("https://maven.isxander.dev/releases")
 
         mavenCentral()

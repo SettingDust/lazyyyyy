@@ -16,6 +16,7 @@
         "pack_resources_cache.dynamic_trees.FlatTreeResourcePackMixin",
         "pack_resources_cache.sinytra_connector.ModNioResourcePackMixin",
         "prismlib.faster_colors_loader.WebColorsMixin",
+        "puzzlelib.faster_model_location_cache.faster_model_location_cache.ForgeClientEventInvokersMixin",
         "weaponmaster.faster_initilize.PartsMixin"
     ],
     "client": [
