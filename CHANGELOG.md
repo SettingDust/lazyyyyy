@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2025-02-26
+### :sparkles: New Features
+- [`e4d8bc5`](https://github.com/SettingDust/lazyyyyy/commit/e4d8bc53a8e50c999a58f35c83fc7b6e7735b8aa) - **puzzleslib**: replace the model baking event invoker with fabric api *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`0bf0946`](https://github.com/SettingDust/lazyyyyy/commit/0bf0946f1e6d2a63008c4b5535a8e0ade6b470ff) - replace cast with extension *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.7.14] - 2025-02-19
 ### :bug: Bug Fixes
 - [`a02c3b0`](https://github.com/SettingDust/lazyyyyy/commit/a02c3b0f1e6acc63d02dc81afb603eb7f5933ad2) - **async-model-baking**: crash with mods accessing children field of model part *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -313,3 +321,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.7.12]: https://github.com/SettingDust/lazyyyyy/compare/0.7.11...0.7.12
 [0.7.13]: https://github.com/SettingDust/lazyyyyy/compare/0.7.12...0.7.13
 [0.7.14]: https://github.com/SettingDust/lazyyyyy/compare/0.7.13...0.7.14
+[0.8.0]: https://github.com/SettingDust/lazyyyyy/compare/0.7.14...0.8.0
