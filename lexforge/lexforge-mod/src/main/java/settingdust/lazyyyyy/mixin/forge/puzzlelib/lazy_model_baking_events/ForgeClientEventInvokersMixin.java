@@ -1,11 +1,11 @@
-package settingdust.lazyyyyy.mixin.forge.puzzlelib.faster_model_location_cache.faster_model_location_cache;
+package settingdust.lazyyyyy.mixin.forge.puzzlelib.lazy_model_baking_events;
 
 import fuzs.puzzleslib.api.event.v1.core.ForgeEventInvokerRegistry;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import settingdust.lazyyyyy.puzzlelib.LazyModelBakingEventsKt;
+import settingdust.lazyyyyy.forge.puzzlelib.LazyModelBakingEventsKt;
 
 import java.util.function.BiConsumer;
 

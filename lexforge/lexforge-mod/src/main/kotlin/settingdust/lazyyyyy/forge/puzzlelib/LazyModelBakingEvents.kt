@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.puzzlelib
+package settingdust.lazyyyyy.forge.puzzlelib
 
 import fuzs.puzzleslib.api.client.event.v1.ModelEvents
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker
