@@ -75,7 +75,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     library("modmenu", "com.terraformersmc", "modmenu").version("7.2.2")
 
-    library("mixin-constraints", "com.moulberry", "mixinconstraints").version("1.0.1")
+    library("mixin-constraints", "com.moulberry", "mixinconstraints").version("1.0.7")
 
     library("yacl-fabric", "dev.isxander", "yet-another-config-lib").version("3.6.1+1.20.1-fabric")
     library("yacl-forge", "dev.isxander", "yet-another-config-lib").version("3.6.1+1.20.1-forge")
