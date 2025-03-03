@@ -93,7 +93,7 @@ dependencies {
 
     modImplementation("maven.modrinth:dynamictrees:1.20.1-1.4.1")
 
-    modImplementation("fuzs.puzzleslib:puzzleslib-forge:8.1.25")
+    modImplementation("fuzs.puzzleslib:puzzleslib-forge:20.4.52")
 }
 
 tasks {
