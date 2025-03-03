@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2025-03-03
+### :wrench: Chores
+- [`384a3ea`](https://github.com/SettingDust/lazyyyyy/commit/384a3ea8b5a2fe70bd095f8fead9698a72f8eb9e) - bumo mixinconstraints *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.0] - 2025-02-26
 ### :sparkles: New Features
 - [`e4d8bc5`](https://github.com/SettingDust/lazyyyyy/commit/e4d8bc53a8e50c999a58f35c83fc7b6e7735b8aa) - **puzzleslib**: replace the model baking event invoker with fabric api *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -322,3 +327,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.7.13]: https://github.com/SettingDust/lazyyyyy/compare/0.7.12...0.7.13
 [0.7.14]: https://github.com/SettingDust/lazyyyyy/compare/0.7.13...0.7.14
 [0.8.0]: https://github.com/SettingDust/lazyyyyy/compare/0.7.14...0.8.0
+[0.8.1]: https://github.com/SettingDust/lazyyyyy/compare/0.8.0...0.8.1
