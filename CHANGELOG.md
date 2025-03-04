@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.2] - 2025-03-04
+### :bug: Bug Fixes
+- [`f779f3d`](https://github.com/SettingDust/lazyyyyy/commit/f779f3d838e269c23e423618d3388a728b742122) - crash if newer mixin extras in environment *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`1c07e08`](https://github.com/SettingDust/lazyyyyy/commit/1c07e08683459231207b5a5a5ba36fdd24149d6d) - **puzzleslib**: correct the filename and package *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`a82a54a`](https://github.com/SettingDust/lazyyyyy/commit/a82a54a5dc879e9a264b6ecda99c3017a02dbb5f) - bumo mixinconstraints *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.1] - 2025-03-03
 ### :wrench: Chores
 - [`384a3ea`](https://github.com/SettingDust/lazyyyyy/commit/384a3ea8b5a2fe70bd095f8fead9698a72f8eb9e) - bumo mixinconstraints *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -328,3 +337,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.7.14]: https://github.com/SettingDust/lazyyyyy/compare/0.7.13...0.7.14
 [0.8.0]: https://github.com/SettingDust/lazyyyyy/compare/0.7.14...0.8.0
 [0.8.1]: https://github.com/SettingDust/lazyyyyy/compare/0.8.0...0.8.1
+[0.8.2]: https://github.com/SettingDust/lazyyyyy/compare/0.8.1...0.8.2
