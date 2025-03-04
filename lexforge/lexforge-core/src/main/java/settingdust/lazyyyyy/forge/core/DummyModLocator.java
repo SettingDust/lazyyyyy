@@ -1,38 +1,45 @@
 package settingdust.lazyyyyy.forge.core;
 
-import com.google.common.collect.Lists;
-import cpw.mods.niofs.union.UnionFileSystem;
+import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.fml.loading.moddiscovery.AbstractJarFileModLocator;
 import net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator;
-import net.minecraftforge.forgespi.locating.IModFile;
-import net.minecraftforge.forgespi.locating.IModLocator;
-import net.minecraftforge.jarjar.selection.JarSelector;
+import net.minecraftforge.fml.loading.moddiscovery.ModDiscoverer;
+import net.minecraftforge.forgespi.locating.IDependencyLocator;
 
-import java.net.URISyntaxException;
-import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
-public class DummyModLocator extends JarInJarDependencyLocator {
+public class DummyModLocator extends AbstractJarFileModLocator {
     @Override
-    public List<IModFile> scanMods(final Iterable<IModFile> loadedMods) {
+    public Stream<Path> scanCandidates() {
         try {
-            var modURI = getClass().getProtectionDomain().getCodeSource().getLocation().toURI();
-            var modPath = ((UnionFileSystem) FileSystems.getFileSystem(modURI)).getPrimaryPath();
-            IModLocator.ModFileOrException mod = createMod(modPath);
-
-            return JarSelector.detectAndSelect(
-                Lists.newArrayList(mod.file()),
-                this::loadResourceFromModFile,
-                this::loadModFileFrom,
-                this::identifyMod,
-                this::exception
-            );
-        } catch (URISyntaxException e) {
+            var modDiscovererField = FMLLoader.class.getDeclaredField("modDiscoverer");
+            modDiscovererField.setAccessible(true);
+            var modDiscoverer = (ModDiscoverer) modDiscovererField.get(null);
+            var dependencyLocatorListField = ModDiscoverer.class.getDeclaredField("dependencyLocatorList");
+            dependencyLocatorListField.setAccessible(true);
+            var dependencyLocatorList = (List<IDependencyLocator>) dependencyLocatorListField.get(modDiscoverer);
+            for (var i = 0; i < dependencyLocatorList.size(); i++) {
+                if (dependencyLocatorList.get(i) instanceof JarInJarDependencyLocator locator) {
+                    dependencyLocatorList.set(i, new DummyDependencyLocator(locator));
+                    break;
+                }
+            }
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+        return Stream.empty();
     }
 
     @Override
     public String name() {
-        return "Lazyyyyy self loading locator";
+        return "Lazyyyyy wrapping JiJ early locator";
+    }
+
+    @Override
+    public void initArguments(final Map<String, ?> arguments) {
+
     }
 }
