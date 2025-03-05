@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.3] - 2025-03-05
+### :bug: Bug Fixes
+- [`65e7cb5`](https://github.com/SettingDust/lazyyyyy/commit/65e7cb523fb10cf0f7c5301f3cbc9caf95c58c27) - **lazy-entity-renderers**: fix `entity_model_features` crash when crash by concurrent *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.2] - 2025-03-04
 ### :bug: Bug Fixes
 - [`f779f3d`](https://github.com/SettingDust/lazyyyyy/commit/f779f3d838e269c23e423618d3388a728b742122) - crash if newer mixin extras in environment *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -338,3 +343,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.0]: https://github.com/SettingDust/lazyyyyy/compare/0.7.14...0.8.0
 [0.8.1]: https://github.com/SettingDust/lazyyyyy/compare/0.8.0...0.8.1
 [0.8.2]: https://github.com/SettingDust/lazyyyyy/compare/0.8.1...0.8.2
+[0.8.3]: https://github.com/SettingDust/lazyyyyy/compare/0.8.2...0.8.3
