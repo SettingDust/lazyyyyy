@@ -14,6 +14,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import settingdust.lazyyyyy.util.fastutil_wrappers.WrappedObject2IntOpenHashMap;
 import traben.entity_model_features.EMFManager;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 @IfModLoaded("entity_model_features")
 @Mixin(EMFManager.class)
 public class EMFManagerMixin {
@@ -38,5 +41,17 @@ public class EMFManagerMixin {
         final Operation<Void> original
     ) {
         original.call(instance, new WrappedObject2IntOpenHashMap<>(Object2IntMaps.synchronize(value)));
+    }
+
+    @WrapOperation(
+        method = "<init>",
+        remap = false,
+        at = @At(
+            value = "FIELD",
+            target = "Ltraben/entity_model_features/EMFManager;loadingExceptions:Ljava/util/List;"
+        )
+    )
+    private void lazyyyyy$syncMap(final EMFManager instance, final List<Exception> value, final Operation<Void> original) {
+        original.call(instance, new CopyOnWriteArrayList<>(value));
     }
 }
