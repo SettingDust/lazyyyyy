@@ -35,7 +35,7 @@ public class ResolverClassTransformer implements ClassFileTransformer {
                     && methodInsn.name.equals("values")
                     && methodInsn.owner.equals("java/util/Map")) {
                     if (counter++ < 2) continue;
-                    // Replace the method call with ResolverClassTransformer.filterAutomaticModules(g1)
+                    // Replace the method call with BootstrapHooks.filterAutomaticModules(g1)
                     method.instructions.set(
                         methodInsn, new MethodInsnNode(
                             Opcodes.INVOKESTATIC,

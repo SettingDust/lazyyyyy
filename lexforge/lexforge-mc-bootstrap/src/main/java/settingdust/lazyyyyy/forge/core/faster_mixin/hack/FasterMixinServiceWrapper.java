@@ -29,9 +29,9 @@ public class FasterMixinServiceWrapper extends MixinServiceModLauncher implement
 
     public static final Logger LOGGER = LogManager.getLogger();
 
-    public static final Map<String, Set<IMixinConfig>> pluginToConfigs = new HashMap<>();
-    public static final Map<IMixinConfig, String> configToRefmap = new HashMap<>();
-    public static final Map<String, Set<IMixinConfig>> refmapToConfigs = new HashMap<>();
+    public static final Map<String, Set<IMixinConfig>> PLUGIN_TO_CONFIGS = new HashMap<>();
+    public static final Map<IMixinConfig, String> CONFIG_TO_REFMAP = new HashMap<>();
+    public static final Map<String, Set<IMixinConfig>> REFMAP_TO_CONFIGS = new HashMap<>();
 
     private static final Class<?> secureJarResourceClass;
     private static final Field secureJarField;
@@ -119,7 +119,7 @@ public class FasterMixinServiceWrapper extends MixinServiceModLauncher implement
 
     @Override
     public InputStream getResourceAsStream(final String name) {
-        var handle = MixinPlatformAgentDefault.configToHandle.get(name);
+        var handle = MixinPlatformAgentDefault.CONFIG_TO_CONTAINER.get(name);
         InputStream result = null;
         if (handle != null) {
             try {
@@ -135,11 +135,11 @@ public class FasterMixinServiceWrapper extends MixinServiceModLauncher implement
             }
         }
 
-        var configs = refmapToConfigs.get(name);
+        var configs = REFMAP_TO_CONFIGS.get(name);
 
         if (configs != null && !configs.isEmpty()) {
             for (final var mixinConfig : configs) {
-                var source = MixinPlatformAgentDefault.configToHandle.get(mixinConfig.getName());
+                var source = MixinPlatformAgentDefault.CONFIG_TO_CONTAINER.get(mixinConfig.getName());
                 if (source == null) continue;
                 try {
                     result = Files.newInputStream(((SecureJar) secureJarField.get(source)).getPath(name));
@@ -190,17 +190,10 @@ public class FasterMixinServiceWrapper extends MixinServiceModLauncher implement
     public void onStartup() {
         for (final var config : Mixins.getConfigs()) {
             var plugin = MixinConfigReflection.getPlugin(config.getConfig());
-            var configsForPlugin = pluginToConfigs.getOrDefault(
-                plugin,
-                new HashSet<>()
-            );
-            configsForPlugin.add(config.getConfig());
-            pluginToConfigs.put(plugin, configsForPlugin);
+            PLUGIN_TO_CONFIGS.computeIfAbsent(plugin, (key) -> new HashSet<>()).add(config.getConfig());
 
             var refmap = MixinConfigReflection.getRefmap(config.getConfig());
-            var configsForRefmap = refmapToConfigs.getOrDefault(refmap, new HashSet<>());
-            configsForRefmap.add(config.getConfig());
-            refmapToConfigs.put(refmap, configsForRefmap);
+            REFMAP_TO_CONFIGS.computeIfAbsent(refmap, key -> new HashSet<>()).add(config.getConfig());
 
             FasterMixinServiceWrapper.LOGGER.debug(
                 "Caching info for config {}. Plugin: {}. Refmap: {}",

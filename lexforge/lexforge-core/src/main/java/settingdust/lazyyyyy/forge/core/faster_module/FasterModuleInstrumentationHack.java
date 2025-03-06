@@ -34,7 +34,7 @@ public class FasterModuleInstrumentationHack {
         try {
             instrumentation = ByteBuddyAgent.getInstrumentation();
         } catch (Throwable t) {
-            LazyyyyyHacksInjector.LOGGER.error(
+            LazyyyyyHacksInjector.LOGGER.debug(
                 "No bytebuddy agent, the major optimization for module resolver won't work",
                 t
             );

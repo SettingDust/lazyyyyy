@@ -30,14 +30,14 @@ public final class FasterClassProviderWrapper implements IClassProvider {
         var isPlugin = stackTrace[1].getClassName().equals("org.spongepowered.asm.mixin.transformer.PluginHandle") &&
                        stackTrace[2].getMethodName().equals("onSelect");
         if (!isPlugin) return clazz;
-        var configs = FasterMixinServiceWrapper.pluginToConfigs.get(name);
+        var configs = FasterMixinServiceWrapper.PLUGIN_TO_CONFIGS.get(name);
         if (configs == null || configs.isEmpty()) return clazz;
         try {
             // FIXME Init the plugin twice may cause problems
             var plugin = (IMixinConfigPlugin) clazz.getDeclaredConstructor().newInstance();
             var refmap = plugin.getRefMapperConfig();
             for (final var config : configs) {
-                FasterMixinServiceWrapper.configToRefmap.computeIfAbsent(
+                FasterMixinServiceWrapper.CONFIG_TO_REFMAP.computeIfAbsent(
                     config, (ignored) -> {
                         FasterMixinServiceWrapper.LOGGER.debug(
                             "Config {} find refmap {} from plugin {}",

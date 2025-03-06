@@ -40,10 +40,7 @@ public class ClassLoaderInjector {
             try {
                 instrumentation = ByteBuddyAgent.getInstrumentation();
             } catch (Throwable t) {
-                LazyyyyyHacksInjector.LOGGER.error(
-                    "No bytebuddy agent, the bootstrap jar can't be injected",
-                    t
-                );
+                LazyyyyyHacksInjector.LOGGER.debug("No bytebuddy agent, the bootstrap jar can't be injected", t);
                 return;
             }
             instrumentation.appendToBootstrapClassLoaderSearch(bootstrapJar);

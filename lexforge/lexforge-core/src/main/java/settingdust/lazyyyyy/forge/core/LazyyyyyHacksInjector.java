@@ -33,7 +33,9 @@ public class LazyyyyyHacksInjector implements ITransformationService {
             try {
                 attachAgent();
             } catch (Throwable t) {
-                LazyyyyyHacksInjector.LOGGER.error(
+                LazyyyyyHacksInjector.LOGGER.warn(
+                    "Error attaching bytebuddy agent, the major optimization for module resolver won't work");
+                LazyyyyyHacksInjector.LOGGER.debug(
                     "Error attaching bytebuddy agent, the major optimization for module resolver won't work",
                     t
                 );

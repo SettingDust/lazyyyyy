@@ -16,7 +16,7 @@ public class MixinPlatformAgentDefault extends MixinPlatformAgentAbstract {
     private static final Method addTokenProviderMethod;
     private static final Method addConnectorMethod;
 
-    public static final Map<String, IContainerHandle> configToHandle = new HashMap<>();
+    public static final Map<String, IContainerHandle> CONFIG_TO_CONTAINER = new HashMap<>();
 
     static {
         try {
@@ -57,7 +57,7 @@ public class MixinPlatformAgentDefault extends MixinPlatformAgentAbstract {
             for (String config : mixinConfigs.split(",")) {
                 try {
                     var configName = config.trim();
-                    configToHandle.putIfAbsent(configName, handle);
+                    CONFIG_TO_CONTAINER.putIfAbsent(configName, handle);
                     addConfigMethod.invoke(manager, configName);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     throw new RuntimeException(e);
