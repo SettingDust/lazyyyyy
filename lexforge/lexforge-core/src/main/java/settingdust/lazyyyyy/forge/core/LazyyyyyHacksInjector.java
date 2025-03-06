@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.service.MixinService;
 import org.spongepowered.asm.service.modlauncher.MixinServiceModLauncher;
-import settingdust.lazyyyyy.forge.core.faster_mixin.hack.FasterMixinServiceWrapper;
+import settingdust.lazyyyyy.forge.core.faster_mixin.injected.FasterMixinServiceWrapper;
 import settingdust.lazyyyyy.forge.core.faster_module.FasterModuleInstrumentationHack;
 import sun.misc.Unsafe;
 
@@ -81,7 +81,7 @@ public class LazyyyyyHacksInjector implements ITransformationService {
             FasterMixinServiceWrapper.wrapped = (MixinServiceModLauncher) service;
             System.setProperty(
                 "mixin.service",
-                "settingdust.lazyyyyy.forge.core.faster_mixin.hack.FasterMixinServiceWrapper"
+                "settingdust.lazyyyyy.forge.core.faster_mixin.injected.FasterMixinServiceWrapper"
             );
         } catch (Throwable e) {
             throw new RuntimeException(e);

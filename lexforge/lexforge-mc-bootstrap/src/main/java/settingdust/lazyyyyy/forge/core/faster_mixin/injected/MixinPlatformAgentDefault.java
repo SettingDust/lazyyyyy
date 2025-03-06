@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.forge.core.faster_mixin.hack;
+package settingdust.lazyyyyy.forge.core.faster_mixin.injected;
 
 import org.spongepowered.asm.launch.platform.MixinPlatformAgentAbstract;
 import org.spongepowered.asm.launch.platform.MixinPlatformManager;

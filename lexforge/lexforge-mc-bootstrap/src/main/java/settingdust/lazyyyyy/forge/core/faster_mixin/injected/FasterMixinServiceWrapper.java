@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.forge.core.faster_mixin.hack;
+package settingdust.lazyyyyy.forge.core.faster_mixin.injected;
 
 import cpw.mods.jarhandling.SecureJar;
 import org.apache.logging.log4j.LogManager;
@@ -51,9 +51,9 @@ public class FasterMixinServiceWrapper extends MixinServiceModLauncher implement
         var agentClassesField = MixinContainer.class.getDeclaredField("agentClasses");
         agentClassesField.setAccessible(true);
         var agentClasses = (List<String>) agentClassesField.get(null);
-        if (!agentClasses.contains("settingdust.lazyyyyy.forge.core.faster_mixin.hack.MixinPlatformAgentDefault")) {
+        if (!agentClasses.contains("settingdust.lazyyyyy.forge.core.faster_mixin.injected.MixinPlatformAgentDefault")) {
             agentClasses.remove("org.spongepowered.asm.launch.platform.MixinPlatformAgentDefault");
-            agentClasses.add("settingdust.lazyyyyy.forge.core.faster_mixin.hack.MixinPlatformAgentDefault");
+            agentClasses.add("settingdust.lazyyyyy.forge.core.faster_mixin.injected.MixinPlatformAgentDefault");
         }
     }
 
