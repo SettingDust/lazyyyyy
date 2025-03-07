@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.4] - 2025-03-07
+### :bug: Bug Fixes
+- [`61d2b68`](https://github.com/SettingDust/lazyyyyy/commit/61d2b6849b9e1a3231bbbd37cce938f763b4862d) - **lazy-entity-renderers**: emf fix forget to mark the field as mutable *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`a549d06`](https://github.com/SettingDust/lazyyyyy/commit/a549d06f491730183c6852a86a2b362c8c370f22) - **faster-module**: lesser error when no runtime agent *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`c882479`](https://github.com/SettingDust/lazyyyyy/commit/c882479646f6e4725cd7bb9c3652d55dd37f38f1) - **faster-mixin**: rename package *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.3] - 2025-03-05
 ### :bug: Bug Fixes
 - [`65e7cb5`](https://github.com/SettingDust/lazyyyyy/commit/65e7cb523fb10cf0f7c5301f3cbc9caf95c58c27) - **lazy-entity-renderers**: fix `entity_model_features` crash when crash by concurrent *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -344,3 +353,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.1]: https://github.com/SettingDust/lazyyyyy/compare/0.8.0...0.8.1
 [0.8.2]: https://github.com/SettingDust/lazyyyyy/compare/0.8.1...0.8.2
 [0.8.3]: https://github.com/SettingDust/lazyyyyy/compare/0.8.2...0.8.3
+[0.8.4]: https://github.com/SettingDust/lazyyyyy/compare/0.8.3...0.8.4
