@@ -5,6 +5,7 @@ import cpw.mods.cl.ModuleClassLoader;
 import cpw.mods.jarhandling.SecureJar;
 import cpw.mods.modlauncher.Launcher;
 import net.bytebuddy.agent.ByteBuddyAgent;
+import net.minecraftforge.fml.loading.FMLPaths;
 import settingdust.lazyyyyy.forge.core.faster_mixin.ModuleClassLoaderReflection;
 
 import java.io.IOException;
@@ -13,7 +14,6 @@ import java.lang.module.ModuleReference;
 import java.lang.module.ResolvedModule;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -30,7 +30,7 @@ public class ClassLoaderInjector {
     public static void injectBootstrap() throws IOException {
         LazyyyyyHacksInjector.LOGGER.info("Injecting bootstrap");
         var bootstrapJarPath = SELF_PATH.resolve("lazyyyyy-lexforge-bootstrap.jar");
-        var exportedJarPath = Paths.get(".lazyyyyy", "lazyyyyy-lexforge-bootstrap.jar");
+        var exportedJarPath = FMLPaths.GAMEDIR.get().resolve(".lazyyyyy").resolve("lazyyyyy-lexforge-bootstrap.jar");
         if (Files.notExists(exportedJarPath)) {
             try {Files.createDirectory(exportedJarPath.getParent());} catch (IOException ignored) {}
             Files.copy(bootstrapJarPath, exportedJarPath);
@@ -52,10 +52,10 @@ public class ClassLoaderInjector {
      */
     public static void injectMcBootstrap() {
         LazyyyyyHacksInjector.LOGGER.info("Injecting mc bootstrap");
-        var mcBootstrapJar = SELF_PATH.resolve("lazyyyyy-lexforge-mc-bootstrap.jar");
-        var mixinJar = SecureJar.from(mcBootstrapJar);
+        var mcBootstrapJarPath = SELF_PATH.resolve("lazyyyyy-lexforge-mc-bootstrap.jar");
+        var mcBootstrapJar = SecureJar.from(mcBootstrapJarPath);
 
-        var jarModuleFinder = JarModuleFinder.of(mixinJar);
+        var jarModuleFinder = JarModuleFinder.of(mcBootstrapJar);
 
         var bootstrapClassLoader = (ModuleClassLoader) Launcher.class.getClassLoader();
         var parentConfiguration = ModuleClassLoaderReflection.getConfiguration(bootstrapClassLoader);
@@ -71,15 +71,15 @@ public class ClassLoaderInjector {
         Map<String, ResolvedModule> packageLookup =
             new HashMap<>(ModuleClassLoaderReflection.getPackageLookup(bootstrapClassLoader));
 
-        for (String pkg : mixinJar.getPackages()) {
+        for (String pkg : mcBootstrapJar.getPackages()) {
             packageLookup.put(pkg, resolvedModule);
         }
 
-        ModuleClassLoaderReflection.setPackageLookup(bootstrapClassLoader, new HashMap<>(packageLookup));
+        ModuleClassLoaderReflection.setPackageLookup(bootstrapClassLoader, packageLookup);
 
         Map<String, ModuleReference> resolvedRoots =
             new HashMap<>(ModuleClassLoaderReflection.getResolvedRoots(bootstrapClassLoader));
         resolvedRoots.put(resolvedModule.reference().descriptor().name(), resolvedModule.reference());
-        ModuleClassLoaderReflection.setResolvedRoots(bootstrapClassLoader, new HashMap<>(resolvedRoots));
+        ModuleClassLoaderReflection.setResolvedRoots(bootstrapClassLoader, resolvedRoots);
     }
 }

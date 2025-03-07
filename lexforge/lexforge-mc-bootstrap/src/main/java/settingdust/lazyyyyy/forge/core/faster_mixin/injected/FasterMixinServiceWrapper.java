@@ -12,14 +12,15 @@ import org.spongepowered.asm.logging.ILogger;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfig;
+import org.spongepowered.asm.mixin.transformer.IMixinTransformerFactory;
 import org.spongepowered.asm.service.*;
 import org.spongepowered.asm.service.modlauncher.MixinServiceModLauncher;
 import org.spongepowered.asm.util.IConsumer;
 import org.spongepowered.asm.util.ReEntranceLock;
+import settingdust.lazyyyyy.forge.core.faster_mixin.injected.cache.CachingMixinTransformer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -32,22 +33,13 @@ public class FasterMixinServiceWrapper extends MixinServiceModLauncher implement
     public static final Map<String, Set<IMixinConfig>> PLUGIN_TO_CONFIGS = new HashMap<>();
     public static final Map<IMixinConfig, String> CONFIG_TO_REFMAP = new HashMap<>();
     public static final Map<String, Set<IMixinConfig>> REFMAP_TO_CONFIGS = new HashMap<>();
-
-    private static final Class<?> secureJarResourceClass;
-    private static final Field secureJarField;
-
-    static {
-        try {
-            secureJarResourceClass = Class.forName(
-                "org.spongepowered.asm.launch.platform.container.ContainerHandleModLauncherEx$SecureJarResource");
-            secureJarField = secureJarResourceClass.getDeclaredField("jar");
-            secureJarField.setAccessible(true);
-        } catch (ClassNotFoundException | NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    public static final Map<MixinEnvironment, Set<IMixinConfig>> ENV_TO_CONFIGS = new HashMap<>();
 
     public FasterMixinServiceWrapper() throws NoSuchFieldException, IllegalAccessException {
+        replacePlatformAgent();
+    }
+
+    private static void replacePlatformAgent() throws NoSuchFieldException, IllegalAccessException {
         var agentClassesField = MixinContainer.class.getDeclaredField("agentClasses");
         agentClassesField.setAccessible(true);
         var agentClasses = (List<String>) agentClassesField.get(null);
@@ -72,7 +64,13 @@ public class FasterMixinServiceWrapper extends MixinServiceModLauncher implement
     }
 
     @Override
-    public void offer(final IMixinInternal internal) {wrapped.offer(internal);}
+    public void offer(IMixinInternal internal) {
+        if (internal instanceof IMixinTransformerFactory factory) {
+            CachingMixinTransformer.wrapped = factory.createTransformer();
+            internal = new CachingMixinTransformer.Factory();
+        }
+        wrapped.offer(internal);
+    }
 
     @Override
     public void init() {
@@ -123,7 +121,9 @@ public class FasterMixinServiceWrapper extends MixinServiceModLauncher implement
         InputStream result = null;
         if (handle != null) {
             try {
-                result = Files.newInputStream(((SecureJar) secureJarField.get(handle)).getPath(name));
+                result =
+                    Files.newInputStream(
+                        ((SecureJar) SecureJarResourceReflection.secureJarField.get(handle)).getPath(name));
                 LOGGER.debug("Read config {} from {}", name, ((ContainerHandleURI) handle).getURI());
             } catch (IllegalAccessException | IOException e) {
                 LOGGER.warn(
@@ -142,7 +142,9 @@ public class FasterMixinServiceWrapper extends MixinServiceModLauncher implement
                 var source = MixinPlatformAgentDefault.CONFIG_TO_CONTAINER.get(mixinConfig.getName());
                 if (source == null) continue;
                 try {
-                    result = Files.newInputStream(((SecureJar) secureJarField.get(source)).getPath(name));
+                    result =
+                        Files.newInputStream(
+                            ((SecureJar) SecureJarResourceReflection.secureJarField.get(source)).getPath(name));
                     LOGGER.debug(
                         "Read refmap {} from {} for config {}",
                         name,
@@ -194,6 +196,8 @@ public class FasterMixinServiceWrapper extends MixinServiceModLauncher implement
 
             var refmap = MixinConfigReflection.getRefmap(config.getConfig());
             REFMAP_TO_CONFIGS.computeIfAbsent(refmap, key -> new HashSet<>()).add(config.getConfig());
+
+            ENV_TO_CONFIGS.computeIfAbsent(config.getEnvironment(), key -> new HashSet<>()).add(config.getConfig());
 
             FasterMixinServiceWrapper.LOGGER.debug(
                 "Caching info for config {}. Plugin: {}. Refmap: {}",
