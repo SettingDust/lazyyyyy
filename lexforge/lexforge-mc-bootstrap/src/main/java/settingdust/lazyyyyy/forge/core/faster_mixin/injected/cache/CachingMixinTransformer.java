@@ -211,17 +211,20 @@ public class CachingMixinTransformer implements IMixinTransformer {
             transformed = wrapped.transformClass(environment, name, classNode);
             if (!needCache.get()) needCache.set(transformed);
             if (needCache.get()) {
-                try {
-                    Files.createDirectories(classPath.getParent());
-                    Files.write(hashPath, hash);
-                    Files.write(classPath, getClassBytes(classNode, true));
-                } catch (IOException e) {
-                    LOGGER.debug(
-                        "Failed to write cached class '{}'",
-                        name,
-                        e
-                    );
-                }
+                final byte[] finalHash = hash;
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        Files.createDirectories(classPath.getParent());
+                        Files.write(hashPath, finalHash);
+                        Files.write(classPath, getClassBytes(classNode, true));
+                    } catch (IOException e) {
+                        LOGGER.debug(
+                            "Failed to write cached class '{}'",
+                            name,
+                            e
+                        );
+                    }
+                });
             }
         }
         return transformed;
