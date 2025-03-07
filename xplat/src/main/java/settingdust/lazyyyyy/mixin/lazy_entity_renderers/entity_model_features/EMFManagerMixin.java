@@ -27,6 +27,11 @@ public class EMFManagerMixin {
     @Mutable
     private Object2IntOpenHashMap<ModelLayerLocation> amountOfLayerAttempts;
 
+    @Shadow(remap = false)
+    @Final
+    @Mutable
+    public List<Exception> loadingExceptions;
+
     @WrapOperation(
         method = "<init>",
         remap = false,
@@ -51,7 +56,11 @@ public class EMFManagerMixin {
             target = "Ltraben/entity_model_features/EMFManager;loadingExceptions:Ljava/util/List;"
         )
     )
-    private void lazyyyyy$syncMap(final EMFManager instance, final List<Exception> value, final Operation<Void> original) {
+    private void lazyyyyy$syncMap(
+        final EMFManager instance,
+        final List<Exception> value,
+        final Operation<Void> original
+    ) {
         original.call(instance, new CopyOnWriteArrayList<>(value));
     }
 }
