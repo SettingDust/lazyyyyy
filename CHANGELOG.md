@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.5] - 2025-03-08
+### :bug: Bug Fixes
+- [`17b57c1`](https://github.com/SettingDust/lazyyyyy/commit/17b57c1b7653405739aa759031a5f988f7dbb39a) - mixin failed when modern fix mixin plugin load after *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.4] - 2025-03-07
 ### :bug: Bug Fixes
 - [`61d2b68`](https://github.com/SettingDust/lazyyyyy/commit/61d2b6849b9e1a3231bbbd37cce938f763b4862d) - **lazy-entity-renderers**: emf fix forget to mark the field as mutable *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -354,3 +359,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.2]: https://github.com/SettingDust/lazyyyyy/compare/0.8.1...0.8.2
 [0.8.3]: https://github.com/SettingDust/lazyyyyy/compare/0.8.2...0.8.3
 [0.8.4]: https://github.com/SettingDust/lazyyyyy/compare/0.8.3...0.8.4
+[0.8.5]: https://github.com/SettingDust/lazyyyyy/compare/0.8.4...0.8.5
