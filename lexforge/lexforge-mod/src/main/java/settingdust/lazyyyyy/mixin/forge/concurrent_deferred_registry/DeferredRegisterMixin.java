@@ -6,7 +6,7 @@ import net.minecraftforge.registries.RegistryObject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import settingdust.lazyyyyy.forge.minecraft.ConcurrentDeferredRegistryKt;
+import settingdust.lazyyyyy.forge.minecraft.ConcurrentDeferredRegistry;
 
 import java.util.Collections;
 import java.util.Map;
@@ -20,7 +20,7 @@ public class DeferredRegisterMixin {
         final Map<RegistryObject<T>, Supplier<? extends T>> instance,
         RegisterEvent event
     ) {
-        ConcurrentDeferredRegistryKt.concurrentAddEntries((DeferredRegister<T>) (Object) this, event, instance);
+        ConcurrentDeferredRegistry.INSTANCE.concurrentAddEntries((DeferredRegister<T>) (Object) this, event, instance);
         return Collections.emptySet();
     }
 }

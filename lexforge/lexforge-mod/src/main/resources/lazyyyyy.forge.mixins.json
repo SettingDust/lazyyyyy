@@ -9,6 +9,7 @@
         "avoid_redundant_list_resources.DelegatingPackResourcesMixin",
         "concurrent_deferred_registry.DeferredRegisterMixin",
         "concurrent_deferred_registry.RegistryObjectAccessor",
+        "concurrent_deferred_registry.RegistryObjectMixin",
         "kiwi.faster_annotation.AnnotatedTypeLoaderMixin",
         "lazy_entity_renderers.EntityRenderDispatcherMixin",
         "lazy_entity_renderers.supplementaries.SignPostBlockTileRendererMixin",
