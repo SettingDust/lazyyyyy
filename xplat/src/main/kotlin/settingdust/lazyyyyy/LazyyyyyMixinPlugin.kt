@@ -47,6 +47,8 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
 
     val logger = LogManager.getLogger()
 
+    private var first = false
+
     init {
         val configPath = Path("./config/lazyyyyy.mixins.json")
         runCatching { configPath.createParentDirectories() }
@@ -66,16 +68,6 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
     override fun onLoad(mixinPackage: String) {
         super.onLoad(mixinPackage)
         this.mixinPackage = mixinPackage
-        if (config.any { it.key.startsWith("pack_resources_cache") && it.value }) {
-            try {
-                ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ReloadableResourceManagerMixin"] =
-                    "lazyyyyy"
-                ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ForgePathPackResourcesMixin"] =
-                    "lazyyyyy"
-                logger.info("Disabled ModernFix resourcepacks cache")
-            } catch (_: NoClassDefFoundError) {
-            }
-        }
         if (config.any { it.key.startsWith("lazy_entity_renderers") && it.value }) {
             try {
                 forge.me.thosea.badoptimizations.other.Config.enable_entity_renderer_caching = false
@@ -93,6 +85,20 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
     }
 
     override fun shouldApplyMixin(targetClassName: String, mixinClassName: String): Boolean {
+        if (first) {
+            first = false
+            if (config.any { it.key.startsWith("pack_resources_cache") && it.value }) {
+                try {
+                    ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ReloadableResourceManagerMixin"] =
+                        "lazyyyyy"
+                    ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ForgePathPackResourcesMixin"] =
+                        "lazyyyyy"
+                    logger.info("Disabled ModernFix resourcepacks cache")
+                } catch (_: NoClassDefFoundError) {
+                }
+            }
+        }
+
         if (!mixinClassName.startsWith(mixinPackage)) return super.shouldApplyMixin(targetClassName, mixinClassName)
         val relativeName = mixinClassName.removePrefix("${mixinPackage}.").removePrefix("forge.")
         val disabled =
