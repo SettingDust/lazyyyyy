@@ -453,3 +453,25 @@ fun <T> ConcurrentFlow<T>.onEach(
 }
 
 fun <T> ConcurrentFlow<T>.launchIn(scope: CoroutineScope) = scope.launch { collect {} }
+
+/**
+ * Collects given flow into a [destination]
+ */
+suspend fun <T> ConcurrentFlow<T>.toList(destination: MutableList<T> = ArrayList()): List<T> =
+    toCollection(destination)
+
+/**
+ * Collects given flow into a [destination]
+ */
+suspend fun <T> ConcurrentFlow<T>.toSet(destination: MutableSet<T> = LinkedHashSet()): Set<T> =
+    toCollection(destination)
+
+/**
+ * Collects given flow into a [destination]
+ */
+suspend fun <T, C : MutableCollection<in T>> ConcurrentFlow<T>.toCollection(destination: C): C {
+    collect { value ->
+        destination.add(value)
+    }
+    return destination
+}
