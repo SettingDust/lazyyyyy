@@ -22,6 +22,7 @@
     "client": [
         "lazy_entity_renderers.big_brain.BigBrainRendererEventsMixin",
         "lazy_entity_renderers.bovines_and_buttercups.BovinesAndButtercupsClientForgeMixin",
+        "lazy_entity_renderers.cloudstorage.ClientProxyMixin",
         "lazy_entity_renderers.quark.UsesForCursesModule_ClientMixin",
         "lazy_entity_renderers.taniwha.TForgeClientEventsMixin"
     ],
