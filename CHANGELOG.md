@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.6] - 2025-03-08
+### :sparkles: New Features
+- [`8b1ac8f`](https://github.com/SettingDust/lazyyyyy/commit/8b1ac8f48484cec8633eff32502b66ce5ef6c12e) - **lazy-entity-renderers**: compat with cloud storage *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.5] - 2025-03-08
 ### :bug: Bug Fixes
 - [`17b57c1`](https://github.com/SettingDust/lazyyyyy/commit/17b57c1b7653405739aa759031a5f988f7dbb39a) - mixin failed when modern fix mixin plugin load after *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -360,3 +365,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.3]: https://github.com/SettingDust/lazyyyyy/compare/0.8.2...0.8.3
 [0.8.4]: https://github.com/SettingDust/lazyyyyy/compare/0.8.3...0.8.4
 [0.8.5]: https://github.com/SettingDust/lazyyyyy/compare/0.8.4...0.8.5
+[0.8.6]: https://github.com/SettingDust/lazyyyyy/compare/0.8.5...0.8.6
