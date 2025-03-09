@@ -9,12 +9,16 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import net.minecraftforge.registries.DeferredRegister
 import net.minecraftforge.registries.RegisterEvent
 import net.minecraftforge.registries.RegistryObject
+import settingdust.lazyyyyy.Lazyyyyy
+import settingdust.lazyyyyy.collect
 import settingdust.lazyyyyy.concurrent
+import settingdust.lazyyyyy.forge.LazyyyyyForge
 import settingdust.lazyyyyy.map
-import settingdust.lazyyyyy.merge
 import settingdust.lazyyyyy.mixin.forge.concurrent_deferred_registry.RegistryObjectAccessor
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Supplier
@@ -24,11 +28,7 @@ object ConcurrentDeferredRegistry {
     val entryToRegistrationJob = ConcurrentHashMap<RegistryObject<*>, Job>()
 
     fun RegistryObject<*>.join() {
-        if (entryToRegistrationJob.containsKey(this)) {
-            runBlocking {
-                entryToRegistrationJob[this@join]?.join()
-            }
-        }
+        entryToRegistrationJob[this@join]?.let { runBlocking(Dispatchers.IO) { it.join() } }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -36,26 +36,34 @@ object ConcurrentDeferredRegistry {
         event: RegisterEvent,
         entries: Map<RegistryObject<T>, Supplier<out T>>
     ) {
+        val mutex = Mutex()
         entriesRegistering += entries.keys
-        runBlocking(Dispatchers.IO + CoroutineName("Concurrent Deferred Registry")) {
+        runBlocking(Dispatchers.IO + CoroutineName("Concurrent Deferred Registry #${registryName}")) {
             entries.asSequence().asFlow().concurrent()
                 .map { (registryObject, supplier) ->
-                    val deferred = async(start = CoroutineStart.LAZY) { supplier.get() }
+                    val deferred = async(start = CoroutineStart.LAZY) {
+                        // Some mod use SPI, which depends on the classloader
+                        Thread.currentThread().contextClassLoader = LazyyyyyForge::class.java.classLoader
+                        supplier.get()
+                    }
                     val job = launch(start = CoroutineStart.LAZY) {
-                        event.register(registryKey, registryObject.id) { runBlocking { deferred.await() } }
+                        val value = deferred.await()
+                        mutex.withLock { event.register(registryKey, registryObject.id) { value } }
                         (registryObject as RegistryObjectAccessor).invokeUpdateReference(event)
                     }
                     entryToRegistrationJob[registryObject] = job
-                    registryObject to job
+                    deferred.start()
+                    job.invokeOnCompletion {
+                        entryToRegistrationJob -= registryObject
+                        entriesRegistering -= registryObject
+                    }
+                    job
                 }
-                .merge(false)
-                .collect { (registryObject, job) ->
-                    job.join()
-                    entriesRegistering -= registryObject
-                }
+                .collect { it.join() }
         }
-        require(entriesRegistering.isEmpty()) {
-            "Entries ${entriesRegistering.map { it.id }} failed to register"
+        if (entriesRegistering.isNotEmpty()) {
+            Lazyyyyy.logger.error("Entries ${entriesRegistering.map { it.id }} failed to register")
         }
+        entriesRegistering.clear()
     }
 }
