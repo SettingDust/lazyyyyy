@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -40,7 +39,6 @@ import java.io.InputStream
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 
@@ -62,6 +60,8 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
     val allCompleted = Job()
 
     val files: MutableMap<String, CompletableDeferred<Path>> = ConcurrentHashMap()
+    internal val filesAdded = MutableSharedFlow<String>()
+
     val directoryToFiles: MutableMap<String, CompletableDeferred<Map<Path, String>>> = ConcurrentHashMap()
     internal val directoryToFilesAdded = MutableSharedFlow<String>()
 
@@ -107,12 +107,16 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         scope.cancel()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun getOrCacheResource(path: String) = runBlocking {
-        if (path in files) {
-            files[path]!!.await()
-        } else {
-            roots.asFlow().map { it.resolve(path) }.filter { it.exists() }.firstOrNull()
-        }
+        val deferred = files[path]
+        if (deferred?.isCompleted == true) deferred.getCompleted()
+        else (deferred ?: race(
+            { filesAdded.filter { it == path }.map { files[it] }.first() },
+            {
+                allCompleted.join()
+                null
+            }))?.await()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -122,16 +126,16 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         prefix: String
     ) = runBlocking {
         val pathString = "${type?.directory?.let { "${it}/" } ?: ""}$namespace/$prefix"
-        if (directoryToFiles[pathString]?.isCompleted == true) directoryToFiles[pathString]!!.getCompleted()
+        val deferred = directoryToFiles[pathString]
+        if (deferred?.isCompleted == true) deferred.getCompleted()
         else
-            (directoryToFiles[pathString]
-                ?: race(
-                    { directoryToFilesAdded.filter { it == pathString }.map { directoryToFiles[it] }.first() },
-                    {
-                        allCompleted.join()
-                        null
-                    }
-                ))?.await()
+            (deferred ?: race(
+                { directoryToFilesAdded.filter { it == pathString }.map { directoryToFiles[it] }.first() },
+                {
+                    allCompleted.join()
+                    null
+                }
+            ))?.await()
     }
 }
 
@@ -143,7 +147,11 @@ suspend fun PackResourcesCache.consumeFile(
 ) {
     val relativePath = strategy.getRootRelativePath(file)
     joinAll(
-        scope.launch { files.putIfAbsent(strategy.getRelativePathString(relativePath), CompletableDeferred(file)) },
+        scope.launch {
+            val key = strategy.getRelativePathString(relativePath)
+            files.putIfAbsent(key, CompletableDeferred(file))
+            filesAdded.emit(key)
+        },
         scope.launch { fileConsumer?.invoke(file) }
     )
 }
