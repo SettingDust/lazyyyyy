@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy
+package settingdust.lazyyyyy.util
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.SendChannel
@@ -11,6 +11,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
@@ -453,3 +454,24 @@ fun <T> ConcurrentFlow<T>.onEach(
 }
 
 fun <T> ConcurrentFlow<T>.launchIn(scope: CoroutineScope) = scope.launch { collect {} }
+
+/**
+ * Collects given flow into a [destination]
+ */
+suspend fun <T> ConcurrentFlow<T>.toList(destination: MutableList<T> = Collections.synchronizedList(arrayListOf())): List<T> = toCollection(destination)
+
+/**
+ * Collects given flow into a [destination]
+ */
+suspend fun <T> ConcurrentFlow<T>.toSet(destination: MutableSet<T> = ConcurrentHashMap.newKeySet()): Set<T> =
+    toCollection(destination)
+
+/**
+ * Collects given flow into a [destination]
+ */
+suspend fun <T, C : MutableCollection<in T>> ConcurrentFlow<T>.toCollection(destination: C): C {
+    collect { value ->
+        destination.add(value)
+    }
+    return destination
+}

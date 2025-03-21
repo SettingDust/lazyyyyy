@@ -11,7 +11,7 @@ import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import settingdust.lazyyyyy.forge.minecraft.TreePackResourcesCache;
+import settingdust.lazyyyyy.forge.minecraft.pack_resources_cache.TreePackResourcesCache;
 import settingdust.lazyyyyy.mixin.forge.pack_resources_cache.PathPackResourcesMixin;
 
 import java.io.InputStream;

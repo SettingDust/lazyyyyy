@@ -6,10 +6,10 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import settingdust.lazyyyyy.collect
-import settingdust.lazyyyyy.concurrent
-import settingdust.lazyyyyy.flatMap
-import settingdust.lazyyyyy.reduce
+import settingdust.lazyyyyy.util.collect
+import settingdust.lazyyyyy.util.concurrent
+import settingdust.lazyyyyy.util.flatMap
+import settingdust.lazyyyyy.util.reduce
 
 object FasterParts {
     fun countEveryWeaponVariant() = runBlocking {
