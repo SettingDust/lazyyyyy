@@ -15,7 +15,6 @@ import settingdust.lazyyyyy.Lazyyyyy
 import settingdust.lazyyyyy.util.collect
 import settingdust.lazyyyyy.util.concurrent
 import settingdust.lazyyyyy.util.flatMap
-import settingdust.lazyyyyy.util.withCoroutineNameSuffix
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.ExperimentalPathApi
@@ -42,28 +41,25 @@ class VanillaPackResourcesCache(
             val firstPath = relativePath.firstOrNull()
             if (firstPath?.name in blacklisted) return@collect
             if (path.isDirectory()) {
-                consumeRootDirectory(path, strategy)
+                consumeRootDirectory(this, path, strategy)
             } else {
-                consumeFile(path, strategy)
+                consumeFile(this, path, strategy)
             }
         }
     }
 
     suspend fun PackResourcesCache.consumePackType(
-        type: PackType,
         directory: Path,
         strategy: CachingStrategy,
         directoryToFiles: MutableMap<String, MutableMap<Path, Deferred<String>>>
     ) {
         coroutineScope {
-            withContext(withCoroutineNameSuffix(" / ${type.directory}")) {
-                val entries = directory.listDirectoryEntries()
-                entries.asFlow().concurrent().collect { path ->
-                    if (path.isDirectory()) {
-                        consumeResourceDirectory(path, directoryToFiles, strategy)
-                    } else {
-                        consumeFile(path, strategy)
-                    }
+            val entries = directory.listDirectoryEntries()
+            entries.asFlow().concurrent().collect { path ->
+                if (path.isDirectory()) {
+                    consumeResourceDirectory(path, directoryToFiles, strategy)
+                } else {
+                    consumeFile(this, path, strategy)
                 }
             }
         }
@@ -80,7 +76,7 @@ class VanillaPackResourcesCache(
                             .flatMap { (type, paths) -> paths.asFlow().map { type to it } }
                             .collect { (type, packTypeRoot) ->
                                 val strategy = CachingStrategy.PackTypeRoot(packTypeRoot, type.directory)
-                                consumePackType(type, packTypeRoot, strategy, directoryToFiles)
+                                consumePackType(packTypeRoot, strategy, directoryToFiles)
                             }
                         for ((path, files) in directoryToFiles) {
                             this@VanillaPackResourcesCache.directoryToFiles[path]!!.complete(files.mapValues { it.value.await() })

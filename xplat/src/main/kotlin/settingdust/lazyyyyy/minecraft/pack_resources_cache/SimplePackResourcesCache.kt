@@ -5,7 +5,6 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -17,7 +16,6 @@ import settingdust.lazyyyyy.Lazyyyyy
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingStrategy.PackRoot
 import settingdust.lazyyyyy.util.collect
 import settingdust.lazyyyyy.util.concurrent
-import settingdust.lazyyyyy.util.withCoroutineNameSuffix
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.ExperimentalPathApi
@@ -37,7 +35,7 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
         scope.launch { loadCache() }
     }
 
-    private suspend fun consumeRoot(
+    private suspend fun CoroutineScope.consumeRoot(
         root: Path,
         namespaces: ConcurrentHashMap<PackType, MutableSet<String>>
     ) {
@@ -50,51 +48,47 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                 val packType = packTypeByDirectory[firstPath?.name] ?: return@collect
                 consumePackType(packType, path, PackRoot(root, path), namespaces)
             } else {
-                consumeFile(path, strategy)
+                consumeFile(this, path, strategy)
             }
         }
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#root/$root] cached") }
     }
 
-    private suspend fun PackResourcesCache.consumePackType(
+    private suspend fun CoroutineScope.consumePackType(
         type: PackType,
         directory: Path,
         strategy: CachingStrategy,
         namespaces: MutableMap<PackType, MutableSet<String>>
     ) {
         val entries = directory.listDirectoryEntries()
-        coroutineScope {
-            withContext(withCoroutineNameSuffix(" / ${type.directory}")) {
-                Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type] caching") }
-                joinAll(
-                    launch {
-                        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/namespaces] caching") }
-                        val toPut = entries.mapTo(mutableSetOf()) { it.name }
-                        namespaces.computeIfAbsent(type) { ConcurrentHashMap.newKeySet() }.addAll(toPut)
-                        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/namespaces] cached $toPut") }
-                    },
-                    launch {
-                        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/entries] caching") }
-                        val directoryToFiles = ConcurrentHashMap<String, MutableMap<Path, Deferred<String>>>()
-                        entries.asFlow().concurrent().collect { path ->
-                            if (path.isDirectory()) {
-                                consumeResourceDirectory(path, directoryToFiles, strategy)
-                            } else {
-                                consumeFile(path, strategy)
-                            }
-                        }
-                        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/directoryToFiles] caching") }
-                        for ((path, files) in directoryToFiles) {
-                            this@SimplePackResourcesCache.directoryToFiles[path]!!.complete(files.mapValues { it.value.await() })
-                        }
-                        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/directoryToFiles] cached") }
-
-                        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/entries] cached") }
+        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type] caching") }
+        joinAll(
+            launch {
+                Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/namespaces] caching") }
+                val toPut = entries.mapTo(mutableSetOf()) { it.name }
+                namespaces.computeIfAbsent(type) { ConcurrentHashMap.newKeySet() }.addAll(toPut)
+                Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/namespaces] cached $toPut") }
+            },
+            launch {
+                Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/entries] caching") }
+                val directoryToFiles = ConcurrentHashMap<String, MutableMap<Path, Deferred<String>>>()
+                entries.asFlow().concurrent().collect { path ->
+                    if (path.isDirectory()) {
+                        consumeResourceDirectory(path, directoryToFiles, strategy)
+                    } else {
+                        consumeFile(this, path, strategy)
                     }
-                )
-                Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type] cached") }
+                }
+                Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/directoryToFiles] caching") }
+                for ((path, files) in directoryToFiles) {
+                    this@SimplePackResourcesCache.directoryToFiles[path]!!.complete(files.mapValues { it.value.await() })
+                }
+                Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/directoryToFiles] cached") }
+
+                Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/entries] cached") }
             }
-        }
+        )
+        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type] cached") }
     }
 
     @OptIn(ExperimentalPathApi::class)
