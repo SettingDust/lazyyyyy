@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2025-03-21
+### :bug: Bug Fixes
+- [`25473b9`](https://github.com/SettingDust/lazyyyyy/commit/25473b9334a993f5591ebe329aebd1a5eb57e227) - **pack-resources-cache**: fix the dynamic trees pack support *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`d66bdb9`](https://github.com/SettingDust/lazyyyyy/commit/d66bdb97572375715e5705c785f30dc8c85169b8) - **pack-resources-cache**: randomly crash relating to concurrent hash map get is overlapping *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :zap: Performance Improvements
+- [`cc24468`](https://github.com/SettingDust/lazyyyyy/commit/cc2446845f522c15ed104a9d13563d9f5b5cbd59) - **pack-resources-cache**: avoid switch coroutine context *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`7c71e42`](https://github.com/SettingDust/lazyyyyy/commit/7c71e42dd49ab48086c0bfee90b86a585410eca0) - **pack-resources-cache**: wait for files being added instead of find it *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :recycle: Refactors
+- [`f595372`](https://github.com/SettingDust/lazyyyyy/commit/f5953727279e4e8d6839f320d065a4fb5cef75d5) - **pack-resources-cache**: loading pack cache complete *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`424eaa9`](https://github.com/SettingDust/lazyyyyy/commit/424eaa90068d0886e6050a776077530b9f46f85f) - **deps**: bump net.bytebuddy:byte-buddy-agent from 1.17.1 to 1.17.2 *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
+- [`945f3bd`](https://github.com/SettingDust/lazyyyyy/commit/945f3bdd020d1bc6994a3e7daf55d4086851b13d) - simply mod path in locator *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`ccc43be`](https://github.com/SettingDust/lazyyyyy/commit/ccc43be3b0e410959c4eda39a429190dfd6c7a14) - **pack-resources-cache**: remove warn time since it's not referable *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`a9f9046`](https://github.com/SettingDust/lazyyyyy/commit/a9f9046e2613dbcec5d32b5fc5fe62424911da77) - avoid duplicate mixin configure for the other mods *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.6] - 2025-03-08
 ### :sparkles: New Features
 - [`8b1ac8f`](https://github.com/SettingDust/lazyyyyy/commit/8b1ac8f48484cec8633eff32502b66ce5ef6c12e) - **lazy-entity-renderers**: compat with cloud storage *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -366,3 +385,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.4]: https://github.com/SettingDust/lazyyyyy/compare/0.8.3...0.8.4
 [0.8.5]: https://github.com/SettingDust/lazyyyyy/compare/0.8.4...0.8.5
 [0.8.6]: https://github.com/SettingDust/lazyyyyy/compare/0.8.5...0.8.6
+[0.9.0]: https://github.com/SettingDust/lazyyyyy/compare/0.8.6...0.9.0
