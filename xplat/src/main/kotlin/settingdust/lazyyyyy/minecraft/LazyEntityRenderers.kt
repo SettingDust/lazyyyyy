@@ -35,12 +35,12 @@ import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.phys.Vec3
 import settingdust.lazyyyyy.Lazyyyyy
-import settingdust.lazyyyyy.collect
-import settingdust.lazyyyyy.concurrent
 import settingdust.lazyyyyy.mixin.lazy_entity_renderers.BlockEntityRenderDispatcherAccessor
 import settingdust.lazyyyyy.mixin.lazy_entity_renderers.EntityRenderDispatcherAccessor
 import settingdust.lazyyyyy.mixin.lazy_entity_renderers.EntityRendererAccessor
 import settingdust.lazyyyyy.mixin.lazy_entity_renderers.LivingEntityRendererAccessor
+import settingdust.lazyyyyy.util.collect
+import settingdust.lazyyyyy.util.concurrent
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.BiConsumer
 

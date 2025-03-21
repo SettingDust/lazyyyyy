@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import settingdust.lazyyyyy.minecraft.CachingPackResources;
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingPackResources;
 
 import java.io.InputStream;
 import java.nio.file.LinkOption;
