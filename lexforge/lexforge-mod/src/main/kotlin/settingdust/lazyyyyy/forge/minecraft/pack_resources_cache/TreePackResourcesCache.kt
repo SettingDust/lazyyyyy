@@ -23,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
 class TreePackResourcesCache(pack: TreeResourcePack, treePackTypeRoots: List<Path>) :
@@ -63,8 +62,7 @@ class TreePackResourcesCache(pack: TreeResourcePack, treePackTypeRoots: List<Pat
                 allNamespaces.complete(namespaces)
                 allCompleted.complete()
             }
-            if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache tree pack ${pack.packId()} in $time")
-            else Lazyyyyy.logger.debug("Cache tree pack ${pack.packId()} in $time")
+            Lazyyyyy.logger.debug("Cache tree pack ${pack.packId()} in $time")
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)

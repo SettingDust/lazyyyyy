@@ -22,7 +22,6 @@ import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
 class VanillaPackResourcesCache(
@@ -91,8 +90,7 @@ class VanillaPackResourcesCache(
                 )
                 allCompleted.complete()
             }
-            if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache vanilla pack ${pack.packId()} in $time")
-            else Lazyyyyy.logger.debug("Cache vanilla pack ${pack.packId()} in $time")
+            Lazyyyyy.logger.debug("Cache vanilla pack ${pack.packId()} in $time")
         }
 
     override fun getNamespaces(type: PackType?): Set<String> {

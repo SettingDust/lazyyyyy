@@ -24,7 +24,6 @@ import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
 typealias FileConsumer = (Path) -> Unit?
@@ -117,8 +116,7 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                 allCompleted.complete()
                 Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}] cached") }
             }
-            if (time >= 500.milliseconds) Lazyyyyy.logger.warn("Cache pack ${pack.packId()} in $time")
-            else Lazyyyyy.logger.debug("Cache pack ${pack.packId()} in $time")
+            Lazyyyyy.logger.debug("Cache pack ${pack.packId()} in $time")
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
