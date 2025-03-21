@@ -34,11 +34,7 @@ public abstract class FlatTreeResourcePackMixin extends PathPackResourcesMixin {
         method = "getNamespaces"
     )
     private Set<String> lazyyyyy$getNamespaces(final @Nullable PackType type, final Operation<Set<String>> original) {
-        if (lazyyyyy$cache != null) {
-            return lazyyyyy$cache.getNamespaces(type);
-        } else {
-            return original.call(type);
-        }
+        return lazyyyyy$cache.getNamespaces(type);
     }
 
     @WrapMethod(
