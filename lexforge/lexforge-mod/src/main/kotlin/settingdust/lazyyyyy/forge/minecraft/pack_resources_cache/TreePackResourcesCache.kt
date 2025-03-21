@@ -35,7 +35,7 @@ class TreePackResourcesCache(pack: TreeResourcePack, treePackTypeRoots: List<Pat
         scope.launch { loadCache() }
     }
 
-    private suspend fun PackResourcesCache.consumePackType(
+    private suspend fun CoroutineScope.consumePackType(
         directory: Path,
         namespaces: MutableSet<String>
     ) {
@@ -46,7 +46,7 @@ class TreePackResourcesCache(pack: TreeResourcePack, treePackTypeRoots: List<Pat
                 namespaces += path.name
                 consumeResourceDirectory(path, directoryToFiles, strategy)
             } else {
-                consumeFile(path, strategy)
+                consumeFile(this, path, strategy)
             }
         }
         for ((path, files) in directoryToFiles) {
