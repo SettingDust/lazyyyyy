@@ -13,11 +13,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -41,6 +38,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
+import kotlin.time.Duration.Companion.nanoseconds
 
 abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>) : Closeable {
     companion object {
@@ -60,10 +58,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
     val allCompleted = Job()
 
     val files: MutableMap<String, CompletableDeferred<Path>> = ConcurrentHashMap()
-    internal val filesAdded = MutableSharedFlow<String>()
-
     val directoryToFiles: MutableMap<String, CompletableDeferred<Map<Path, String>>> = ConcurrentHashMap()
-    internal val directoryToFilesAdded = MutableSharedFlow<String>()
 
     fun join(vararg paths: String?) = when (paths.size) {
         0 -> ""
@@ -112,10 +107,15 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         val deferred = files[path]
         if (deferred?.isCompleted == true) deferred.getCompleted()
         else (deferred ?: race(
-            { filesAdded.filter { it == path }.map { files[it] }.first() },
+            {
+                while (path !in files) {
+                    delay(50.nanoseconds)
+                }
+                files[path]
+            },
             {
                 allCompleted.join()
-                null
+                files[path]
             }))?.await()
     }
 
@@ -130,7 +130,12 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         if (deferred?.isCompleted == true) deferred.getCompleted()
         else
             (deferred ?: race(
-                { directoryToFilesAdded.filter { it == pathString }.map { directoryToFiles[it] }.first() },
+                {
+                    while (pathString !in directoryToFiles) {
+                        delay(50.nanoseconds)
+                    }
+                    directoryToFiles[pathString]
+                },
                 {
                     allCompleted.join()
                     null
@@ -150,7 +155,6 @@ suspend fun PackResourcesCache.consumeFile(
         scope.launch {
             val key = strategy.getRelativePathString(relativePath)
             files.putIfAbsent(key, CompletableDeferred(file))
-            filesAdded.emit(key)
         },
         scope.launch { fileConsumer?.invoke(file) }
     )
@@ -172,7 +176,6 @@ suspend fun PackResourcesCache.consumeResourceDirectory(
     if (shouldCacheDirectoryToFiles) {
         directoryToFiles.computeIfAbsent(relativePathString) { ConcurrentHashMap() }
         this.directoryToFiles.computeIfAbsent(relativePathString) {
-            runBlocking { directoryToFilesAdded.emit(relativePathString) }
             CompletableDeferred()
         }
     }
