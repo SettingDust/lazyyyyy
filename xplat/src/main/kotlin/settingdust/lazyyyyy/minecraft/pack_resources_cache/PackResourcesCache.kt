@@ -84,7 +84,8 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
     @OptIn(ExperimentalPathApi::class, ExperimentalCoroutinesApi::class)
     fun listResources(type: PackType?, namespace: String, prefix: String, output: PackResources.ResourceOutput) {
         val filesInDir = listOrCacheResources(type, namespace, prefix) ?: return
-        runBlocking(Dispatchers.IO) {
+
+        runBlocking(scope.coroutineContext) {
             filesInDir.asSequence().asFlow().concurrent()
                 .mapNotNull { (path, relativeString) ->
                     val location = ResourceLocation.tryBuild(namespace, relativeString)
@@ -103,10 +104,11 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun getOrCacheResource(path: String) = runBlocking {
+    private fun getOrCacheResource(path: String) = runBlocking(scope.coroutineContext) {
         val deferred = files[path]
         if (deferred?.isCompleted == true) deferred.getCompleted()
-        else (deferred ?: race(
+        else (deferred ?: if (allCompleted.isCompleted) files[path]
+        else race(
             {
                 while (path !in files) {
                     delay(50.nanoseconds)
@@ -124,12 +126,13 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         type: PackType?,
         namespace: String,
         prefix: String
-    ) = runBlocking {
+    ): Map<Path, String>? {
         val pathString = "${type?.directory?.let { "${it}/" } ?: ""}$namespace/$prefix"
         val deferred = directoryToFiles[pathString]
-        if (deferred?.isCompleted == true) deferred.getCompleted()
-        else
-            (deferred ?: race(
+        return if (deferred?.isCompleted == true) deferred.getCompleted()
+        else runBlocking {
+            (deferred ?: if (allCompleted.isCompleted) directoryToFiles[pathString]
+            else race(
                 {
                     while (pathString !in directoryToFiles) {
                         delay(50.nanoseconds)
@@ -138,9 +141,10 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
                 },
                 {
                     allCompleted.join()
-                    null
+                    directoryToFiles[pathString]
                 }
             ))?.await()
+        }
     }
 }
 
