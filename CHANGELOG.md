@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.7] - 2025-03-23
+### :bug: Bug Fixes
+- [`aca0e4d`](https://github.com/SettingDust/lazyyyyy/commit/aca0e4d3df806728399743014553cf7a243b80d6) - **lazy-entity-renderers**: fps drop when rendering block entities *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`74058bd`](https://github.com/SettingDust/lazyyyyy/commit/74058bdbbc318dc621a2d0b5807a111c144fc13b) - move the utils *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.6] - 2025-03-08
 ### :sparkles: New Features
 - [`8b1ac8f`](https://github.com/SettingDust/lazyyyyy/commit/8b1ac8f48484cec8633eff32502b66ce5ef6c12e) - **lazy-entity-renderers**: compat with cloud storage *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -366,3 +374,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.4]: https://github.com/SettingDust/lazyyyyy/compare/0.8.3...0.8.4
 [0.8.5]: https://github.com/SettingDust/lazyyyyy/compare/0.8.4...0.8.5
 [0.8.6]: https://github.com/SettingDust/lazyyyyy/compare/0.8.5...0.8.6
+[0.8.7]: https://github.com/SettingDust/lazyyyyy/compare/0.9.0...0.8.7
