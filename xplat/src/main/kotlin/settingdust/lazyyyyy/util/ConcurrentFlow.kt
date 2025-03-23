@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy
+package settingdust.lazyyyyy.util
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.SendChannel
