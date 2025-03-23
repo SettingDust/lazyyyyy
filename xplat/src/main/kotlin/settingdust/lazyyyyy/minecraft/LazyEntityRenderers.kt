@@ -35,12 +35,12 @@ import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.phys.Vec3
 import settingdust.lazyyyyy.Lazyyyyy
-import settingdust.lazyyyyy.collect
-import settingdust.lazyyyyy.concurrent
 import settingdust.lazyyyyy.mixin.lazy_entity_renderers.BlockEntityRenderDispatcherAccessor
 import settingdust.lazyyyyy.mixin.lazy_entity_renderers.EntityRenderDispatcherAccessor
 import settingdust.lazyyyyy.mixin.lazy_entity_renderers.EntityRendererAccessor
 import settingdust.lazyyyyy.mixin.lazy_entity_renderers.LivingEntityRendererAccessor
+import settingdust.lazyyyyy.util.collect
+import settingdust.lazyyyyy.util.concurrent
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.BiConsumer
 
@@ -313,9 +313,13 @@ var EntityRenderDispatcher.playerRenderers: Map<String, EntityRenderer<out Playe
 val BlockEntityRenderDispatcher.renderers: MutableMap<BlockEntityType<*>, BlockEntityRenderer<*>>
     get() = (this as BlockEntityRenderDispatcherAccessor).renderers
 
+@OptIn(ExperimentalCoroutinesApi::class)
 fun Map<BlockEntityType<*>, BlockEntityRenderer<*>>.observeBlockEntityRenderers() = ObservableMap(this) {
     val renderer = this[it]
-    if (renderer is LazyBlockEntityRenderer<*>) runBlocking(Dispatchers.IO) { renderer.loading.await() } else renderer
+    if (renderer is LazyBlockEntityRenderer<*>) {
+        if (renderer.loading.isCompleted) renderer.loading.getCompleted()
+        else runBlocking(Dispatchers.IO) { renderer.loading.await() }
+    } else renderer
 }
 
 val EntityRenderDispatcher.`lazyyyyy$renderers`: MutableMap<EntityType<*>, EntityRenderer<*>>
