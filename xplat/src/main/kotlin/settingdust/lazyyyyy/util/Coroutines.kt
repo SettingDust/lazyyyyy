@@ -21,7 +21,6 @@ suspend fun CoroutineScope.withCoroutineNameSuffix(name: String) =
 suspend fun <T> race(vararg racers: suspend CoroutineScope.() -> T): T {
     require(racers.isNotEmpty()) { "A race needs racers." }
     return coroutineScope {
-        @Suppress("RemoveExplicitTypeArguments")
         select<T> {
             @OptIn(ExperimentalCoroutinesApi::class)
             val racersAsyncList = racers.map {

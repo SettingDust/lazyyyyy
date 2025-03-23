@@ -50,7 +50,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
     }
 
     val scope =
-        CoroutineScope(Dispatchers.IO + CoroutineName("Pack cache #${pack.packId()}") + CoroutineExceptionHandler { context, throwable ->
+        CoroutineScope(Dispatchers.IO + CoroutineName("Pack cache #${pack.packId()}") + Dispatchers.IO + CoroutineExceptionHandler { context, throwable ->
             if (throwable is Exception || throwable is Error)
                 Lazyyyyy.logger.error("Error loading pack cache in $context", throwable)
         })
@@ -104,21 +104,23 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun getOrCacheResource(path: String) = runBlocking(scope.coroutineContext) {
+    private fun getOrCacheResource(path: String): Path? {
         val deferred = files[path]
-        if (deferred?.isCompleted == true) deferred.getCompleted()
-        else (deferred ?: if (allCompleted.isCompleted) files[path]
-        else race(
-            {
-                while (path !in files) {
-                    delay(50.nanoseconds)
-                }
-                files[path]
-            },
-            {
-                allCompleted.join()
-                files[path]
-            }))?.await()
+        return if (deferred?.isCompleted == true) deferred.getCompleted()
+        else runBlocking(scope.coroutineContext) {
+            (deferred ?: if (allCompleted.isCompleted) files[path]
+            else race(
+                {
+                    while (path !in files) {
+                        delay(50.nanoseconds)
+                    }
+                    files[path]
+                },
+                {
+                    allCompleted.join()
+                    files[path]
+                }))?.await()
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -130,7 +132,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         val pathString = "${type?.directory?.let { "${it}/" } ?: ""}$namespace/$prefix"
         val deferred = directoryToFiles[pathString]
         return if (deferred?.isCompleted == true) deferred.getCompleted()
-        else runBlocking {
+        else runBlocking(scope.coroutineContext) {
             (deferred ?: if (allCompleted.isCompleted) directoryToFiles[pathString]
             else race(
                 {
