@@ -5,4 +5,5 @@ import settingdust.lazyyyyy.PlatformService
 
 class PlatformServiceImpl : PlatformService {
     override fun isModLoaded(modId: String) = LoadingModList.get().getModFileById(modId) != null
+    override fun hasEarlyError() = LoadingModList.get().errors.isNotEmpty()
 }

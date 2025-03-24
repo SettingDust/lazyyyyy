@@ -99,6 +99,8 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
             }
         }
 
+        if (PlatformService.hasEarlyError()) return false
+
         if (!mixinClassName.startsWith(mixinPackage)) return super.shouldApplyMixin(targetClassName, mixinClassName)
         val relativeName = mixinClassName.removePrefix("${mixinPackage}.").removePrefix("forge.")
         val disabled =
