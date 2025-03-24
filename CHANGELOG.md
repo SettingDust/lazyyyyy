@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.8] - 2025-03-24
+### :bug: Bug Fixes
+- [`4afb463`](https://github.com/SettingDust/lazyyyyy/commit/4afb46390eecc533122cf9577d625d8c8bdb9ceb) - **mixin**: avoid minecraft blame my mod *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.7] - 2025-03-23
 ### :bug: Bug Fixes
 - [`aca0e4d`](https://github.com/SettingDust/lazyyyyy/commit/aca0e4d3df806728399743014553cf7a243b80d6) - **lazy-entity-renderers**: fps drop when rendering block entities *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -375,3 +380,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.5]: https://github.com/SettingDust/lazyyyyy/compare/0.8.4...0.8.5
 [0.8.6]: https://github.com/SettingDust/lazyyyyy/compare/0.8.5...0.8.6
 [0.8.7]: https://github.com/SettingDust/lazyyyyy/compare/0.9.0...0.8.7
+[0.8.8]: https://github.com/SettingDust/lazyyyyy/compare/0.8.7...0.8.8
