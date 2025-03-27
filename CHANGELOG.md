@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.10] - 2025-03-27
+### :bug: Bug Fixes
+- [`a3f9555`](https://github.com/SettingDust/lazyyyyy/commit/a3f95559b7f286dc987ba97f0d2e47cb6f3d4cc1) - **lazy-entity-renderers**: fast path when the renderer loaded *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`5a7e149`](https://github.com/SettingDust/lazyyyyy/commit/5a7e1492fb20f63693429ccda45808be6a5b8da4) - **lazy-entity-renderers**: player slim model render as default *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`ce1d7f3`](https://github.com/SettingDust/lazyyyyy/commit/ce1d7f381041c328e32be0b8562d5a2e5544fd63) - **mixin**: add more `IfModLoaded` *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.9] - 2025-03-25
 ### :bug: Bug Fixes
 - [`f73c42d`](https://github.com/SettingDust/lazyyyyy/commit/f73c42d5bdf1d7e1ba4a0e473f09132bdda8adcd) - **lazy-entity-renderers**: concurrent modification exception with player renderers *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -387,3 +396,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.7]: https://github.com/SettingDust/lazyyyyy/compare/0.9.0...0.8.7
 [0.8.8]: https://github.com/SettingDust/lazyyyyy/compare/0.8.7...0.8.8
 [0.8.9]: https://github.com/SettingDust/lazyyyyy/compare/0.8.8...0.8.9
+[0.8.10]: https://github.com/SettingDust/lazyyyyy/compare/0.8.9...0.8.10
