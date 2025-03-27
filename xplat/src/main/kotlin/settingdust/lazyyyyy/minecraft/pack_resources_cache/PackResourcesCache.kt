@@ -47,13 +47,14 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         val logger = LogManager.getLogger()
 
         val packTypeByDirectory = PackType.entries.associateByTo(Object2ReferenceOpenHashMap()) { it.directory }
-    }
 
-    val scope =
-        CoroutineScope(Dispatchers.IO + CoroutineName("Pack cache #${pack.packId()}") + Dispatchers.IO + CoroutineExceptionHandler { context, throwable ->
+        private val handler = CoroutineExceptionHandler { context, throwable ->
             if (throwable is Exception || throwable is Error)
                 Lazyyyyy.logger.error("Error loading pack cache in $context", throwable)
-        })
+        }
+    }
+
+    val scope = CoroutineScope(Dispatchers.IO + CoroutineName("Pack cache #${pack.packId()}") + handler)
 
     val allCompleted = Job()
 

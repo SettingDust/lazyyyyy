@@ -23,6 +23,8 @@ dependencies {
     minecraft(catalog.minecraft)
     mappings(loom.officialMojangMappings())
 
+    implementation(catalog.kotlinx.coroutines.debug)
+
     implementation(catalog.mixinsquared.common)
     annotationProcessor(catalog.mixinsquared.common)
 
@@ -49,9 +51,6 @@ dependencies {
     modImplementation(catalog.fusion.fabric)
 
     modImplementation(catalog.continuity.fabric)
-
-    implementation(catalog.caffeine)
-    implementation(catalog.caffeine.coroutines)
 
     modImplementation(catalog.almostUnified.fabric)
 
