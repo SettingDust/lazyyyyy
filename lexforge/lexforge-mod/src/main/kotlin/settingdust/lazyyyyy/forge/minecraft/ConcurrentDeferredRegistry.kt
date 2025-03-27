@@ -1,13 +1,13 @@
 package settingdust.lazyyyyy.forge.minecraft
 
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap
+import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -15,20 +15,18 @@ import net.minecraftforge.registries.DeferredRegister
 import net.minecraftforge.registries.RegisterEvent
 import net.minecraftforge.registries.RegistryObject
 import settingdust.lazyyyyy.Lazyyyyy
-import settingdust.lazyyyyy.collect
-import settingdust.lazyyyyy.concurrent
 import settingdust.lazyyyyy.forge.LazyyyyyForge
-import settingdust.lazyyyyy.map
 import settingdust.lazyyyyy.mixin.forge.concurrent_deferred_registry.RegistryObjectAccessor
+import settingdust.lazyyyyy.util.collect
+import settingdust.lazyyyyy.util.concurrent
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Supplier
 
 object ConcurrentDeferredRegistry {
-    val entriesRegistering = hashSetOf<RegistryObject<*>>()
-    val entryToRegistrationJob = ConcurrentHashMap<RegistryObject<*>, Job>()
+    val entryToJob = Reference2ReferenceOpenHashMap<RegistryObject<*>, CompletableJob>()
 
     fun RegistryObject<*>.join() {
-        entryToRegistrationJob[this@join]?.let { runBlocking(Dispatchers.IO) { it.join() } }
+        if (entryToJob[this@join] != null) runBlocking { entryToJob[this@join]?.join() }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -37,33 +35,34 @@ object ConcurrentDeferredRegistry {
         entries: Map<RegistryObject<T>, Supplier<out T>>
     ) {
         val mutex = Mutex()
-        entriesRegistering += entries.keys
+        val entryRegistering = ConcurrentHashMap.newKeySet<RegistryObject<T>>().apply { addAll(entries.keys) }
+        for (registryObject in entries.keys) {
+            entryToJob[registryObject] = Job()
+        }
         runBlocking(Dispatchers.IO + CoroutineName("Concurrent Deferred Registry #${registryName}")) {
             entries.asSequence().asFlow().concurrent()
-                .map { (registryObject, supplier) ->
-                    val deferred = async(start = CoroutineStart.LAZY) {
-                        // Some mod use SPI, which depends on the classloader
+                .collect { (registryObject, supplier) ->
+                    coroutineScope {
+                        // Some mod use SPI, which depends on the classloader. Use the transforming layer here.
                         Thread.currentThread().contextClassLoader = LazyyyyyForge::class.java.classLoader
-                        supplier.get()
-                    }
-                    val job = launch(start = CoroutineStart.LAZY) {
-                        val value = deferred.await()
+                        // FIXME has side effect. Like [ArmorItem]
+                        val value = supplier.get()
                         mutex.withLock { event.register(registryKey, registryObject.id) { value } }
                         (registryObject as RegistryObjectAccessor).invokeUpdateReference(event)
                     }
-                    entryToRegistrationJob[registryObject] = job
-                    deferred.start()
-                    job.invokeOnCompletion {
-                        entryToRegistrationJob -= registryObject
-                        entriesRegistering -= registryObject
-                    }
-                    job
+                    entryRegistering -= registryObject
+                    entryToJob[registryObject]!!.complete()
                 }
-                .collect { it.join() }
         }
-        if (entriesRegistering.isNotEmpty()) {
-            Lazyyyyy.logger.error("Entries ${entriesRegistering.map { it.id }} failed to register")
+        if (entryRegistering.isNotEmpty()) {
+            Lazyyyyy.logger.error("Entries ${entryRegistering.map { it.id }} failed to register")
         }
-        entriesRegistering.clear()
+        entryRegistering.clear()
+        for (registryObject in entries.keys) {
+            if (entryToJob[registryObject]!!.complete()) {
+                Lazyyyyy.logger.error("Entry ${registryObject.id} failed to complete")
+            }
+            entryToJob.remove(registryObject)
+        }
     }
 }
