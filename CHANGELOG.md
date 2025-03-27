@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.11] - 2025-03-27
+### :wrench: Chores
+- [`2dbcf64`](https://github.com/SettingDust/lazyyyyy/commit/2dbcf64638ad34c1f97e0f4024ee561c6dfa4d51) - **async-model-baking**: disable by default since it's lagging fps *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.10] - 2025-03-27
 ### :bug: Bug Fixes
 - [`a3f9555`](https://github.com/SettingDust/lazyyyyy/commit/a3f95559b7f286dc987ba97f0d2e47cb6f3d4cc1) - **lazy-entity-renderers**: fast path when the renderer loaded *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -397,3 +402,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.8]: https://github.com/SettingDust/lazyyyyy/compare/0.8.7...0.8.8
 [0.8.9]: https://github.com/SettingDust/lazyyyyy/compare/0.8.8...0.8.9
 [0.8.10]: https://github.com/SettingDust/lazyyyyy/compare/0.8.9...0.8.10
+[0.8.11]: https://github.com/SettingDust/lazyyyyy/compare/0.8.10...0.8.11
