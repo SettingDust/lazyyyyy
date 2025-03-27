@@ -41,6 +41,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     )
 
     library("kotlinx-coroutines", "org.jetbrains.kotlinx", "kotlinx-coroutines-core").version("1.10.1")
+    library("kotlinx-coroutines-debug", "org.jetbrains.kotlinx", "kotlinx-coroutines-debug").version("1.10.1")
 
     // https://modrinth.com/mod/kinecraft-serialization/versions
     library("kinecraft-serialization", "maven.modrinth", "kinecraft-serialization").version("1.16.0")

@@ -4,6 +4,8 @@ plugins {
 
     alias(catalog.plugins.architectury.plugin)
     alias(catalog.plugins.architectury.loom)
+
+    alias(catalog.plugins.shadow)
 }
 
 val id: String by rootProject.properties
@@ -16,6 +18,8 @@ dependencies {
     forge(catalog.lexforge)
     minecraft(catalog.minecraft)
     mappings(loom.officialMojangMappings())
+
+    implementation(catalog.kotlinx.coroutines.debug)
 
     implementation(project(":xplat"))
 
@@ -74,11 +78,33 @@ tasks {
                 "FMLModType" to "GAMELIBRARY"
             )
         }
+    }
 
-        rename("$id-${project.name}-${project.path.substring(1).replace(':', '_')}-refmap.json", "$id.refmap.json")
+    shadowJar {
+        from(loom.accessWidenerPath)
+        configurations = listOf(project.configurations.shadow.get())
+
+        manifest {
+            attributes(
+                "MixinConfigs" to "$id.mixins.json",
+                "FMLModType" to "GAMELIBRARY"
+            )
+        }
+
+        relocate("kotlinx.coroutines.debug", "shadow.kotlinx.coroutines.debug")
+
+        mergeServiceFiles()
+    }
+
+    remapJar {
+        inputFile = shadowJar.flatMap { it.archiveFile }
     }
 }
 
 loom {
     accessWidenerPath = project(":xplat").file("src/main/resources/$id.accesswidener")
+
+    mixin {
+        defaultRefmapName = "$id.refmap.json"
+    }
 }

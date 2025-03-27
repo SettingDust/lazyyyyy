@@ -4,6 +4,8 @@ plugins {
 
     alias(catalog.plugins.architectury.plugin)
     alias(catalog.plugins.architectury.loom)
+
+    alias(catalog.plugins.shadow)
 }
 
 val id: String by rootProject.properties
@@ -47,6 +49,13 @@ dependencies {
 
     catalog.mixinextras.lexforge.let {
         include(it)
+        implementation(it)
+    }
+
+    catalog.kotlinx.coroutines.debug.let {
+        shadow(it) {
+            isTransitive = false
+        }
         implementation(it)
     }
 
@@ -99,10 +108,27 @@ dependencies {
     modRuntimeOnly("maven.modrinth:citadel:2.6.1")
 
     modImplementation("maven.modrinth:decorative-blocks:4.1.3+forge")
+
+    modImplementation("maven.modrinth:l_enders-cataclysm:2.62")
 }
 
 tasks {
     jar {
         from(loom.accessWidenerPath)
+    }
+
+    shadowJar {
+        from(loom.accessWidenerPath)
+        configurations = listOf(project.configurations.shadow.get())
+
+        relocate("kotlinx.coroutines.debug", "shadow.kotlinx.coroutines.debug") {
+            exclude("kotlinx.coroutines.debug.internal.*")
+        }
+
+        mergeServiceFiles()
+    }
+
+    remapJar {
+        inputFile = shadowJar.flatMap { it.archiveFile }
     }
 }
