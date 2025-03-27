@@ -95,6 +95,9 @@ dependencies {
 
     modImplementation("fuzs.puzzleslib:puzzleslib-forge:8.1.25")
 
+    modImplementation("maven.modrinth:alexs-cloud-storage:1.4.0")
+    modRuntimeOnly("maven.modrinth:citadel:2.6.1")
+
     modImplementation("maven.modrinth:decorative-blocks:4.1.3+forge")
 }
 

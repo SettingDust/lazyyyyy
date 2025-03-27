@@ -6,7 +6,7 @@ import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import ru.feytox.toomanyplayers.TooManyPlayers;
-import settingdust.lazyyyyy.AsyncNetworkingKt;
+import settingdust.lazyyyyy.util.AsyncNetworkingKt;
 
 @IfModLoaded("toomanyplayers")
 @Mixin(value = TooManyPlayers.class, remap = false)

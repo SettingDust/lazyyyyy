@@ -11,9 +11,9 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import net.minecraft.server.packs.PackType
 import settingdust.lazyyyyy.Lazyyyyy
-import settingdust.lazyyyyy.collect
-import settingdust.lazyyyyy.concurrent
 import settingdust.lazyyyyy.minecraft.SimplePackResourcesCache
+import settingdust.lazyyyyy.util.collect
+import settingdust.lazyyyyy.util.concurrent
 import java.nio.file.FileVisitResult
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap

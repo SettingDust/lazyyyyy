@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.resource.TreeResourcePack;
 import com.ferreusveritas.dynamictrees.resources.FlatTreeResourcePack;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Set;
 
+@IfModLoaded("dynamictrees")
 @Mixin(FlatTreeResourcePack.class)
 public abstract class FlatTreeResourcePackMixin extends PathPackResourcesMixin {
     @Override

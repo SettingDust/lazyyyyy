@@ -4,6 +4,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.11] - 2025-03-27
+### :wrench: Chores
+- [`2dbcf64`](https://github.com/SettingDust/lazyyyyy/commit/2dbcf64638ad34c1f97e0f4024ee561c6dfa4d51) - **async-model-baking**: disable by default since it's lagging fps *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
+## [0.8.10] - 2025-03-27
+### :bug: Bug Fixes
+- [`a3f9555`](https://github.com/SettingDust/lazyyyyy/commit/a3f95559b7f286dc987ba97f0d2e47cb6f3d4cc1) - **lazy-entity-renderers**: fast path when the renderer loaded *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`5a7e149`](https://github.com/SettingDust/lazyyyyy/commit/5a7e1492fb20f63693429ccda45808be6a5b8da4) - **lazy-entity-renderers**: player slim model render as default *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`ce1d7f3`](https://github.com/SettingDust/lazyyyyy/commit/ce1d7f381041c328e32be0b8562d5a2e5544fd63) - **mixin**: add more `IfModLoaded` *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
+## [0.8.9] - 2025-03-25
+### :bug: Bug Fixes
+- [`f73c42d`](https://github.com/SettingDust/lazyyyyy/commit/f73c42d5bdf1d7e1ba4a0e473f09132bdda8adcd) - **lazy-entity-renderers**: concurrent modification exception with player renderers *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
+## [0.8.8] - 2025-03-24
+### :bug: Bug Fixes
+- [`4afb463`](https://github.com/SettingDust/lazyyyyy/commit/4afb46390eecc533122cf9577d625d8c8bdb9ceb) - **mixin**: avoid minecraft blame my mod *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
+## [0.8.7] - 2025-03-23
+### :bug: Bug Fixes
+- [`aca0e4d`](https://github.com/SettingDust/lazyyyyy/commit/aca0e4d3df806728399743014553cf7a243b80d6) - **lazy-entity-renderers**: fps drop when rendering block entities *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`74058bd`](https://github.com/SettingDust/lazyyyyy/commit/74058bdbbc318dc621a2d0b5807a111c144fc13b) - move the utils *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
+## [0.8.6] - 2025-03-08
+### :sparkles: New Features
+- [`8b1ac8f`](https://github.com/SettingDust/lazyyyyy/commit/8b1ac8f48484cec8633eff32502b66ce5ef6c12e) - **lazy-entity-renderers**: compat with cloud storage *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
+## [0.8.5] - 2025-03-08
+### :bug: Bug Fixes
+- [`17b57c1`](https://github.com/SettingDust/lazyyyyy/commit/17b57c1b7653405739aa759031a5f988f7dbb39a) - mixin failed when modern fix mixin plugin load after *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.4] - 2025-03-07
 ### :bug: Bug Fixes
 - [`61d2b68`](https://github.com/SettingDust/lazyyyyy/commit/61d2b6849b9e1a3231bbbd37cce938f763b4862d) - **lazy-entity-renderers**: emf fix forget to mark the field as mutable *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -354,3 +396,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.2]: https://github.com/SettingDust/lazyyyyy/compare/0.8.1...0.8.2
 [0.8.3]: https://github.com/SettingDust/lazyyyyy/compare/0.8.2...0.8.3
 [0.8.4]: https://github.com/SettingDust/lazyyyyy/compare/0.8.3...0.8.4
+[0.8.5]: https://github.com/SettingDust/lazyyyyy/compare/0.8.4...0.8.5
+[0.8.6]: https://github.com/SettingDust/lazyyyyy/compare/0.8.5...0.8.6
+[0.8.7]: https://github.com/SettingDust/lazyyyyy/compare/0.9.0...0.8.7
+[0.8.8]: https://github.com/SettingDust/lazyyyyy/compare/0.8.7...0.8.8
+[0.8.9]: https://github.com/SettingDust/lazyyyyy/compare/0.8.8...0.8.9
+[0.8.10]: https://github.com/SettingDust/lazyyyyy/compare/0.8.9...0.8.10
+[0.8.11]: https://github.com/SettingDust/lazyyyyy/compare/0.8.10...0.8.11

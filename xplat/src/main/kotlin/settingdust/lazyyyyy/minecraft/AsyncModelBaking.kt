@@ -25,6 +25,9 @@ var ModelPart.children: MutableMap<String, ModelPart>
         (this as ModelPartAccessor).children = value
     }
 
+/**
+ * FIXME It's lagging the fps
+ */
 @Suppress("UsePropertyAccessSyntax", "HasPlatformType")
 class AsyncModelPart(
     val location: ModelLayerLocation,

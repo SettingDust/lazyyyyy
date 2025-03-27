@@ -17,11 +17,11 @@ import net.minecraft.server.packs.PackResources
 import net.minecraft.server.packs.PackType
 import net.minecraft.server.packs.resources.IoSupplier
 import settingdust.lazyyyyy.Lazyyyyy
-import settingdust.lazyyyyy.collect
-import settingdust.lazyyyyy.concurrent
-import settingdust.lazyyyyy.flatMap
-import settingdust.lazyyyyy.mapNotNull
-import settingdust.lazyyyyy.merge
+import settingdust.lazyyyyy.util.collect
+import settingdust.lazyyyyy.util.concurrent
+import settingdust.lazyyyyy.util.flatMap
+import settingdust.lazyyyyy.util.mapNotNull
+import settingdust.lazyyyyy.util.merge
 import java.io.IOException
 import java.io.InputStream
 import java.nio.file.FileVisitResult
