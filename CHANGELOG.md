@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.12] - 2025-04-03
+### :bug: Bug Fixes
+- [`481bf2e`](https://github.com/SettingDust/lazyyyyy/commit/481bf2ee95907a205e5e4789ed8af4445a49bd08) - **pack-resources-cache**: wrong separator for directories *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.11] - 2025-03-27
 ### :wrench: Chores
 - [`2dbcf64`](https://github.com/SettingDust/lazyyyyy/commit/2dbcf64638ad34c1f97e0f4024ee561c6dfa4d51) - **async-model-baking**: disable by default since it's lagging fps *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -403,3 +408,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.9]: https://github.com/SettingDust/lazyyyyy/compare/0.8.8...0.8.9
 [0.8.10]: https://github.com/SettingDust/lazyyyyy/compare/0.8.9...0.8.10
 [0.8.11]: https://github.com/SettingDust/lazyyyyy/compare/0.8.10...0.8.11
+[0.8.12]: https://github.com/SettingDust/lazyyyyy/compare/0.8.11...0.8.12
