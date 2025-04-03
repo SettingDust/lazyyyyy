@@ -91,7 +91,7 @@ tasks {
             )
         }
 
-        relocate("kotlinx.coroutines.debug", "shadow.kotlinx.coroutines.debug")
+//        relocate("kotlinx.coroutines.debug", "shadow.kotlinx.coroutines.debug")
 
         mergeServiceFiles()
     }

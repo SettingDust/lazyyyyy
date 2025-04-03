@@ -1,6 +1,8 @@
 package settingdust.lazyyyyy
 
 import com.moulberry.mixinconstraints.ConstraintsMixinPlugin
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.debug.DebugProbes
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -26,6 +28,7 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         private set
 
     val defaultConfig = mapOf<String, Boolean>(
+        "debug" to false,
         "async_model_baking" to true,
         "axiom.async_check_commercial" to true,
         "entity_sound_features.async_sound_events" to true,
@@ -68,11 +71,15 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         json.encodeToStream(config, configPath.outputStream())
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onLoad(mixinPackage: String) {
         super.onLoad(mixinPackage)
         this.mixinPackage = mixinPackage
         if (firstLoad) {
             firstLoad = false
+            if (config["debug"] == true) {
+                DebugProbes.install()
+            }
             if (config.any { it.key.startsWith("lazy_entity_renderers") && it.value }) {
                 try {
                     forge.me.thosea.badoptimizations.other.Config.enable_entity_renderer_caching = false

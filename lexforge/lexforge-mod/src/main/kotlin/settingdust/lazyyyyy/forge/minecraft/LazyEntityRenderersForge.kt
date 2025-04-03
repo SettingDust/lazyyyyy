@@ -1,8 +1,8 @@
 package settingdust.lazyyyyy.forge.minecraft
 
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.Minecraft
@@ -24,8 +24,8 @@ import settingdust.lazyyyyy.minecraft.playerRenderers
 
 object LazyEntityRenderersForge {
     init {
-        CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
-            launch {
+        CoroutineScope(Dispatchers.Default).launch {
+            launch(CoroutineName("Lazy entity renderer loaded handler")) {
                 LazyEntityRenderer.onLoaded.collect { (type, context, renderer) ->
                     val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
                     entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
@@ -44,7 +44,7 @@ object LazyEntityRenderersForge {
                 }
             }
 
-            launch {
+            launch(CoroutineName("Lazy player renderer loaded handler")) {
                 LazyPlayerRenderer.onLoaded.collect { (type, context, renderer) ->
                     val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
                     entityRenderDispatcher.`lazyyyyy$playerRenderers`[type] = renderer

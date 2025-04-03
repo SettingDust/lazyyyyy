@@ -117,9 +117,9 @@ tasks {
         from(loom.accessWidenerPath)
         configurations = listOf(project.configurations.shadow.get())
 
-        relocate("kotlinx.coroutines.debug", "shadow.kotlinx.coroutines.debug") {
-            exclude("kotlinx.coroutines.debug.internal.*")
-        }
+//        relocate("kotlinx.coroutines.debug", "shadow.kotlinx.coroutines.debug") {
+//            exclude("kotlinx.coroutines.debug.internal.*")
+//        }
 
         mergeServiceFiles()
     }
