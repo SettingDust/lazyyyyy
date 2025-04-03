@@ -38,12 +38,6 @@ interface CachingPackResources {
     val `lazyyyyy$cache`: PackResourcesCache
 }
 
-val supported = setOf(
-    "net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack",
-    "com.ferreusveritas.dynamictrees.resources.ModTreeResourcePack",
-    "com.ferreusveritas.dynamictrees.resources.FlatTreeResourcePack"
-)
-
 abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>) {
     companion object {
         val JOINER = Joiner.on('/').useForNull("null")
@@ -238,7 +232,7 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                                 for (i in 2 until relativePath.nameCount) {
                                     val directory = relativePath.subpath(0, i)
                                     directoryToFiles
-                                        .computeIfAbsent(directory.toString()) { ConcurrentHashMap() }
+                                        .computeIfAbsent(JOINER.join(directory)) { ConcurrentHashMap() }
                                         .put(file, JOINER.join(namespaceRoot.relativize(file)))
                                 }
                             })
