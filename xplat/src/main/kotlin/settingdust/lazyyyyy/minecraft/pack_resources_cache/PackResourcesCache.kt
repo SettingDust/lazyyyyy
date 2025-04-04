@@ -29,7 +29,6 @@ import settingdust.lazyyyyy.util.collect
 import settingdust.lazyyyyy.util.concurrent
 import settingdust.lazyyyyy.util.mapNotNull
 import settingdust.lazyyyyy.util.merge
-import settingdust.lazyyyyy.util.race
 import java.io.Closeable
 import java.io.IOException
 import java.io.InputStream
@@ -74,7 +73,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         getResource("${type?.directory?.let { "${it}/" } ?: ""}${location.namespace}/${location.path}")
 
     fun getResource(path: String): IoSupplier<InputStream>? {
-        val path = getOrCacheResource(path) ?: return null
+        val path = getOrWaitResource(path) ?: return null
         return try {
             IoSupplier.create(path)
         } catch (_: IOException) {
@@ -84,7 +83,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
 
     @OptIn(ExperimentalPathApi::class, ExperimentalCoroutinesApi::class)
     fun listResources(type: PackType?, namespace: String, prefix: String, output: PackResources.ResourceOutput) {
-        val filesInDir = listOrCacheResources(type, namespace, prefix) ?: return
+        val filesInDir = listOrWaitResources(type, namespace, prefix) ?: return
 
         runBlocking(scope.coroutineContext) {
             filesInDir.asSequence().asFlow().concurrent()
@@ -105,48 +104,35 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun getOrCacheResource(path: String): Path? {
-        val deferred = files[path]
-        return if (deferred?.isCompleted == true) deferred.getCompleted()
-        else runBlocking(scope.coroutineContext) {
-            (deferred ?: if (allCompleted.isCompleted) files[path]
-            else race(
-                {
-                    while (path !in files) {
-                        delay(50.nanoseconds)
-                    }
-                    files[path]
-                },
-                {
-                    allCompleted.join()
-                    files[path]
-                }))?.await()
-        }
+    private fun getOrWaitResource(path: String): Path? {
+        return getOrWait { files[path] }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun listOrCacheResources(
+    private fun listOrWaitResources(
         type: PackType?,
         namespace: String,
         prefix: String
     ): Map<Path, String>? {
         val pathString = "${type?.directory?.let { "${it}/" } ?: ""}$namespace/$prefix"
-        val deferred = directoryToFiles[pathString]
+        return getOrWait { directoryToFiles[pathString] }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun <T> getOrWait(getter: () -> CompletableDeferred<T>?): T? {
+        val deferred = getter()
         return if (deferred?.isCompleted == true) deferred.getCompleted()
         else runBlocking(scope.coroutineContext) {
-            (deferred ?: if (allCompleted.isCompleted) directoryToFiles[pathString]
-            else race(
-                {
-                    while (pathString !in directoryToFiles) {
-                        delay(50.nanoseconds)
-                    }
-                    directoryToFiles[pathString]
-                },
-                {
-                    allCompleted.join()
-                    directoryToFiles[pathString]
+            (deferred ?: if (allCompleted.isCompleted) getter()
+            else {
+                var result = getter()
+                while (result == null) {
+                    delay(50.nanoseconds)
+                    result = getter()
+                    if (allCompleted.isCompleted) break
                 }
-            ))?.await()
+                result
+            })?.await()
         }
     }
 }
