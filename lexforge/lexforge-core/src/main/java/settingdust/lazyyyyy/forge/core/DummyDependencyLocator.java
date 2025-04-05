@@ -1,13 +1,12 @@
 package settingdust.lazyyyyy.forge.core;
 
 import com.google.common.collect.Lists;
-import cpw.mods.niofs.union.UnionFileSystem;
 import net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator;
 import net.minecraftforge.forgespi.locating.IModFile;
 import net.minecraftforge.forgespi.locating.IModLocator;
 
 import java.net.URISyntaxException;
-import java.nio.file.FileSystems;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class DummyDependencyLocator extends JarInJarDependencyLocator {
@@ -19,7 +18,7 @@ public class DummyDependencyLocator extends JarInJarDependencyLocator {
     public List<IModFile> scanMods(final Iterable<IModFile> loadedMods) {
         try {
             var modURI = getClass().getProtectionDomain().getCodeSource().getLocation().toURI();
-            var modPath = ((UnionFileSystem) FileSystems.getFileSystem(modURI)).getPrimaryPath();
+            var modPath = Paths.get(modURI);
             IModLocator.ModFileOrException mod = createMod(modPath);
             var newLadedMods = Lists.newArrayList(loadedMods);
             newLadedMods.add(mod.file());

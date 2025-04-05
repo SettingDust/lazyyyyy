@@ -13,9 +13,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import settingdust.lazyyyyy.minecraft.CachingPackResources;
-import settingdust.lazyyyyy.minecraft.PackResourcesCache;
-import settingdust.lazyyyyy.minecraft.SimplePackResourcesCache;
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingPackResources;
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCache;
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.SimplePackResourcesCache;
 
 import java.io.InputStream;
 import java.nio.file.Path;

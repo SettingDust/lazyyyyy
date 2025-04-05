@@ -1,6 +1,8 @@
 package settingdust.lazyyyyy
 
 import com.moulberry.mixinconstraints.ConstraintsMixinPlugin
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.debug.DebugProbes
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -17,10 +19,16 @@ import kotlin.io.path.outputStream
 
 @OptIn(ExperimentalSerializationApi::class)
 class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
+    companion object {
+        private var firstLoad = true
+        private var firstApply = true
+    }
+
     lateinit var mixinPackage: String
         private set
 
     val defaultConfig = mapOf<String, Boolean>(
+        "debug" to false,
         "async_model_baking" to false,
         "axiom.async_check_commercial" to true,
         "entity_sound_features.async_sound_events" to true,
@@ -47,8 +55,6 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
 
     val logger = LogManager.getLogger()
 
-    private var first = false
-
     init {
         val configPath = Path("./config/lazyyyyy.mixins.json")
         runCatching { configPath.createParentDirectories() }
@@ -65,28 +71,35 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         json.encodeToStream(config, configPath.outputStream())
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onLoad(mixinPackage: String) {
         super.onLoad(mixinPackage)
         this.mixinPackage = mixinPackage
-        if (config.any { it.key.startsWith("lazy_entity_renderers") && it.value }) {
-            try {
-                forge.me.thosea.badoptimizations.other.Config.enable_entity_renderer_caching = false
-                forge.me.thosea.badoptimizations.other.Config.enable_block_entity_renderer_caching = false
-                logger.info("Disabled BadOptimizations `enable_entity_renderer_caching` and `enable_block_entity_renderer_caching`")
-            } catch (_: NoClassDefFoundError) {
+        if (firstLoad) {
+            firstLoad = false
+            if (config["debug"] == true) {
+                DebugProbes.install()
             }
-            try {
-                fabric.me.thosea.badoptimizations.other.Config.enable_entity_renderer_caching = false
-                fabric.me.thosea.badoptimizations.other.Config.enable_block_entity_renderer_caching = false
-                logger.info("Disabled BadOptimizations `enable_entity_renderer_caching` and `enable_block_entity_renderer_caching`")
-            } catch (_: NoClassDefFoundError) {
+            if (config.any { it.key.startsWith("lazy_entity_renderers") && it.value }) {
+                try {
+                    forge.me.thosea.badoptimizations.other.Config.enable_entity_renderer_caching = false
+                    forge.me.thosea.badoptimizations.other.Config.enable_block_entity_renderer_caching = false
+                    logger.info("Disabled BadOptimizations `enable_entity_renderer_caching` and `enable_block_entity_renderer_caching`")
+                } catch (_: NoClassDefFoundError) {
+                }
+                try {
+                    fabric.me.thosea.badoptimizations.other.Config.enable_entity_renderer_caching = false
+                    fabric.me.thosea.badoptimizations.other.Config.enable_block_entity_renderer_caching = false
+                    logger.info("Disabled BadOptimizations `enable_entity_renderer_caching` and `enable_block_entity_renderer_caching`")
+                } catch (_: NoClassDefFoundError) {
+                }
             }
         }
     }
 
     override fun shouldApplyMixin(targetClassName: String, mixinClassName: String): Boolean {
-        if (first) {
-            first = false
+        if (firstApply) {
+            firstApply = false
             if (config.any { it.key.startsWith("pack_resources_cache") && it.value }) {
                 try {
                     ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ReloadableResourceManagerMixin"] =

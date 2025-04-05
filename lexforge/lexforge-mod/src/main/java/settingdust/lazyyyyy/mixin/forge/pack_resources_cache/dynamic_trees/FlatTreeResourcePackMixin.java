@@ -1,5 +1,6 @@
 package settingdust.lazyyyyy.mixin.forge.pack_resources_cache.dynamic_trees;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.resource.TreeResourcePack;
 import com.ferreusveritas.dynamictrees.resources.FlatTreeResourcePack;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
@@ -12,14 +13,14 @@ import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import settingdust.lazyyyyy.forge.minecraft.TreePackResourcesCache;
+import settingdust.lazyyyyy.forge.minecraft.pack_resources_cache.TreePackResourcesCache;
 import settingdust.lazyyyyy.mixin.forge.pack_resources_cache.PathPackResourcesMixin;
 
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Set;
 
-@IfModLoaded("dynamictrees")
+@IfModLoaded(DynamicTrees.MOD_ID)
 @Mixin(FlatTreeResourcePack.class)
 public abstract class FlatTreeResourcePackMixin extends PathPackResourcesMixin {
     @Override
@@ -36,11 +37,7 @@ public abstract class FlatTreeResourcePackMixin extends PathPackResourcesMixin {
         method = "getNamespaces"
     )
     private Set<String> lazyyyyy$getNamespaces(final @Nullable PackType type, final Operation<Set<String>> original) {
-        if (lazyyyyy$cache != null) {
-            return lazyyyyy$cache.getNamespaces(type);
-        } else {
-            return original.call(type);
-        }
+        return lazyyyyy$cache.getNamespaces(type);
     }
 
     @WrapMethod(

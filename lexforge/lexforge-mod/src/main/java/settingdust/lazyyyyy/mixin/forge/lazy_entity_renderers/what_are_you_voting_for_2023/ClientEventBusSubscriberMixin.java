@@ -1,13 +1,16 @@
 package settingdust.lazyyyyy.mixin.forge.lazy_entity_renderers.what_are_you_voting_for_2023;
 
+import com.alexander.whatareyouvotingfor.WhatAreYouVotingFor;
 import com.alexander.whatareyouvotingfor.util.ClientEventBusSubscriber;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+@IfModLoaded(WhatAreYouVotingFor.MODID)
 @Mixin(ClientEventBusSubscriber.class)
 public class ClientEventBusSubscriberMixin {
     @WrapOperation(
