@@ -125,18 +125,27 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun <T> getOrWait(getter: () -> CompletableDeferred<T>?): T? {
         val deferred = getter()
-        return if (deferred?.isCompleted == true) deferred.getCompleted()
-        else runBlocking(scope.coroutineContext) {
-            (deferred ?: if (allCompleted.isCompleted) getter()
-            else {
-                var result = getter()
+        if (deferred != null) {
+            return if (deferred.isCompleted) deferred.getCompleted()
+            else runBlocking { deferred.await() }
+        } else if (allCompleted.isCompleted) {
+            // ConcurrentHashMap may overlap get and put.
+            return getter()?.getCompleted()
+        } else {
+            var result = getter()
+            if (result != null) {
+                return if (result.isCompleted) result.getCompleted()
+                else runBlocking { result.await() }
+            }
+            runBlocking {
                 while (result == null) {
-                    delay(50.nanoseconds)
+                    delay(300.nanoseconds)
                     result = getter()
                     if (allCompleted.isCompleted) break
                 }
-                result
-            })?.await()
+            }
+            return if (result == null) null
+            else runBlocking { result.await() }
         }
     }
 }
