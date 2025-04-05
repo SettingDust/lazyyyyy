@@ -23,8 +23,6 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.time.measureTime
 
-typealias FileConsumer = (Path) -> Unit?
-
 open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : PackResourcesCache(pack, roots) {
     constructor(root: Path, pack: PackResources) : this(pack, listOf(root))
 

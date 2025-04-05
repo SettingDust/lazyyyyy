@@ -39,6 +39,8 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.time.Duration.Companion.nanoseconds
 
+typealias FileConsumer = (Path) -> Unit?
+
 abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>) : Closeable {
     companion object {
         val JOINER: Joiner = Joiner.on('/').useForNull("null")
