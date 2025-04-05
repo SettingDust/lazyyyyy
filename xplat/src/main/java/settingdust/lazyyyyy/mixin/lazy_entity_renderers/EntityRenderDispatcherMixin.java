@@ -1,6 +1,7 @@
 package settingdust.lazyyyyy.mixin.lazy_entity_renderers;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -45,7 +46,7 @@ public class EntityRenderDispatcherMixin implements LazyEntityRenderDispatcher {
         )
     )
     private Map<String, EntityRenderer<? extends Player>> lazyyyyy$initLazyPlayerRenderers(final Map<String, EntityRenderer<? extends Player>> original) {
-        lazyyyyy$playerRenderers = new Reference2ReferenceOpenHashMap<>(original);
+        lazyyyyy$playerRenderers = new Object2ReferenceOpenHashMap<>(original);
         return original;
     }
 

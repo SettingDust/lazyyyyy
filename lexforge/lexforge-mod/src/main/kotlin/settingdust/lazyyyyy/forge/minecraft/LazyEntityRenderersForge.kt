@@ -3,6 +3,7 @@ package settingdust.lazyyyyy.forge.minecraft
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.Minecraft
@@ -28,7 +29,6 @@ object LazyEntityRenderersForge {
             launch(CoroutineName("Lazy entity renderer loaded handler")) {
                 LazyEntityRenderer.onLoaded.collect { (type, context, renderer) ->
                     val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
-                    entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
                     if (renderer !is LivingEntityRenderer<*, *>) return@collect
                     val originalRenderers = entityRenderDispatcher.renderers
                     entityRenderDispatcher.renderers = mapOf(type to renderer)
@@ -47,7 +47,6 @@ object LazyEntityRenderersForge {
             launch(CoroutineName("Lazy player renderer loaded handler")) {
                 LazyPlayerRenderer.onLoaded.collect { (type, context, renderer) ->
                     val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
-                    entityRenderDispatcher.`lazyyyyy$playerRenderers`[type] = renderer
                     val originalRenderers = entityRenderDispatcher.playerRenderers
                     entityRenderDispatcher.playerRenderers = mapOf(type to renderer)
                     ModLoader.get()
@@ -82,12 +81,20 @@ fun Map<EntityType<*>, EntityRenderer<*>>.replaceWithDummyLivingEntity(context: 
 fun Map<String, EntityRenderer<out Player>>.replaceWithDummyPlayer(context: EntityRendererProvider.Context) =
     mapValues { (_, renderer) -> if (renderer is LazyPlayerRenderer) DummyPlayerRenderer(context) else renderer }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 fun Map<EntityType<*>, EntityRenderer<*>>.observeEntityRenderers() = ObservableMap(this) {
     val renderer = Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$renderers`[it]
-    if (renderer is LazyEntityRenderer<*>) runBlocking { renderer.loading.await() } else renderer
+    if (renderer is LazyEntityRenderer<*>) {
+        if (renderer.loading.isCompleted) renderer.loading.getCompleted()
+        else runBlocking(Dispatchers.IO) { renderer.loading.await() }
+    } else renderer
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 fun Map<String, EntityRenderer<out Player>>.observePlayerRenderers() = ObservableMap(this) {
     val renderer = Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$playerRenderers`[it]
-    if (renderer is LazyPlayerRenderer) runBlocking { renderer.loading.await() } else renderer
+    if (renderer is LazyPlayerRenderer) {
+        if (renderer.loading.isCompleted) renderer.loading.getCompleted()
+        else runBlocking(Dispatchers.IO) { renderer.loading.await() }
+    } else renderer
 }

@@ -4,23 +4,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.9.0] - 2025-03-21
+## [0.8.12] - 2025-04-03
 ### :bug: Bug Fixes
-- [`25473b9`](https://github.com/SettingDust/lazyyyyy/commit/25473b9334a993f5591ebe329aebd1a5eb57e227) - **pack-resources-cache**: fix the dynamic trees pack support *(commit by [@SettingDust](https://github.com/SettingDust))*
-- [`d66bdb9`](https://github.com/SettingDust/lazyyyyy/commit/d66bdb97572375715e5705c785f30dc8c85169b8) - **pack-resources-cache**: randomly crash relating to concurrent hash map get is overlapping *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`481bf2e`](https://github.com/SettingDust/lazyyyyy/commit/481bf2ee95907a205e5e4789ed8af4445a49bd08) - **pack-resources-cache**: wrong separator for directories *(commit by [@SettingDust](https://github.com/SettingDust))*
 
-### :zap: Performance Improvements
-- [`cc24468`](https://github.com/SettingDust/lazyyyyy/commit/cc2446845f522c15ed104a9d13563d9f5b5cbd59) - **pack-resources-cache**: avoid switch coroutine context *(commit by [@SettingDust](https://github.com/SettingDust))*
-- [`7c71e42`](https://github.com/SettingDust/lazyyyyy/commit/7c71e42dd49ab48086c0bfee90b86a585410eca0) - **pack-resources-cache**: wait for files being added instead of find it *(commit by [@SettingDust](https://github.com/SettingDust))*
 
-### :recycle: Refactors
-- [`f595372`](https://github.com/SettingDust/lazyyyyy/commit/f5953727279e4e8d6839f320d065a4fb5cef75d5) - **pack-resources-cache**: loading pack cache complete *(commit by [@SettingDust](https://github.com/SettingDust))*
+## [0.8.11] - 2025-03-27
+### :wrench: Chores
+- [`2dbcf64`](https://github.com/SettingDust/lazyyyyy/commit/2dbcf64638ad34c1f97e0f4024ee561c6dfa4d51) - **async-model-baking**: disable by default since it's lagging fps *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
+## [0.8.10] - 2025-03-27
+### :bug: Bug Fixes
+- [`a3f9555`](https://github.com/SettingDust/lazyyyyy/commit/a3f95559b7f286dc987ba97f0d2e47cb6f3d4cc1) - **lazy-entity-renderers**: fast path when the renderer loaded *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`5a7e149`](https://github.com/SettingDust/lazyyyyy/commit/5a7e1492fb20f63693429ccda45808be6a5b8da4) - **lazy-entity-renderers**: player slim model render as default *(commit by [@SettingDust](https://github.com/SettingDust))*
 
 ### :wrench: Chores
-- [`424eaa9`](https://github.com/SettingDust/lazyyyyy/commit/424eaa90068d0886e6050a776077530b9f46f85f) - **deps**: bump net.bytebuddy:byte-buddy-agent from 1.17.1 to 1.17.2 *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
-- [`945f3bd`](https://github.com/SettingDust/lazyyyyy/commit/945f3bdd020d1bc6994a3e7daf55d4086851b13d) - simply mod path in locator *(commit by [@SettingDust](https://github.com/SettingDust))*
-- [`ccc43be`](https://github.com/SettingDust/lazyyyyy/commit/ccc43be3b0e410959c4eda39a429190dfd6c7a14) - **pack-resources-cache**: remove warn time since it's not referable *(commit by [@SettingDust](https://github.com/SettingDust))*
-- [`a9f9046`](https://github.com/SettingDust/lazyyyyy/commit/a9f9046e2613dbcec5d32b5fc5fe62424911da77) - avoid duplicate mixin configure for the other mods *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`ce1d7f3`](https://github.com/SettingDust/lazyyyyy/commit/ce1d7f381041c328e32be0b8562d5a2e5544fd63) - **mixin**: add more `IfModLoaded` *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
+## [0.8.9] - 2025-03-25
+### :bug: Bug Fixes
+- [`f73c42d`](https://github.com/SettingDust/lazyyyyy/commit/f73c42d5bdf1d7e1ba4a0e473f09132bdda8adcd) - **lazy-entity-renderers**: concurrent modification exception with player renderers *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
+## [0.8.8] - 2025-03-24
+### :bug: Bug Fixes
+- [`4afb463`](https://github.com/SettingDust/lazyyyyy/commit/4afb46390eecc533122cf9577d625d8c8bdb9ceb) - **mixin**: avoid minecraft blame my mod *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
+## [0.8.7] - 2025-03-23
+### :bug: Bug Fixes
+- [`aca0e4d`](https://github.com/SettingDust/lazyyyyy/commit/aca0e4d3df806728399743014553cf7a243b80d6) - **lazy-entity-renderers**: fps drop when rendering block entities *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`74058bd`](https://github.com/SettingDust/lazyyyyy/commit/74058bdbbc318dc621a2d0b5807a111c144fc13b) - move the utils *(commit by [@SettingDust](https://github.com/SettingDust))*
 
 
 ## [0.8.6] - 2025-03-08
@@ -385,4 +403,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.4]: https://github.com/SettingDust/lazyyyyy/compare/0.8.3...0.8.4
 [0.8.5]: https://github.com/SettingDust/lazyyyyy/compare/0.8.4...0.8.5
 [0.8.6]: https://github.com/SettingDust/lazyyyyy/compare/0.8.5...0.8.6
-[0.9.0]: https://github.com/SettingDust/lazyyyyy/compare/0.8.6...0.9.0
+[0.8.7]: https://github.com/SettingDust/lazyyyyy/compare/0.9.0...0.8.7
+[0.8.8]: https://github.com/SettingDust/lazyyyyy/compare/0.8.7...0.8.8
+[0.8.9]: https://github.com/SettingDust/lazyyyyy/compare/0.8.8...0.8.9
+[0.8.10]: https://github.com/SettingDust/lazyyyyy/compare/0.8.9...0.8.10
+[0.8.11]: https://github.com/SettingDust/lazyyyyy/compare/0.8.10...0.8.11
+[0.8.12]: https://github.com/SettingDust/lazyyyyy/compare/0.8.11...0.8.12

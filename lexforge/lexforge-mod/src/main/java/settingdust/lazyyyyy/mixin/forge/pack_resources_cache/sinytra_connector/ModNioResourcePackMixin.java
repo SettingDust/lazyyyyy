@@ -1,5 +1,6 @@
 package settingdust.lazyyyyy.mixin.forge.pack_resources_cache.sinytra_connector;
 
+import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +14,7 @@ import java.io.InputStream;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
+@IfModLoaded("fabric_resource_loader_v0")
 @Mixin(ModNioResourcePack.class)
 public abstract class ModNioResourcePackMixin implements CachingPackResources {
     @Redirect(

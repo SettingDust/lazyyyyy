@@ -9,4 +9,5 @@ class PlatformServiceImpl : PlatformService {
     override val configDir: Path = FMLPaths.CONFIGDIR.get()
 
     override fun isModLoaded(modId: String) = LoadingModList.get().getModFileById(modId) != null
+    override fun hasEarlyError() = LoadingModList.get().errors.isNotEmpty()
 }

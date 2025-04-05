@@ -29,7 +29,7 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
 
     val defaultConfig = mapOf<String, Boolean>(
         "debug" to false,
-        "async_model_baking" to true,
+        "async_model_baking" to false,
         "axiom.async_check_commercial" to true,
         "entity_sound_features.async_sound_events" to true,
         "lazy_entity_renderers" to true,
@@ -111,6 +111,8 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
                 }
             }
         }
+
+        if (PlatformService.hasEarlyError()) return false
 
         if (!mixinClassName.startsWith(mixinPackage)) return super.shouldApplyMixin(targetClassName, mixinClassName)
         val relativeName = mixinClassName.removePrefix("${mixinPackage}.").removePrefix("forge.")

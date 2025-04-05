@@ -79,14 +79,12 @@ class LazyEntityRenderer<T : Entity>(
                     return@invokeOnCompletion
                 }
                 val renderer = loading.getCompleted()
-                Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
                 if (renderer is LivingEntityRenderer<*, *>) {
                     (renderer as LivingEntityRendererAccessor).layers =
                         CopyOnWriteArrayList((renderer as LivingEntityRendererAccessor).layers)
                 }
-                runBlocking {
-                    onLoaded.emit(Triple(type, context, renderer))
-                }
+                Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
+                runBlocking { onLoaded.emit(Triple(type, context, renderer)) }
             }
         }
 
@@ -166,9 +164,11 @@ class LazyPlayerRenderer(
     val loading = CoroutineScope(Dispatchers.IO + CoroutineName("Lazy Player Renderer $type"))
         .async(start = CoroutineStart.LAZY) {
             val renderer = wrapped()
+            (renderer as LivingEntityRendererAccessor).layers =
+                CopyOnWriteArrayList((renderer as LivingEntityRendererAccessor).layers)
             Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$playerRenderers`[type] = renderer
             runBlocking { onLoaded.emit(Triple(type, context, renderer)) }
-            renderer
+            renderer as EntityRenderer<AbstractClientPlayer>
         }
 
     private fun <R> handle(loaded: EntityRenderer<AbstractClientPlayer>.() -> R, loading: () -> R) =
@@ -313,9 +313,13 @@ var EntityRenderDispatcher.playerRenderers: Map<String, EntityRenderer<out Playe
 val BlockEntityRenderDispatcher.renderers: MutableMap<BlockEntityType<*>, BlockEntityRenderer<*>>
     get() = (this as BlockEntityRenderDispatcherAccessor).renderers
 
+@OptIn(ExperimentalCoroutinesApi::class)
 fun Map<BlockEntityType<*>, BlockEntityRenderer<*>>.observeBlockEntityRenderers() = ObservableMap(this) {
     val renderer = this[it]
-    if (renderer is LazyBlockEntityRenderer<*>) runBlocking(Dispatchers.IO) { renderer.loading.await() } else renderer
+    if (renderer is LazyBlockEntityRenderer<*>) {
+        if (renderer.loading.isCompleted) renderer.loading.getCompleted()
+        else runBlocking(Dispatchers.IO) { renderer.loading.await() }
+    } else renderer
 }
 
 val EntityRenderDispatcher.`lazyyyyy$renderers`: MutableMap<EntityType<*>, EntityRenderer<*>>

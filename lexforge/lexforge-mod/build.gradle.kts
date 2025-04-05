@@ -106,6 +106,8 @@ dependencies {
 
     modImplementation("maven.modrinth:alexs-cloud-storage:1.4.0")
     modRuntimeOnly("maven.modrinth:citadel:2.6.1")
+
+    modImplementation("maven.modrinth:timeless-and-classics-zero:1.1.4-hotfix,1.20.1")
 }
 
 tasks {

@@ -9,4 +9,6 @@ interface PlatformService {
     val configDir: Path
 
     fun isModLoaded(modId: String): Boolean
+
+    fun hasEarlyError(): Boolean
 }
