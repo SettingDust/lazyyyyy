@@ -4,6 +4,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2025-04-05
+### :sparkles: New Features
+- [`f3b805d`](https://github.com/SettingDust/lazyyyyy/commit/f3b805d308c1f107f932a747d1fe2f31597c0970) - cancel c2me `MixinUtil` *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :bug: Bug Fixes
+- [`25473b9`](https://github.com/SettingDust/lazyyyyy/commit/25473b9334a993f5591ebe329aebd1a5eb57e227) - **pack-resources-cache**: fix the dynamic trees pack support *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`d66bdb9`](https://github.com/SettingDust/lazyyyyy/commit/d66bdb97572375715e5705c785f30dc8c85169b8) - **pack-resources-cache**: randomly crash relating to concurrent hash map get is overlapping *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`9448d66`](https://github.com/SettingDust/lazyyyyy/commit/9448d66078a078c94c01ef9c078fa4eb1f9ebe11) - **pack-resources-cache**: filter out file for namespaces *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :zap: Performance Improvements
+- [`cc24468`](https://github.com/SettingDust/lazyyyyy/commit/cc2446845f522c15ed104a9d13563d9f5b5cbd59) - **pack-resources-cache**: avoid switch coroutine context *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`7c71e42`](https://github.com/SettingDust/lazyyyyy/commit/7c71e42dd49ab48086c0bfee90b86a585410eca0) - **pack-resources-cache**: wait for files being added instead of find it *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`ba5043e`](https://github.com/SettingDust/lazyyyyy/commit/ba5043e088fc72f7e14d8edee821cbad170e91c2) - **pack-resources-cache**: lesser race *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`f2252d9`](https://github.com/SettingDust/lazyyyyy/commit/f2252d96d9e7697edd3cd14a2fdc02af7db959c0) - **pack-resources-cache**: reduce coroutine scope allocate *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`a70d8af`](https://github.com/SettingDust/lazyyyyy/commit/a70d8af0b0810b88c293fc548c304e5387eab81c) - **pack-resources-cache**: add faster path for `getOrWait` *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :recycle: Refactors
+- [`f595372`](https://github.com/SettingDust/lazyyyyy/commit/f5953727279e4e8d6839f320d065a4fb5cef75d5) - **pack-resources-cache**: loading pack cache complete *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`424eaa9`](https://github.com/SettingDust/lazyyyyy/commit/424eaa90068d0886e6050a776077530b9f46f85f) - **deps**: bump net.bytebuddy:byte-buddy-agent from 1.17.1 to 1.17.2 *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
+- [`945f3bd`](https://github.com/SettingDust/lazyyyyy/commit/945f3bdd020d1bc6994a3e7daf55d4086851b13d) - simply mod path in locator *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`ccc43be`](https://github.com/SettingDust/lazyyyyy/commit/ccc43be3b0e410959c4eda39a429190dfd6c7a14) - **pack-resources-cache**: remove warn time since it's not referable *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`a9f9046`](https://github.com/SettingDust/lazyyyyy/commit/a9f9046e2613dbcec5d32b5fc5fe62424911da77) - avoid duplicate mixin configure for the other mods *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`577c81d`](https://github.com/SettingDust/lazyyyyy/commit/577c81d620f3161cf7d421942fdda257986d740f) - add dispatcher *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`08917ef`](https://github.com/SettingDust/lazyyyyy/commit/08917efd24c8c0b4fcd58e3a79f5695d3e1578ff) - **pack-resources-cache**: reduce the handler instances *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`6d92d31`](https://github.com/SettingDust/lazyyyyy/commit/6d92d31893a50d367412c26b9552815680b60ade) - **lazy-entity-renderers**: add coroutine name for renderer loaded *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`fa670e8`](https://github.com/SettingDust/lazyyyyy/commit/fa670e85656f2bc767cd66aca8a639fb12d73d1e) - add more `IfModLoaded` *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`46eae3f`](https://github.com/SettingDust/lazyyyyy/commit/46eae3f47c09f56ad86abfe55b6ea689b455880a) - **deps**: bump net.bytebuddy:byte-buddy-agent from 1.17.1 to 1.17.4 *(PR [#45](https://github.com/SettingDust/lazyyyyy/pull/45) by [@dependabot[bot]](https://github.com/apps/dependabot))*
+- [`ccc7a52`](https://github.com/SettingDust/lazyyyyy/commit/ccc7a5208d2634eb09e89606e92fd29bee9f87f4) - **pack-resources-cache**: move the file consumer *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.8.12] - 2025-04-03
 ### :bug: Bug Fixes
 - [`481bf2e`](https://github.com/SettingDust/lazyyyyy/commit/481bf2ee95907a205e5e4789ed8af4445a49bd08) - **pack-resources-cache**: wrong separator for directories *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -409,3 +441,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.10]: https://github.com/SettingDust/lazyyyyy/compare/0.8.9...0.8.10
 [0.8.11]: https://github.com/SettingDust/lazyyyyy/compare/0.8.10...0.8.11
 [0.8.12]: https://github.com/SettingDust/lazyyyyy/compare/0.8.11...0.8.12
+[0.9.0]: https://github.com/SettingDust/lazyyyyy/compare/0.8.12...0.9.0
