@@ -115,7 +115,9 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         prefix: String
     ): Map<Path, String>? {
         val pathString = "${type?.directory?.let { "${it}/" } ?: ""}$namespace/$prefix"
-        return getOrWait { directoryToFiles[pathString] }
+        return getOrWait {
+            directoryToFiles[pathString]
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
