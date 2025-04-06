@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingPackResources;
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.GenericPackResourcesCache;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Set;
@@ -32,8 +31,8 @@ public class PathPackResourcesMixin implements CachingPackResources {
         lazyyyyy$cache = new GenericPackResourcesCache(path, (PackResources) this);
     }
 
-    @Inject(method = "close", at = @At("TAIL"))
-    private void lazyyyyy$close(final CallbackInfo ci) throws IOException {
+    @Inject(method = "close", remap = false, at = @At("TAIL"))
+    private void lazyyyyy$close(final CallbackInfo ci) {
         lazyyyyy$cache.close();
     }
 

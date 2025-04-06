@@ -1,5 +1,6 @@
 package settingdust.lazyyyyy.mixin.pack_resources_cache;
 
+import com.google.common.hash.HashCode;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.server.packs.FilePackResources;
@@ -35,18 +36,16 @@ public abstract class FilePackResourcesMixin implements CachingPackResources, Ha
 
     @Unique
     private GenericPackResourcesCache lazyyyyy$cache;
+    @Unique
     private FileSystem lazyyyyy$fs;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void lazyyyyy$init(final CallbackInfo ci) throws IOException {
         lazyyyyy$fs = FileSystems.newFileSystem(file.toPath());
-        lazyyyyy$cache = new GenericPackResourcesCache(
-            FileSystems.newFileSystem(file.toPath()).getPath(""),
-            (PackResources) this
-        );
+        lazyyyyy$cache = new GenericPackResourcesCache(lazyyyyy$fs.getPath(""), (PackResources) this);
     }
 
-    @Inject(method = "close", at = @At("TAIL"))
+    @Inject(method = "close", remap = false, at = @At("TAIL"))
     private void lazyyyyy$close(final CallbackInfo ci) throws IOException {
         lazyyyyy$fs.close();
         lazyyyyy$cache.close();
@@ -83,5 +82,10 @@ public abstract class FilePackResourcesMixin implements CachingPackResources, Ha
     @Override
     public @NotNull GenericPackResourcesCache getLazyyyyy$cache() {
         return lazyyyyy$cache;
+    }
+
+    @Override
+    public @NotNull HashCode lazyyyyy$getHash() {
+        return PackResourcesCacheManager.INSTANCE.getHash(file);
     }
 }

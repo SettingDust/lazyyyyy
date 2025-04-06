@@ -5,7 +5,10 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -79,24 +82,69 @@ open class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : P
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type] cached") }
     }
 
-    @OptIn(ExperimentalPathApi::class)
+    private suspend fun CoroutineScope.cachePack() {
+        for (type in PackType.entries) {
+            namespaces.computeIfAbsent(type) { CompletableDeferred() }
+        }
+
+        val namespaces = ConcurrentHashMap<PackType, MutableSet<String>>()
+
+        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}] caching") }
+        roots.asFlow().concurrent().collect { root -> consumeRoot(root, namespaces) }
+
+        for ((type, deferred) in this@GenericPackResourcesCache.namespaces) {
+            deferred.complete(namespaces[type] ?: emptySet())
+        }
+        allCompleted.complete()
+        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}] cached") }
+    }
+
+    @OptIn(ExperimentalPathApi::class, ExperimentalCoroutinesApi::class)
     private suspend fun CoroutineScope.loadCache() =
         withContext(CoroutineName("Simple pack cache #${pack.packId()}")) {
             val time = measureTime {
-                for (type in PackType.entries) {
-                    namespaces.computeIfAbsent(type) { CompletableDeferred() }
+                if (pack is HashablePackResources) {
+                    val hash = pack.`lazyyyyy$getHash`()
+                    val cachedData = PackResourcesCacheManager.getOrCache(hash)
+                    if (cachedData != null) {
+                        joinAll(
+                            launch {
+                                cachedData.files.asSequence().asFlow().concurrent().collect { (key, value) ->
+                                    files[key] = CompletableDeferred(value)
+                                }
+                            },
+                            launch {
+                                cachedData.directoryToFiles.asSequence().asFlow().concurrent().collect { (key, value) ->
+                                    directoryToFiles[key] = CompletableDeferred(value)
+                                }
+                            },
+                            launch {
+                                cachedData.namespaces.asSequence().asFlow().concurrent().collect { (key, value) ->
+                                    namespaces[key] = CompletableDeferred(value)
+                                }
+                            }
+                        )
+                        allCompleted.complete()
+                    } else {
+                        cachePack()
+                        val values = awaitAll(
+                            async { files.mapValues { it.value.getCompleted() } },
+                            async { directoryToFiles.mapValues { it.value.getCompleted() } },
+                            async { namespaces.mapValues { it.value.getCompleted() } }
+                        )
+
+                        @Suppress("UNCHECKED_CAST")
+                        val data = PackResourcesCacheData(
+                            values[0] as Map<String, Path>,
+                            values[1] as Map<String, Map<Path, String>>,
+                            values[2] as Map<PackType, Set<String>>
+                        )
+                        PackResourcesCacheManager.cache[hash] = data
+                        PackResourcesCacheManager.save(hash, data)
+                    }
+                } else {
+                    cachePack()
                 }
-
-                val namespaces = ConcurrentHashMap<PackType, MutableSet<String>>()
-
-                Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}] caching") }
-                roots.asFlow().concurrent().collect { root -> consumeRoot(root, namespaces) }
-
-                for ((type, deferred) in this@GenericPackResourcesCache.namespaces) {
-                    deferred.complete(namespaces[type] ?: emptySet())
-                }
-                allCompleted.complete()
-                Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}] cached") }
             }
             Lazyyyyy.logger.debug("Cache pack ${pack.packId()} in $time")
         }
