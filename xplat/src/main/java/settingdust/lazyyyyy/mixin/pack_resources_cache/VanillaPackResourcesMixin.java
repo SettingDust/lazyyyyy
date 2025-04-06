@@ -19,6 +19,7 @@ import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingPackResources;
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCache;
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.VanillaPackResourcesCache;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
@@ -39,6 +40,11 @@ public class VanillaPackResourcesMixin implements CachingPackResources {
         final CallbackInfo ci
     ) {
         lazyyyyy$cache = new VanillaPackResourcesCache((PackResources) this, rootPaths, pathsForType);
+    }
+
+    @Inject(method = "close", at = @At("TAIL"))
+    private void lazyyyyy$close(final CallbackInfo ci) throws IOException {
+        lazyyyyy$cache.close();
     }
 
     @Override

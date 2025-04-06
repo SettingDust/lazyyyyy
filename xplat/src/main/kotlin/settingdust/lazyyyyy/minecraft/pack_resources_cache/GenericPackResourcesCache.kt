@@ -23,7 +23,7 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.time.measureTime
 
-open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : PackResourcesCache(pack, roots) {
+open class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackResourcesCache(pack, roots) {
     constructor(root: Path, pack: PackResources) : this(pack, listOf(root))
 
     var namespaces: MutableMap<PackType, CompletableDeferred<Set<String>>> = ConcurrentHashMap()
@@ -71,7 +71,7 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
         }
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/directoryToFiles] caching") }
         for ((path, files) in directoryToFiles) {
-            this@SimplePackResourcesCache.directoryToFiles[path]!!.complete(files.mapValues { it.value.await() })
+            this@GenericPackResourcesCache.directoryToFiles[path]!!.complete(files.mapValues { it.value.await() })
         }
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/directoryToFiles] cached") }
 
@@ -92,7 +92,7 @@ open class SimplePackResourcesCache(pack: PackResources, roots: List<Path>) : Pa
                 Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}] caching") }
                 roots.asFlow().concurrent().collect { root -> consumeRoot(root, namespaces) }
 
-                for ((type, deferred) in this@SimplePackResourcesCache.namespaces) {
+                for ((type, deferred) in this@GenericPackResourcesCache.namespaces) {
                     deferred.complete(namespaces[type] ?: emptySet())
                 }
                 allCompleted.complete()

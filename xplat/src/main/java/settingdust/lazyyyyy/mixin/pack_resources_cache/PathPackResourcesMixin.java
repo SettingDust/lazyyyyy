@@ -7,6 +7,7 @@ import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.resources.IoSupplier;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -14,8 +15,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingPackResources;
-import settingdust.lazyyyyy.minecraft.pack_resources_cache.SimplePackResourcesCache;
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.GenericPackResourcesCache;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Set;
@@ -23,11 +25,16 @@ import java.util.Set;
 @Mixin(PathPackResources.class)
 public class PathPackResourcesMixin implements CachingPackResources {
     @Unique
-    private SimplePackResourcesCache lazyyyyy$cache;
+    private GenericPackResourcesCache lazyyyyy$cache;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void lazyyyyy$init(String string, Path path, boolean bl, final CallbackInfo ci) {
-        lazyyyyy$cache = new SimplePackResourcesCache(path, (PackResources) this);
+        lazyyyyy$cache = new GenericPackResourcesCache(path, (PackResources) this);
+    }
+
+    @Inject(method = "close", at = @At("TAIL"))
+    private void lazyyyyy$close(final CallbackInfo ci) throws IOException {
+        lazyyyyy$cache.close();
     }
 
     @WrapMethod(method = "getNamespaces")
@@ -68,7 +75,7 @@ public class PathPackResourcesMixin implements CachingPackResources {
     }
 
     @Override
-    public SimplePackResourcesCache getLazyyyyy$cache() {
+    public @NotNull GenericPackResourcesCache getLazyyyyy$cache() {
         return lazyyyyy$cache;
     }
 }

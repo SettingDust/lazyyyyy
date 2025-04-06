@@ -16,30 +16,40 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingPackResources;
-import settingdust.lazyyyyy.minecraft.pack_resources_cache.SimplePackResourcesCache;
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.GenericPackResourcesCache;
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.HashablePackResources;
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCacheManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.util.Set;
 
 @Mixin(FilePackResources.class)
-public abstract class FilePackResourcesMixin implements CachingPackResources {
+public abstract class FilePackResourcesMixin implements CachingPackResources, HashablePackResources {
     @Shadow
     @Final
     private File file;
 
     @Unique
-    private SimplePackResourcesCache lazyyyyy$cache;
+    private GenericPackResourcesCache lazyyyyy$cache;
+    private FileSystem lazyyyyy$fs;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void lazyyyyy$init(final CallbackInfo ci) throws IOException {
-        //        PackResourcesCache.INSTANCE.track((PackResources) this);
-        lazyyyyy$cache = new SimplePackResourcesCache(
+        lazyyyyy$fs = FileSystems.newFileSystem(file.toPath());
+        lazyyyyy$cache = new GenericPackResourcesCache(
             FileSystems.newFileSystem(file.toPath()).getPath(""),
             (PackResources) this
         );
+    }
+
+    @Inject(method = "close", at = @At("TAIL"))
+    private void lazyyyyy$close(final CallbackInfo ci) throws IOException {
+        lazyyyyy$fs.close();
+        lazyyyyy$cache.close();
     }
 
     @WrapMethod(method = "getNamespaces")
@@ -71,7 +81,7 @@ public abstract class FilePackResourcesMixin implements CachingPackResources {
     }
 
     @Override
-    public @NotNull SimplePackResourcesCache getLazyyyyy$cache() {
+    public @NotNull GenericPackResourcesCache getLazyyyyy$cache() {
         return lazyyyyy$cache;
     }
 }

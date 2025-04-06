@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingPackResources;
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.GenericPackResourcesCache;
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCache;
-import settingdust.lazyyyyy.minecraft.pack_resources_cache.SimplePackResourcesCache;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -28,7 +28,7 @@ public abstract class PathPackResourcesMixin implements CachingPackResources {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     protected void lazyyyyy$init(final String packId, final boolean isBuiltin, final Path source, final CallbackInfo ci) {
-        lazyyyyy$cache = new SimplePackResourcesCache(source, (PackResources) this);
+        lazyyyyy$cache = new GenericPackResourcesCache(source, (PackResources) this);
     }
 
     @WrapOperation(
