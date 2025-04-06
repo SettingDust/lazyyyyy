@@ -60,6 +60,9 @@ dependencies {
     modImplementation(catalog.almostUnified.forge)
 
     modImplementation(catalog.badOptimizations)
+
+    modImplementation(catalog.moonlight.forge)
+    modImplementation(catalog.everyCompat.forge)
 }
 
 sourceSets {

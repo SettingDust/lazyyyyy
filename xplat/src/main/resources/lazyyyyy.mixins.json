@@ -6,6 +6,7 @@
     "refmap": "lazyyyyy.refmap.json",
     "plugin": "settingdust.lazyyyyy.LazyyyyyMixinPlugin",
     "mixins": [
+        "every_compat.faster_config.ModEntriesConfigsMixin",
         "lazy_entity_renderers.entity_model_features.EMFManagerMixin",
         "pack_resources_cache.FilePackResourcesMixin",
         "pack_resources_cache.PathPackResourcesMixin",
