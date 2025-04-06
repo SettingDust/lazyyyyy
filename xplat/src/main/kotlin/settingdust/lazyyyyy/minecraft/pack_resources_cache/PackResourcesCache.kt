@@ -45,7 +45,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
     companion object {
         val JOINER: Joiner = Joiner.on('/').useForNull("null")
 
-        val logger = LogManager.getLogger()
+        val logger = LogManager.getLogger()!!
 
         val packTypeByDirectory = PackType.entries.associateByTo(Object2ReferenceOpenHashMap()) { it.directory }
 

@@ -55,6 +55,9 @@ dependencies {
     modImplementation(catalog.almostUnified.fabric)
 
     modImplementation(catalog.badOptimizations)
+
+    modImplementation(catalog.moonlight.fabric)
+    modImplementation(catalog.everyCompat.fabric)
 }
 
 tasks {

@@ -142,6 +142,14 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     val badOptimizations  = "2.2.1-1.20.1"
     library("badOptimizations", "maven.modrinth", "badoptimizations").version(badOptimizations)
+
+    val moonlight = "1.20-2.13.81"
+    library("moonlight-fabric", "maven.modrinth", "moonlight").version("fabric_$moonlight")
+    library("moonlight-forge", "maven.modrinth", "moonlight").version("forge_$moonlight")
+
+    val everyCompat = "1.20-2.7.25"
+    library("everyCompat-fabric", "maven.modrinth", "every-compat").version("$everyCompat-fabric")
+    library("everyCompat-forge", "maven.modrinth", "every-compat").version("$everyCompat-forge")
 }
 
 plugins {
