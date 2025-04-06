@@ -2,6 +2,7 @@ package settingdust.lazyyyyy.minecraft.pack_resources_cache
 
 import com.google.common.base.Joiner
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -49,13 +50,14 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
 
         val packTypeByDirectory = PackType.entries.associateByTo(Object2ReferenceOpenHashMap()) { it.directory }
 
-        private val handler = CoroutineExceptionHandler { context, throwable ->
+        val coroutineExceptionHandler = CoroutineExceptionHandler { context, throwable ->
             if (throwable is Exception || throwable is Error)
                 Lazyyyyy.logger.error("Error loading pack cache in $context", throwable)
         }
     }
 
-    val scope = CoroutineScope(Dispatchers.IO + CoroutineName("Pack cache #${pack.packId()}") + handler)
+    val scope =
+        CoroutineScope(Dispatchers.IO + CoroutineName("Pack cache #${pack.packId()}") + coroutineExceptionHandler)
 
     val allCompleted = Job()
 
@@ -102,7 +104,10 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
     }
 
     override fun close() {
-        scope.cancel()
+        try {
+            scope.cancel()
+        } catch (_: CancellationException) {
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

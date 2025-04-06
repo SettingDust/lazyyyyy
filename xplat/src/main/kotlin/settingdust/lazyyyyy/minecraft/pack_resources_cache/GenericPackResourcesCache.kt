@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -26,7 +25,7 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.time.measureTime
 
-open class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackResourcesCache(pack, roots) {
+class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackResourcesCache(pack, roots) {
     constructor(root: Path, pack: PackResources) : this(pack, listOf(root))
 
     var namespaces: MutableMap<PackType, CompletableDeferred<Set<String>>> = ConcurrentHashMap()
@@ -104,18 +103,19 @@ open class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : P
         withContext(CoroutineName("Simple pack cache #${pack.packId()}")) {
             val time = measureTime {
                 if (pack is HashablePackResources) {
+                    val root = roots.single()
                     val hash = pack.`lazyyyyy$getHash`()
                     val cachedData = PackResourcesCacheManager.getOrCache(hash)
                     if (cachedData != null) {
                         joinAll(
                             launch {
                                 cachedData.files.asSequence().asFlow().concurrent().collect { (key, value) ->
-                                    files[key] = CompletableDeferred(value)
+                                    files[key] = CompletableDeferred(root.resolve(value))
                                 }
                             },
                             launch {
                                 cachedData.directoryToFiles.asSequence().asFlow().concurrent().collect { (key, value) ->
-                                    directoryToFiles[key] = CompletableDeferred(value)
+                                    directoryToFiles[key] = CompletableDeferred(value.mapKeys { root.resolve(it.key) })
                                 }
                             },
                             launch {
@@ -127,17 +127,20 @@ open class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : P
                         allCompleted.complete()
                     } else {
                         cachePack()
-                        val values = awaitAll(
-                            async { files.mapValues { it.value.getCompleted() } },
-                            async { directoryToFiles.mapValues { it.value.getCompleted() } },
-                            async { namespaces.mapValues { it.value.getCompleted() } }
-                        )
+                        val deferredFiles = async { files.mapValues { it.value.getCompleted().toString() } }
+                        val deferredDirectoryToFiles = async {
+                            directoryToFiles.mapValues {
+                                it.value.getCompleted().mapKeys { it.key.toString() }
+                            }
+                        }
+                        val deferredNamespaces = async { namespaces.mapValues { it.value.getCompleted() } }
+                        joinAll(deferredFiles, deferredDirectoryToFiles, deferredNamespaces)
 
                         @Suppress("UNCHECKED_CAST")
                         val data = PackResourcesCacheData(
-                            values[0] as Map<String, Path>,
-                            values[1] as Map<String, Map<Path, String>>,
-                            values[2] as Map<PackType, Set<String>>
+                            deferredFiles.getCompleted(),
+                            deferredDirectoryToFiles.getCompleted(),
+                            deferredNamespaces.getCompleted()
                         )
                         PackResourcesCacheManager.cache[hash] = data
                         PackResourcesCacheManager.save(hash, data)

@@ -6,12 +6,14 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import java.io.File
+import java.nio.file.StandardOpenOption
 import java.util.concurrent.ConcurrentHashMap
-import java.util.zip.GZIPInputStream
-import java.util.zip.GZIPOutputStream
 import kotlin.io.path.Path
 import kotlin.io.path.createFile
+import kotlin.io.path.createParentDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
@@ -35,15 +37,25 @@ object PackResourcesCacheManager {
     fun load(hashCode: HashCode): PackResourcesCacheData? {
         val path = dir.resolve("$hashCode.json.gz")
         if (!path.exists()) return null
-        val data = json.decodeFromStream<PackResourcesCacheData>(GZIPInputStream(path.inputStream()))
-        cache[hashCode] = data
-        return data
+        try {
+            val data = GzipCompressorInputStream(path.inputStream()).use {
+                json.decodeFromStream<PackResourcesCacheData>(it)
+            }
+            cache[hashCode] = data
+            return data
+        } catch (e: Exception) {
+            PackResourcesCache.logger.error("Failed to load cache from $path", e)
+            return null
+        }
     }
 
     @OptIn(ExperimentalSerializationApi::class)
     fun save(hashCode: HashCode, data: PackResourcesCacheData) {
         val path = dir.resolve("$hashCode.json.gz")
-        runCatching { path.createFile() }
-        json.encodeToStream(data, GZIPOutputStream(path.outputStream()))
+        if (!path.parent.exists()) path.createParentDirectories()
+        if (!path.exists()) path.createFile()
+        GzipCompressorOutputStream(path.outputStream(StandardOpenOption.TRUNCATE_EXISTING)).use {
+            json.encodeToStream(data, it)
+        }
     }
 }
