@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2025-04-06
+### :sparkles: New Features
+- [`f680601`](https://github.com/SettingDust/lazyyyyy/commit/f68060140e7680abee7ce6a3a1bd295d3bec54a2) - **wood-good**: faster config *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.9.0] - 2025-04-05
 ### :sparkles: New Features
 - [`f3b805d`](https://github.com/SettingDust/lazyyyyy/commit/f3b805d308c1f107f932a747d1fe2f31597c0970) - cancel c2me `MixinUtil` *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -442,3 +447,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.11]: https://github.com/SettingDust/lazyyyyy/compare/0.8.10...0.8.11
 [0.8.12]: https://github.com/SettingDust/lazyyyyy/compare/0.8.11...0.8.12
 [0.9.0]: https://github.com/SettingDust/lazyyyyy/compare/0.8.12...0.9.0
+[0.10.0]: https://github.com/SettingDust/lazyyyyy/compare/0.9.0...0.10.0
