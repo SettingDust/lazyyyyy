@@ -106,10 +106,12 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
     private suspend fun CoroutineScope.loadCache() =
         withContext(CoroutineName("Simple pack cache #${pack.packId()}")) {
             val time = measureTime {
-                if (pack is HashablePackResources) {
+                val hash by lazy {
+                    (pack as HashablePackResources).`lazyyyyy$getHash`()
+                }
+                if (pack is HashablePackResources && hash != null) {
                     val root = roots.single()
-                    val hash = pack.`lazyyyyy$getHash`()
-                    val cachedData = PackResourcesCacheManager.getOrCache(hash)
+                    val cachedData = PackResourcesCacheManager.getOrCache(hash!!)
                     if (cachedData != null) {
                         joinAll(
                             launch {
@@ -146,8 +148,8 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                             deferredDirectoryToFiles.getCompleted(),
                             deferredNamespaces.getCompleted()
                         )
-                        PackResourcesCacheManager.cache[hash] = data
-                        PackResourcesCacheManager.save(hash, data)
+                        PackResourcesCacheManager.cache[hash!!] = data
+                        PackResourcesCacheManager.save(hash!!, data)
                     }
                 } else {
                     cachePack()

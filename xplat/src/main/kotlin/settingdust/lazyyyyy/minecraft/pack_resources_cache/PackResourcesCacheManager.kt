@@ -9,6 +9,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import java.io.File
+import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.Path
@@ -29,6 +30,8 @@ object PackResourcesCacheManager {
     val cache = ConcurrentHashMap<HashCode, PackResourcesCacheData>()
 
     fun getHash(file: File): HashCode = HashCode.fromBytes(DigestUtils.md5(file.inputStream().buffered()))
+
+    fun getHash(path: Path): HashCode = HashCode.fromBytes(DigestUtils.md5(path.inputStream().buffered()))
 
     fun getOrCache(hashCode: HashCode): PackResourcesCacheData? {
         return cache[hashCode] ?: load(hashCode)?.also { cache[hashCode] = it }
