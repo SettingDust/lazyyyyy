@@ -155,8 +155,9 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getNamespaces(type: PackType?): Set<String> {
         if (type == null) return emptySet()
-        val deferred = namespaces.computeIfAbsent(type) { CompletableDeferred() }
-        return (if (deferred.isCompleted) deferred.getCompleted()
-        else runBlocking { namespaces[type]?.await() }) ?: emptySet()
+        val deferred = namespaces[type] ?: return emptySet()
+        if (deferred.isCompleted) return deferred.getCompleted()
+        if (allCompleted.isCompleted) return emptySet()
+        return runBlocking { deferred.await() }
     }
 }
