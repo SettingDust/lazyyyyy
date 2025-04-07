@@ -31,7 +31,11 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
     var namespaces: MutableMap<PackType, CompletableDeferred<Set<String>>> = ConcurrentHashMap()
 
     init {
-        scope.launch { loadCache() }
+        try {
+            scope.launch { loadCache() }
+        } catch (e: Exception) {
+            logger.error("Error loading pack cache in $pack", e)
+        }
     }
 
     private suspend fun CoroutineScope.consumeRoot(

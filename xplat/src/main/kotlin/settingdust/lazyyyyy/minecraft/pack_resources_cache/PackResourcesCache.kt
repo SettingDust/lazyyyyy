@@ -2,7 +2,6 @@ package settingdust.lazyyyyy.minecraft.pack_resources_cache
 
 import com.google.common.base.Joiner
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -12,7 +11,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.asFlow
@@ -34,6 +32,7 @@ import java.io.Closeable
 import java.io.IOException
 import java.io.InputStream
 import java.nio.file.Path
+import java.util.concurrent.CancellationException
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.isDirectory
@@ -104,10 +103,9 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
     }
 
     override fun close() {
-        try {
-            scope.cancel()
-        } catch (_: CancellationException) {
-        }
+        val job = scope.coroutineContext[Job] ?: return
+        if (job.isCancelled) job.cancel(CancellationException("Pack ${pack.packId()} closed"))
+        if (job.isCompleted) runBlocking { job.join() }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

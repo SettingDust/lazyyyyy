@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.Path
 import kotlin.io.path.createFile
 import kotlin.io.path.createParentDirectories
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
@@ -45,6 +46,7 @@ object PackResourcesCacheManager {
             return data
         } catch (e: Exception) {
             PackResourcesCache.logger.error("Failed to load cache from $path", e)
+            path.deleteExisting()
             return null
         }
     }
