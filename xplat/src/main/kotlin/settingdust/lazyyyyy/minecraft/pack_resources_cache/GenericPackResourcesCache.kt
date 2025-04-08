@@ -111,7 +111,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                 }
                 if (pack is HashablePackResources && hash != null) {
                     val root = roots.single()
-                    val cachedData = PackResourcesCacheManager.getOrCache(hash!!)
+                    val cachedData = PackResourcesCacheManager.getOrCache(pack, hash!!)
                     if (cachedData != null) {
                         joinAll(
                             launch {
@@ -148,8 +148,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                             deferredDirectoryToFiles.getCompleted(),
                             deferredNamespaces.getCompleted()
                         )
-                        PackResourcesCacheManager.cache[hash!!] = data
-                        PackResourcesCacheManager.save(hash!!, data)
+                        PackResourcesCacheManager.save(pack, hash!!, data)
                     }
                 } else {
                     cachePack()

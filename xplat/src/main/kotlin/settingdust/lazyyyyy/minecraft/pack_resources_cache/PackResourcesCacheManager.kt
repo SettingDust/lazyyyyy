@@ -5,6 +5,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
+import net.minecraft.server.packs.PackResources
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
@@ -27,25 +28,26 @@ object PackResourcesCacheManager {
         classDiscriminator = "_t"
     }
 
-    val cache = ConcurrentHashMap<HashCode, PackResourcesCacheData>()
+    val cache = ConcurrentHashMap<Pair<String, HashCode>, PackResourcesCacheData>()
 
     fun getHash(file: File): HashCode = HashCode.fromBytes(DigestUtils.md5(file.inputStream().buffered()))
 
     fun getHash(path: Path): HashCode = HashCode.fromBytes(DigestUtils.md5(path.inputStream().buffered()))
 
-    fun getOrCache(hashCode: HashCode): PackResourcesCacheData? {
-        return cache[hashCode] ?: load(hashCode)?.also { cache[hashCode] = it }
+    fun getOrCache(pack: PackResources, hashCode: HashCode): PackResourcesCacheData? {
+        val key = pack.packId() to hashCode
+        return cache[key] ?: load(pack, hashCode)?.also { cache[key] = it }
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun load(hashCode: HashCode): PackResourcesCacheData? {
-        val path = dir.resolve("$hashCode.json.gz")
+    fun load(pack: PackResources, hashCode: HashCode): PackResourcesCacheData? {
+        val path = dir.resolve("${pack.packId()}-$hashCode.json.gz".toValidFileName())
         if (!path.exists()) return null
         try {
             val data = GzipCompressorInputStream(path.inputStream()).use {
                 json.decodeFromStream<PackResourcesCacheData>(it)
             }
-            cache[hashCode] = data
+            cache[pack.packId() to hashCode] = data
             return data
         } catch (e: Exception) {
             PackResourcesCache.logger.error("Failed to load cache from $path", e)
@@ -55,12 +57,23 @@ object PackResourcesCacheManager {
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun save(hashCode: HashCode, data: PackResourcesCacheData) {
-        val path = dir.resolve("$hashCode.json.gz")
+    fun save(pack: PackResources, hashCode: HashCode, data: PackResourcesCacheData) {
+        cache[pack.packId() to hashCode] = data
+        val path = dir.resolve("${pack.packId()}-$hashCode.json.gz".toValidFileName())
         if (!path.parent.exists()) path.createParentDirectories()
         if (!path.exists()) path.createFile()
         GzipCompressorOutputStream(path.outputStream(StandardOpenOption.TRUNCATE_EXISTING)).use {
             json.encodeToStream(data, it)
         }
+    }
+
+    private fun String.toValidFileName(replacement: String = "_"): String {
+        val illegalChars = Regex("[/\\\\:*?\"<>|\\x00-\\x1F]")
+        val windowsReserved = setOf("CON", "PRN", "AUX", "NUL", "COM1-9", "LPT1-9")
+
+        return this
+            .replace(illegalChars, replacement)
+            .let { name -> if (windowsReserved.any { name.uppercase().startsWith(it) }) "$replacement$name" else name }
+            .take(255)
     }
 }
