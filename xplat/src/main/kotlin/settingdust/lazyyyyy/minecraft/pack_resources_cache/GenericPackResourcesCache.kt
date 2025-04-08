@@ -15,6 +15,7 @@ import net.minecraft.server.packs.PackResources
 import net.minecraft.server.packs.PackType
 import settingdust.lazyyyyy.Lazyyyyy
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingStrategy.PackRoot
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCacheManager.toValidFileName
 import settingdust.lazyyyyy.util.collect
 import settingdust.lazyyyyy.util.concurrent
 import java.nio.file.Path
@@ -106,13 +107,18 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
     private suspend fun CoroutineScope.loadCache() =
         withContext(CoroutineName("Simple pack cache #${pack.packId()}")) {
             val time = measureTime {
-                val hash by lazy {
-                    (pack as HashablePackResources).`lazyyyyy$getHash`()
-                }
+                val hash by lazy { (pack as HashablePackResources).`lazyyyyy$getHash`() }
                 if (pack is HashablePackResources && hash != null) {
                     val root = roots.single()
-                    val cachedData = PackResourcesCacheManager.getOrCache(pack, hash!!)
-                    if (cachedData != null) {
+                    val key = pack.packId() to hash!!
+                    val lock = PackResourcesCacheManager.getLock(key)
+                    lock.lock(this@GenericPackResourcesCache)
+                    val cachePath =
+                        PackResourcesCacheManager.dir.resolve("${key.first}-${key.second}.json.gz".toValidFileName())
+                    val cachedDataDeferred = PackResourcesCacheManager.get(key, cachePath)
+                    if (cachedDataDeferred.isCompleted) {
+                        lock.unlock(this@GenericPackResourcesCache)
+                        val cachedData = cachedDataDeferred.getCompleted()
                         joinAll(
                             launch {
                                 cachedData.files.asSequence().asFlow().concurrent().collect { (key, value) ->
@@ -141,6 +147,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                             }
                         }
                         val deferredNamespaces = async { namespaces.mapValues { it.value.getCompleted() } }
+
                         joinAll(deferredFiles, deferredDirectoryToFiles, deferredNamespaces)
 
                         @Suppress("UNCHECKED_CAST")
@@ -149,7 +156,8 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                             deferredDirectoryToFiles.getCompleted(),
                             deferredNamespaces.getCompleted()
                         )
-                        PackResourcesCacheManager.save(pack, hash!!, data)
+                        PackResourcesCacheManager.save(key, data, cachePath)
+                        lock.unlock()
                     }
                 } else {
                     cachePack()

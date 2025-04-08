@@ -1,11 +1,12 @@
 package settingdust.lazyyyyy.minecraft.pack_resources_cache
 
 import com.google.common.hash.HashCode
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
-import net.minecraft.server.packs.PackResources
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
@@ -22,52 +23,54 @@ import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 
 object PackResourcesCacheManager {
-    private val dir = Path(".lazyyyyy", "pack-cache")
+    val dir = Path(".lazyyyyy", "pack-cache")
     private val json = Json {
         ignoreUnknownKeys = true
         classDiscriminator = "_t"
     }
 
-    val cache = ConcurrentHashMap<Pair<String, HashCode>, PackResourcesCacheData>()
+    val cache = ConcurrentHashMap<Pair<String, HashCode>, CompletableDeferred<PackResourcesCacheData>>()
+    val cacheLocks = ConcurrentHashMap<Pair<String, HashCode>, Mutex>()
 
     fun getHash(file: File): HashCode = HashCode.fromBytes(DigestUtils.md5(file.inputStream().buffered()))
 
     fun getHash(path: Path): HashCode = HashCode.fromBytes(DigestUtils.md5(path.inputStream().buffered()))
 
-    fun getOrCache(pack: PackResources, hashCode: HashCode): PackResourcesCacheData? {
-        val key = pack.packId() to hashCode
-        return cache[key] ?: load(pack, hashCode)?.also { cache[key] = it }
+    fun getLock(key: Pair<String, HashCode>) =
+        cacheLocks.computeIfAbsent(key) { Mutex() }
+
+    fun get(key: Pair<String, HashCode>, cachePath: Path): CompletableDeferred<PackResourcesCacheData> {
+        val deferred = cache.computeIfAbsent(key) { CompletableDeferred() }
+        if (!deferred.isCompleted) {
+            val data = load(cachePath)
+            if (data != null) deferred.complete(data)
+        }
+        return deferred
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun load(pack: PackResources, hashCode: HashCode): PackResourcesCacheData? {
-        val path = dir.resolve("${pack.packId()}-$hashCode.json.gz".toValidFileName())
-        if (!path.exists()) return null
+    fun load(cachePath: Path): PackResourcesCacheData? {
+        if (!cachePath.exists()) return null
         try {
-            val data = GzipCompressorInputStream(path.inputStream()).use {
-                json.decodeFromStream<PackResourcesCacheData>(it)
-            }
-            cache[pack.packId() to hashCode] = data
-            return data
+            return GzipCompressorInputStream(cachePath.inputStream())
+                .use { json.decodeFromStream<PackResourcesCacheData>(it) }
         } catch (e: Exception) {
-            PackResourcesCache.logger.error("Failed to load cache from $path", e)
-            path.deleteExisting()
+            PackResourcesCache.logger.error("Failed to load cache from $cachePath", e)
+            cachePath.deleteExisting()
             return null
         }
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun save(pack: PackResources, hashCode: HashCode, data: PackResourcesCacheData) {
-        cache[pack.packId() to hashCode] = data
-        val path = dir.resolve("${pack.packId()}-$hashCode.json.gz".toValidFileName())
-        if (!path.parent.exists()) path.createParentDirectories()
-        if (!path.exists()) path.createFile()
-        GzipCompressorOutputStream(path.outputStream(StandardOpenOption.TRUNCATE_EXISTING)).use {
-            json.encodeToStream(data, it)
-        }
+    fun save(key: Pair<String, HashCode>, data: PackResourcesCacheData, cachePath: Path) {
+        cache[key]!!.complete(data)
+        if (!cachePath.parent.exists()) cachePath.createParentDirectories()
+        if (!cachePath.exists()) cachePath.createFile()
+        GzipCompressorOutputStream(cachePath.outputStream(StandardOpenOption.TRUNCATE_EXISTING))
+            .use { json.encodeToStream(data, it) }
     }
 
-    private fun String.toValidFileName(replacement: String = "_"): String {
+    fun String.toValidFileName(replacement: String = "_"): String {
         val illegalChars = Regex("[/\\\\:*?\"<>|\\x00-\\x1F]")
         val windowsReserved = setOf("CON", "PRN", "AUX", "NUL", "COM1-9", "LPT1-9")
 

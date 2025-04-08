@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import settingdust.lazyyyyy.forge.minecraft.pack_resources_cache.TreePackResourcesCache;
-import settingdust.lazyyyyy.mixin.forge.pack_resources_cache.PathPackResourcesMixin;
+import settingdust.lazyyyyy.mixin.forge.pack_resources_cache.ForgePathPackResourcesMixin;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -22,7 +22,7 @@ import java.util.Set;
 
 @IfModLoaded(DynamicTrees.MOD_ID)
 @Mixin(FlatTreeResourcePack.class)
-public abstract class FlatTreeResourcePackMixin extends PathPackResourcesMixin {
+public abstract class FlatTreeResourcePackMixin extends ForgePathPackResourcesMixin {
     @Override
     protected void lazyyyyy$init(
         final String packId,
