@@ -133,10 +133,11 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                         allCompleted.complete()
                     } else {
                         cachePack()
-                        val deferredFiles = async { files.mapValues { it.value.getCompleted().toString() } }
+                        val deferredFiles =
+                            async { files.mapValues { root.relativize(it.value.getCompleted()).toString() } }
                         val deferredDirectoryToFiles = async {
                             directoryToFiles.mapValues {
-                                it.value.getCompleted().mapKeys { it.key.toString() }
+                                it.value.getCompleted().mapKeys { root.relativize(it.key).toString() }
                             }
                         }
                         val deferredNamespaces = async { namespaces.mapValues { it.value.getCompleted() } }

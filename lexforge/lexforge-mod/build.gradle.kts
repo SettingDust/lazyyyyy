@@ -108,6 +108,8 @@ dependencies {
     modRuntimeOnly("maven.modrinth:citadel:2.6.1")
 
     modImplementation("maven.modrinth:timeless-and-classics-zero:1.1.4-hotfix,1.20.1")
+
+    modImplementation("maven.modrinth:blue-skies:1.3.31")
 }
 
 tasks {
