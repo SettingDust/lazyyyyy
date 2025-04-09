@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import settingdust.lazyyyyy.forge.minecraft.pack_resources_cache.PackResourcesCacheForgeKt;
+import settingdust.lazyyyyy.PlatformService;
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.*;
 
 import java.io.InputStream;
@@ -36,16 +36,14 @@ public abstract class ForgePathPackResourcesMixin implements CachingPackResource
         final Path source,
         final CallbackInfo ci
     ) {
-        lazyyyyy$filePath = PackResourcesCacheForgeKt.getFilePath(source);
+        lazyyyyy$filePath = PlatformService.Companion.getFileSystemPath(source);
         lazyyyyy$cache = new GenericPackResourcesCache(source, (PackResources) this);
     }
 
     @Override
     public @Nullable HashCode lazyyyyy$getHash() {
-        if (lazyyyyy$filePath != null) {
-            return PackResourcesCacheManager.INSTANCE.getHash(lazyyyyy$filePath);
-        }
-        return null;
+        if (lazyyyyy$filePath == null) return null;
+        return PackResourcesCacheManager.INSTANCE.getFileHash(lazyyyyy$filePath);
     }
 
     @WrapOperation(

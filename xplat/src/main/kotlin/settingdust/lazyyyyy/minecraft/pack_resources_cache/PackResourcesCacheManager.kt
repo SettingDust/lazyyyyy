@@ -13,6 +13,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import java.io.File
+import java.nio.file.FileSystem
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.util.concurrent.ConcurrentHashMap
@@ -37,9 +38,9 @@ object PackResourcesCacheManager {
     val cache = ConcurrentHashMap<Pair<String, HashCode>, CompletableDeferred<PackResourcesCacheData>>()
     val cacheLocks = ConcurrentHashMap<Pair<String, HashCode>, Mutex>()
 
-    fun getHash(file: File): HashCode = HashCode.fromBytes(DigestUtils.md5(file.inputStream().buffered()))
+    fun getFileHash(file: File): HashCode = HashCode.fromBytes(DigestUtils.md5(file.inputStream().buffered()))
 
-    fun getHash(path: Path): HashCode = HashCode.fromBytes(DigestUtils.md5(path.inputStream().buffered()))
+    fun getFileHash(path: Path): HashCode = HashCode.fromBytes(DigestUtils.md5(path.inputStream().buffered()))
 
     fun getLock(key: Pair<String, HashCode>) =
         cacheLocks.computeIfAbsent(key) { Mutex() }
@@ -84,4 +85,12 @@ object PackResourcesCacheManager {
             .let { name -> if (windowsReserved.any { name.uppercase().startsWith(it) }) "$replacement$name" else name }
             .take(255)
     }
+}
+
+fun Path.getZipFileSystemPath(): Path? {
+    val fs: FileSystem = this.fileSystem
+    if (fs::class.java === ZipFileSystemClass) {
+        return fileSystem.getZipFile()
+    }
+    return null
 }

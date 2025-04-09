@@ -1,6 +1,7 @@
 package settingdust.lazyyyyy.minecraft.pack_resources_cache
 
 import com.google.common.base.Joiner
+import com.google.common.hash.HashCode
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -24,7 +25,6 @@ import settingdust.lazyyyyy.Lazyyyyy
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCache.Companion.JOINER
 import settingdust.lazyyyyy.util.collect
 import settingdust.lazyyyyy.util.concurrent
-import settingdust.lazyyyyy.util.fold
 import settingdust.lazyyyyy.util.mapNotNull
 import settingdust.lazyyyyy.util.merge
 import java.io.Closeable
@@ -229,20 +229,28 @@ suspend fun PackResourcesCache.consumeRootDirectory(
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-suspend fun PackResourcesCache.filesToCache() =
-    files.asSequence().asFlow().concurrent().fold(hashMapOf<String, String>()) { acc, (key, file) ->
-        val (root, file) = file.getCompleted()
-        acc[key] = root.relativize(file).toString()
-        acc
-    }
+suspend fun PackResourcesCache.filesToCache(
+    roots: MutableMap<HashCode, PackResourcesCacheDataEntry>,
+    rootsHashes: Map<Path, HashCode>
+) = files.asSequence().asFlow().concurrent().collect { (key, file) ->
+    val (root, file) = file.getCompleted()
+    val rootHash = rootsHashes[root] ?: error("Missing root hash for $root to $file. Roots: $rootsHashes")
+    val rootEntry = (roots[rootHash] ?: error("Missing root entry for $rootHash"))
+    rootEntry.files[key] = root.relativize(file).toString()
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
-suspend fun PackResourcesCache.directoryToFilesToCache() =
-    directoryToFiles.asSequence().asFlow().concurrent()
-        .fold(hashMapOf<String, Map<String, String>>()) { acc, (key, value) ->
-            acc[key] = value.getCompleted().mapKeys { (key) ->
-                val (root, path) = key
-                root.relativize(path).toString()
-            }
-            acc
-        }
+suspend fun PackResourcesCache.directoryToFilesToCache(
+    roots: MutableMap<HashCode, PackResourcesCacheDataEntry>,
+    rootsHashes: Map<Path, HashCode>
+) = directoryToFiles.asSequence().asFlow().concurrent().collect { (key, value) ->
+    val map = value.getCompleted()
+    map.asSequence().asFlow().concurrent().collect {
+        val (path, string) = it
+        val (root, file) = path
+        val rootHash = rootsHashes[root] ?: error("Missing root hash for $root to $file. Roots: $rootsHashes")
+        val rootEntry = (roots[rootHash] ?: error("Missing root entry for $rootHash"))
+        rootEntry.directoryToFiles
+            .computeIfAbsent(key) { ConcurrentHashMap() }[root.relativize(file).toString()] = string
+    }
+}

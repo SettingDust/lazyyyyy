@@ -15,6 +15,7 @@ import kotlinx.coroutines.withContext
 import net.minecraft.server.packs.PackResources
 import net.minecraft.server.packs.PackType
 import settingdust.lazyyyyy.Lazyyyyy
+import settingdust.lazyyyyy.PlatformService
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingStrategy.PackRoot
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCacheManager.toValidFileName
 import settingdust.lazyyyyy.util.collect
@@ -112,9 +113,12 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                 val hash by lazy { (pack as HashablePackResources).`lazyyyyy$getHash`() }
 
                 if (pack is HashablePackResources && hash != null) {
-
                     val rootHashes =
-                        async { roots.associateWithTo(HashBiMap.create(roots.size)) { HashCode.fromInt(it.hashCode()) } }
+                        async {
+                            roots.associateWithTo(HashBiMap.create(roots.size)) {
+                                HashCode.fromInt(PlatformService.getPathHash(it))
+                            }
+                        }
                     val key = pack.packId() to hash!!
                     val lock = PackResourcesCacheManager.getLock(key)
                     lock.lock(this@GenericPackResourcesCache)
@@ -128,10 +132,11 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                         cachePack()
                         val roots = ConcurrentHashMap<HashCode, PackResourcesCacheDataEntry>()
                         for ((_, hash) in rootHashes.getCompleted()) {
-                            roots[hash] = PackResourcesCacheDataEntry()
+                            roots[hash] = PackResourcesCacheDataEntry(ConcurrentHashMap(), ConcurrentHashMap())
                         }
-                        val deferredFiles = async { filesToCache() }
-                        val deferredDirectoryToFiles = async { directoryToFilesToCache() }
+                        val deferredFiles = async { filesToCache(roots, rootHashes.getCompleted()) }
+                        val deferredDirectoryToFiles =
+                            async { directoryToFilesToCache(roots, rootHashes.getCompleted()) }
                         val deferredNamespaces = async { namespaces.mapValues { it.value.getCompleted() } }
 
                         joinAll(deferredFiles, deferredDirectoryToFiles, deferredNamespaces)

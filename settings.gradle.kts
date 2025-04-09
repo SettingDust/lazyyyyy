@@ -130,7 +130,11 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     library("caffeine", "com.github.ben-manes.caffeine", "caffeine").version("3.1.8")
 
     val bovinesAndButtercups = "1.11.2"
-    library("bovinesAndButtercups-forge", "maven.modrinth", "bovines-and-buttercups").version("$bovinesAndButtercups+1.20.1-forge")
+    library(
+        "bovinesAndButtercups-forge",
+        "maven.modrinth",
+        "bovines-and-buttercups"
+    ).version("$bovinesAndButtercups+1.20.1-forge")
 
     val continuity = "3.0.0"
     library("continuity-fabric", "maven.modrinth", "continuity").version("$continuity+1.20.1")
@@ -140,8 +144,11 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     library("almostUnified-fabric", "maven.modrinth", "almost-unified").version("$almostUnified+fabric")
     library("almostUnified-forge", "maven.modrinth", "almost-unified").version("$almostUnified+forge")
 
-    val badOptimizations  = "2.2.1-1.20.1"
+    val badOptimizations = "2.2.1-1.20.1"
     library("badOptimizations", "maven.modrinth", "badoptimizations").version(badOptimizations)
+
+    val reflect = "1.4.0"
+    library("reflect", "net.lenni0451", "Reflect").version(reflect)
 }
 
 plugins {

@@ -14,6 +14,12 @@ architectury {
     forge()
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs = listOf("-Xjvm-default=all")
+    }
+}
+
 dependencies {
     forge(catalog.lexforge)
     minecraft(catalog.minecraft)
@@ -60,6 +66,8 @@ dependencies {
     modImplementation(catalog.almostUnified.forge)
 
     modImplementation(catalog.badOptimizations)
+
+    implementation(catalog.reflect)
 }
 
 sourceSets {

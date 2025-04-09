@@ -17,6 +17,7 @@ import net.minecraft.DetectedVersion
 import net.minecraft.server.packs.PackResources
 import net.minecraft.server.packs.PackType
 import settingdust.lazyyyyy.Lazyyyyy
+import settingdust.lazyyyyy.PlatformService
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCacheManager.toValidFileName
 import settingdust.lazyyyyy.util.collect
 import settingdust.lazyyyyy.util.concurrent
@@ -78,8 +79,12 @@ class VanillaPackResourcesCache(
     private suspend fun CoroutineScope.loadCache() =
         withContext(CoroutineName("Vanilla pack cache #${pack.packId()}")) {
             val time = measureTime {
+                require(pack is HashablePackResources)
                 val rootHashes =
-                    async { roots.associateWithTo(HashBiMap.create(roots.size)) { HashCode.fromInt(it.hashCode()) } }
+                    async {
+                        (pathsForType.values.flatMap { it } + roots).toSet()
+                            .associateWithTo(HashBiMap.create()) { HashCode.fromInt(PlatformService.getPathHash(it)) }
+                    }
                 val key = pack.packId() to HASH
                 val lock = PackResourcesCacheManager.getLock(key)
                 lock.lock(this@VanillaPackResourcesCache)
@@ -92,10 +97,10 @@ class VanillaPackResourcesCache(
                     cachePack()
                     val roots = ConcurrentHashMap<HashCode, PackResourcesCacheDataEntry>()
                     for ((_, hash) in rootHashes.getCompleted()) {
-                        roots[hash] = PackResourcesCacheDataEntry()
+                        roots[hash] = PackResourcesCacheDataEntry(ConcurrentHashMap(), ConcurrentHashMap())
                     }
-                    val deferredFiles = async { filesToCache() }
-                    val deferredDirectoryToFiles = async { directoryToFilesToCache() }
+                    val deferredFiles = async { filesToCache(roots, rootHashes.getCompleted()) }
+                    val deferredDirectoryToFiles = async { directoryToFilesToCache(roots, rootHashes.getCompleted()) }
 
                     joinAll(deferredFiles, deferredDirectoryToFiles)
 
