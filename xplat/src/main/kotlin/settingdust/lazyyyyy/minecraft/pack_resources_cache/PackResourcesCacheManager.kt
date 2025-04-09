@@ -27,7 +27,6 @@ import kotlin.io.path.outputStream
 object PackResourcesCacheManager {
     val dir = Path(".lazyyyyy", "pack-cache")
     private val json = Json {
-        ignoreUnknownKeys = true
         classDiscriminator = "_t"
 
         serializersModule = SerializersModule {

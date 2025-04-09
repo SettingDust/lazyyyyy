@@ -87,30 +87,8 @@ class VanillaPackResourcesCache(
                     PackResourcesCacheManager.dir.resolve("${key.first}-${key.second}.json.gz".toValidFileName())
                 val cachedDataDeferred = PackResourcesCacheManager.get(key, cachePath)
                 rootHashes.join()
-                if (cachedDataDeferred.isCompleted) {
-                    lock.unlock(this@VanillaPackResourcesCache)
-                    val cachedData = cachedDataDeferred.getCompleted()
-                    cachedData.roots.asSequence().asFlow().concurrent().collect { (rootHash, entry) ->
-                        val root = rootHashes.getCompleted().inverse()[rootHash]
-                            ?: error("No valid root for ${pack.packId()} $rootHash")
-
-                        joinAll(
-                            launch {
-                                entry.files.asSequence().asFlow().concurrent().collect { (key, value) ->
-                                    files[key] = CompletableDeferred(root to root.resolve(value))
-                                }
-                            },
-                            launch {
-                                entry.directoryToFiles.asSequence().asFlow().concurrent()
-                                    .collect { (key, value) ->
-                                        directoryToFiles[key] =
-                                            CompletableDeferred(value.mapKeys { root to root.resolve(it.key) })
-                                    }
-                            }
-                        )
-                    }
-                    allCompleted.complete()
-                } else {
+                @OptIn(ExperimentalCoroutinesApi::class)
+                suspend fun cacheEntry() {
                     cachePack()
                     val roots = ConcurrentHashMap<HashCode, PackResourcesCacheDataEntry>()
                     for ((_, hash) in rootHashes.getCompleted()) {
@@ -123,6 +101,39 @@ class VanillaPackResourcesCache(
 
                     PackResourcesCacheManager.save(key, PackResourcesCacheData(roots), cachePath)
                     lock.unlock(this@VanillaPackResourcesCache)
+                }
+
+                if (cachedDataDeferred.isCompleted) {
+                    lock.unlock(this@VanillaPackResourcesCache)
+                    val cachedData = cachedDataDeferred.getCompleted()
+                    try {
+                        cachedData.roots.asSequence().asFlow().concurrent().collect { (rootHash, entry) ->
+                            val root = rootHashes.getCompleted().inverse()[rootHash]
+                                ?: error("No valid root for ${pack.packId()} $rootHash")
+
+                            joinAll(
+                                launch {
+                                    entry.files.asSequence().asFlow().concurrent().collect { (key, value) ->
+                                        files[key] = CompletableDeferred(root to root.resolve(value))
+                                    }
+                                },
+                                launch {
+                                    entry.directoryToFiles.asSequence().asFlow().concurrent()
+                                        .collect { (key, value) ->
+                                            directoryToFiles[key] =
+                                                CompletableDeferred(value.mapKeys { root to root.resolve(it.key) })
+                                        }
+                                }
+                            )
+                        }
+                    } catch (e: Exception) {
+                        logger.error("Error loading pack cache ${pack.packId()}#$HASH. Re-create cache", e)
+                        lock.lock(this@VanillaPackResourcesCache)
+                        cacheEntry()
+                    }
+                    allCompleted.complete()
+                } else {
+                    cacheEntry()
                 }
             }
             Lazyyyyy.logger.debug("Cache vanilla pack ${pack.packId()} in $time")

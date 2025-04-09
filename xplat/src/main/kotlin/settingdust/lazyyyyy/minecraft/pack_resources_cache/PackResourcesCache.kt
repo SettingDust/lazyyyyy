@@ -230,7 +230,7 @@ suspend fun PackResourcesCache.consumeRootDirectory(
 
 @OptIn(ExperimentalCoroutinesApi::class)
 suspend fun PackResourcesCache.filesToCache() =
-    files.asSequence().asFlow().concurrent().fold(mutableMapOf<String, String>()) { acc, (key, file) ->
+    files.asSequence().asFlow().concurrent().fold(hashMapOf<String, String>()) { acc, (key, file) ->
         val (root, file) = file.getCompleted()
         acc[key] = root.relativize(file).toString()
         acc
@@ -239,7 +239,7 @@ suspend fun PackResourcesCache.filesToCache() =
 @OptIn(ExperimentalCoroutinesApi::class)
 suspend fun PackResourcesCache.directoryToFilesToCache() =
     directoryToFiles.asSequence().asFlow().concurrent()
-        .fold(mutableMapOf<String, Map<String, String>>()) { acc, (key, value) ->
+        .fold(hashMapOf<String, Map<String, String>>()) { acc, (key, value) ->
             acc[key] = value.getCompleted().mapKeys { (key) ->
                 val (root, path) = key
                 root.relativize(path).toString()
