@@ -1,14 +1,15 @@
 package settingdust.lazyyyyy.minecraft.pack_resources_cache
 
+import com.google.common.hash.HashCode
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.minecraft.DetectedVersion
 import net.minecraft.server.packs.PackResources
 import net.minecraft.server.packs.PackType
 import settingdust.lazyyyyy.Lazyyyyy
@@ -28,6 +29,9 @@ class VanillaPackResourcesCache(
     roots: List<Path>,
     private val pathsForType: Map<PackType, List<Path>>
 ) : PackResourcesCache(pack, roots) {
+    companion object {
+        val HASH = HashCode.fromInt(DetectedVersion.BUILT_IN.dataVersion.version)
+    }
 
     init {
         scope.launch { loadCache() }
@@ -41,25 +45,25 @@ class VanillaPackResourcesCache(
             val firstPath = relativePath.firstOrNull()
             if (firstPath?.name in blacklisted) return@collect
             if (path.isDirectory()) {
-                consumeRootDirectory(this, path, strategy)
+                consumeRootDirectory(this, root, path, strategy)
             } else {
-                consumeFile(this, path, strategy)
+                consumeFile(this, root, path, strategy)
             }
         }
     }
 
     suspend fun PackResourcesCache.consumePackType(
-        directory: Path,
+        root: Path,
         strategy: CachingStrategy,
-        directoryToFiles: MutableMap<String, MutableMap<Path, Deferred<String>>>
+        directoryToFiles: MutableMap<String, MutableMap<Pair<Path, Path>, String>>
     ) {
         coroutineScope {
-            val entries = directory.listDirectoryEntries()
+            val entries = root.listDirectoryEntries()
             entries.asFlow().concurrent().collect { path ->
                 if (path.isDirectory()) {
-                    consumeResourceDirectory(path, directoryToFiles, strategy)
+                    consumeResourceDirectory(root, path, directoryToFiles, strategy)
                 } else {
-                    consumeFile(this, path, strategy)
+                    consumeFile(this, root, path, strategy)
                 }
             }
         }
@@ -71,7 +75,7 @@ class VanillaPackResourcesCache(
             val time = measureTime {
                 joinAll(
                     launch {
-                        val directoryToFiles = ConcurrentHashMap<String, MutableMap<Path, Deferred<String>>>()
+                        val directoryToFiles = ConcurrentHashMap<String, MutableMap<Pair<Path, Path>, String>>()
                         pathsForType.asSequence().asFlow().concurrent()
                             .flatMap { (type, paths) -> paths.asFlow().map { type to it } }
                             .collect { (type, packTypeRoot) ->
@@ -79,7 +83,7 @@ class VanillaPackResourcesCache(
                                 consumePackType(packTypeRoot, strategy, directoryToFiles)
                             }
                         for ((path, files) in directoryToFiles) {
-                            this@VanillaPackResourcesCache.directoryToFiles[path]!!.complete(files.mapValues { it.value.await() })
+                            this@VanillaPackResourcesCache.directoryToFiles[path]!!.complete(files)
                         }
                     },
                     launch { roots.asFlow().concurrent().collect { consumeRoot(it) } }
