@@ -24,6 +24,7 @@ import settingdust.lazyyyyy.Lazyyyyy
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCache.Companion.JOINER
 import settingdust.lazyyyyy.util.collect
 import settingdust.lazyyyyy.util.concurrent
+import settingdust.lazyyyyy.util.fold
 import settingdust.lazyyyyy.util.mapNotNull
 import settingdust.lazyyyyy.util.merge
 import java.io.Closeable
@@ -228,17 +229,20 @@ suspend fun PackResourcesCache.consumeRootDirectory(
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-fun PackResourcesCache.filesToCache() =
-    files.mapValues { (_, file) ->
+suspend fun PackResourcesCache.filesToCache() =
+    files.asSequence().asFlow().concurrent().fold(mutableMapOf<String, String>()) { acc, (key, file) ->
         val (root, file) = file.getCompleted()
-        root.relativize(file).toString()
+        acc[key] = root.relativize(file).toString()
+        acc
     }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-fun PackResourcesCache.directoryToFilesToCache() =
-    directoryToFiles.mapValues {
-        it.value.getCompleted().mapKeys { (key) ->
-            val (root, path) = key
-            root.relativize(path).toString()
+suspend fun PackResourcesCache.directoryToFilesToCache() =
+    directoryToFiles.asSequence().asFlow().concurrent()
+        .fold(mutableMapOf<String, Map<String, String>>()) { acc, (key, value) ->
+            acc[key] = value.getCompleted().mapKeys { (key) ->
+                val (root, path) = key
+                root.relativize(path).toString()
+            }
+            acc
         }
-    }
