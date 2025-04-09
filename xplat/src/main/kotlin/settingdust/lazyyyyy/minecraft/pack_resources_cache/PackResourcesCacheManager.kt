@@ -7,6 +7,8 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
@@ -27,6 +29,10 @@ object PackResourcesCacheManager {
     private val json = Json {
         ignoreUnknownKeys = true
         classDiscriminator = "_t"
+
+        serializersModule = SerializersModule {
+            contextual(HashCodeSerializer)
+        }
     }
 
     val cache = ConcurrentHashMap<Pair<String, HashCode>, CompletableDeferred<PackResourcesCacheData>>()

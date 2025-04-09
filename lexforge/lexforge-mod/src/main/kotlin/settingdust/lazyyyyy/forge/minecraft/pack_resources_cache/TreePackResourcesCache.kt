@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.resource.TreeResourcePack
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
@@ -40,17 +39,17 @@ class TreePackResourcesCache(pack: TreeResourcePack, treePackTypeRoots: List<Pat
         namespaces: MutableSet<String>
     ) {
         val strategy = CachingStrategy.PackRoot(directory, directory)
-        val directoryToFiles = ConcurrentHashMap<String, MutableMap<Path, Deferred<String>>>()
+        val directoryToFiles = ConcurrentHashMap<String, MutableMap<Pair<Path, Path>, String>>()
         directory.listDirectoryEntries().asFlow().concurrent().collect { path ->
             if (path.isDirectory()) {
                 namespaces += path.name
-                consumeResourceDirectory(path, directoryToFiles, strategy)
+                consumeResourceDirectory(directory, path, directoryToFiles, strategy)
             } else {
-                consumeFile(this, path, strategy)
+                consumeFile(this, directory, path, strategy)
             }
         }
         for ((path, files) in directoryToFiles) {
-            this@TreePackResourcesCache.directoryToFiles[path]!!.complete(files.mapValues { it.value.await() })
+            this@TreePackResourcesCache.directoryToFiles[path]!!.complete(files)
         }
     }
 

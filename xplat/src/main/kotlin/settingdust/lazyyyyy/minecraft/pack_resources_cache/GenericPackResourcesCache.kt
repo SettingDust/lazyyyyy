@@ -112,11 +112,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                 val hash by lazy { (pack as HashablePackResources).`lazyyyyy$getHash`() }
                 if (pack is HashablePackResources && hash != null) {
                     val rootHashes =
-                        async {
-                            roots.associateWithTo(HashBiMap.create(roots.size)) {
-                                HashCode.fromString(it.toString() + it.fileSystem.javaClass.name)
-                            }
-                        }
+                        async { roots.associateWithTo(HashBiMap.create(roots.size)) { HashCode.fromInt(it.hashCode()) } }
                     val key = pack.packId() to hash!!
                     val lock = PackResourcesCacheManager.getLock(key)
                     lock.lock(this@GenericPackResourcesCache)

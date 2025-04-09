@@ -79,11 +79,7 @@ class VanillaPackResourcesCache(
         withContext(CoroutineName("Vanilla pack cache #${pack.packId()}")) {
             val time = measureTime {
                 val rootHashes =
-                    async {
-                        roots.associateWithTo(HashBiMap.create(roots.size)) {
-                            HashCode.fromString(it.toString() + it.fileSystem.javaClass.name)
-                        }
-                    }
+                    async { roots.associateWithTo(HashBiMap.create(roots.size)) { HashCode.fromInt(it.hashCode()) } }
                 val key = pack.packId() to HASH
                 val lock = PackResourcesCacheManager.getLock(key)
                 lock.lock(this@VanillaPackResourcesCache)
