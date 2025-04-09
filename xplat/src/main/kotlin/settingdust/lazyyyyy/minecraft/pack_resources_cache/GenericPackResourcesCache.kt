@@ -162,29 +162,18 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                         for ((_, hash) in rootHashes.getCompleted()) {
                             roots[hash] = PackResourcesCacheDataEntry()
                         }
-                        val deferredFiles =
-                            async {
-                                files.mapValues { (_, file) ->
-                                    val (root, file) = file.getCompleted()
-                                    root.relativize(file).toString()
-                                }
-                            }
-                        val deferredDirectoryToFiles = async {
-                            directoryToFiles.mapValues {
-                                it.value.getCompleted().mapKeys { (key) ->
-                                    val (root, path) = key
-                                    root.relativize(path).toString()
-                                }
-                            }
-                        }
+                        val deferredFiles = async { filesToCache() }
+                        val deferredDirectoryToFiles = async { directoryToFilesToCache() }
                         val deferredNamespaces = async { namespaces.mapValues { it.value.getCompleted() } }
 
                         joinAll(deferredFiles, deferredDirectoryToFiles, deferredNamespaces)
 
-                        @Suppress("UNCHECKED_CAST")
-                        val data = PackResourcesCacheData(roots, deferredNamespaces.getCompleted())
-                        PackResourcesCacheManager.save(key, data, cachePath)
-                        lock.unlock()
+                        PackResourcesCacheManager.save(
+                            key,
+                            PackResourcesCacheData(roots, deferredNamespaces.getCompleted()),
+                            cachePath
+                        )
+                        lock.unlock(this@GenericPackResourcesCache)
                     }
                 } else {
                     cachePack()

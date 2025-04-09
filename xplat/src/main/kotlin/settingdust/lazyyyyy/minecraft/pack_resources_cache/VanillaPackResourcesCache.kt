@@ -1,8 +1,12 @@
 package settingdust.lazyyyyy.minecraft.pack_resources_cache
 
+import com.google.common.collect.HashBiMap
 import com.google.common.hash.HashCode
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
@@ -13,6 +17,7 @@ import net.minecraft.DetectedVersion
 import net.minecraft.server.packs.PackResources
 import net.minecraft.server.packs.PackType
 import settingdust.lazyyyyy.Lazyyyyy
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCacheManager.toValidFileName
 import settingdust.lazyyyyy.util.collect
 import settingdust.lazyyyyy.util.concurrent
 import settingdust.lazyyyyy.util.flatMap
@@ -69,29 +74,82 @@ class VanillaPackResourcesCache(
         }
     }
 
-    @OptIn(ExperimentalPathApi::class)
+    @OptIn(ExperimentalPathApi::class, ExperimentalCoroutinesApi::class)
     private suspend fun CoroutineScope.loadCache() =
         withContext(CoroutineName("Vanilla pack cache #${pack.packId()}")) {
             val time = measureTime {
-                joinAll(
-                    launch {
-                        val directoryToFiles = ConcurrentHashMap<String, MutableMap<Pair<Path, Path>, String>>()
-                        pathsForType.asSequence().asFlow().concurrent()
-                            .flatMap { (type, paths) -> paths.asFlow().map { type to it } }
-                            .collect { (type, packTypeRoot) ->
-                                val strategy = CachingStrategy.PackTypeRoot(packTypeRoot, type.directory)
-                                consumePackType(packTypeRoot, strategy, directoryToFiles)
-                            }
-                        for ((path, files) in directoryToFiles) {
-                            this@VanillaPackResourcesCache.directoryToFiles[path]!!.complete(files)
+                val rootHashes =
+                    async {
+                        roots.associateWithTo(HashBiMap.create(roots.size)) {
+                            HashCode.fromString(it.toString() + it.fileSystem.javaClass.name)
                         }
-                    },
-                    launch { roots.asFlow().concurrent().collect { consumeRoot(it) } }
-                )
-                allCompleted.complete()
+                    }
+                val key = pack.packId() to HASH
+                val lock = PackResourcesCacheManager.getLock(key)
+                lock.lock(this@VanillaPackResourcesCache)
+                val cachePath =
+                    PackResourcesCacheManager.dir.resolve("${key.first}-${key.second}.json.gz".toValidFileName())
+                val cachedDataDeferred = PackResourcesCacheManager.get(key, cachePath)
+                rootHashes.join()
+                if (cachedDataDeferred.isCompleted) {
+                    lock.unlock(this@VanillaPackResourcesCache)
+                    val cachedData = cachedDataDeferred.getCompleted()
+                    cachedData.roots.asSequence().asFlow().concurrent().collect { (rootHash, entry) ->
+                        val root = rootHashes.getCompleted().inverse()[rootHash]
+                            ?: error("No valid root for ${pack.packId()} $rootHash")
+
+                        joinAll(
+                            launch {
+                                entry.files.asSequence().asFlow().concurrent().collect { (key, value) ->
+                                    files[key] = CompletableDeferred(root to root.resolve(value))
+                                }
+                            },
+                            launch {
+                                entry.directoryToFiles.asSequence().asFlow().concurrent()
+                                    .collect { (key, value) ->
+                                        directoryToFiles[key] =
+                                            CompletableDeferred(value.mapKeys { root to root.resolve(it.key) })
+                                    }
+                            }
+                        )
+                    }
+                    allCompleted.complete()
+                } else {
+                    cachePack()
+                    val roots = ConcurrentHashMap<HashCode, PackResourcesCacheDataEntry>()
+                    for ((_, hash) in rootHashes.getCompleted()) {
+                        roots[hash] = PackResourcesCacheDataEntry()
+                    }
+                    val deferredFiles = async { filesToCache() }
+                    val deferredDirectoryToFiles = async { directoryToFilesToCache() }
+
+                    joinAll(deferredFiles, deferredDirectoryToFiles)
+
+                    PackResourcesCacheManager.save(key, PackResourcesCacheData(roots), cachePath)
+                    lock.unlock(this@VanillaPackResourcesCache)
+                }
             }
             Lazyyyyy.logger.debug("Cache vanilla pack ${pack.packId()} in $time")
         }
+
+    private suspend fun CoroutineScope.cachePack() {
+        joinAll(
+            launch {
+                val directoryToFiles = ConcurrentHashMap<String, MutableMap<Pair<Path, Path>, String>>()
+                pathsForType.asSequence().asFlow().concurrent()
+                    .flatMap { (type, paths) -> paths.asFlow().map { type to it } }
+                    .collect { (type, packTypeRoot) ->
+                        val strategy = CachingStrategy.PackTypeRoot(packTypeRoot, type.directory)
+                        consumePackType(packTypeRoot, strategy, directoryToFiles)
+                    }
+                for ((path, files) in directoryToFiles) {
+                    this@VanillaPackResourcesCache.directoryToFiles[path]!!.complete(files)
+                }
+            },
+            launch { roots.asFlow().concurrent().collect { consumeRoot(it) } }
+        )
+        allCompleted.complete()
+    }
 
     override fun getNamespaces(type: PackType?): Set<String> {
         // Vanilla cached the namespace when constructing

@@ -226,3 +226,19 @@ suspend fun PackResourcesCache.consumeRootDirectory(
         }
     }
 }
+
+@OptIn(ExperimentalCoroutinesApi::class)
+fun PackResourcesCache.filesToCache() =
+    files.mapValues { (_, file) ->
+        val (root, file) = file.getCompleted()
+        root.relativize(file).toString()
+    }
+
+@OptIn(ExperimentalCoroutinesApi::class)
+fun PackResourcesCache.directoryToFilesToCache() =
+    directoryToFiles.mapValues {
+        it.value.getCompleted().mapKeys { (key) ->
+            val (root, path) = key
+            root.relativize(path).toString()
+        }
+    }
