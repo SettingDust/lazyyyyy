@@ -152,6 +152,9 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                     if (cachedDataDeferred.isCompleted) {
                         lock.unlock(this@GenericPackResourcesCache)
                         val cachedData = cachedDataDeferred.getCompleted()
+
+                        val directoryToFiles =
+                            ConcurrentHashMap<String, MutableMap<Pair<Path, Path>, String>>()
                         try {
                             joinAll(
                                 launch {
@@ -167,20 +170,29 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                                         joinAll(
                                             launch {
                                                 entry.files.asSequence().asFlow().concurrent().collect { (key, value) ->
-                                                    files[key] = CompletableDeferred(root to root.resolve(value))
+                                                    this@GenericPackResourcesCache.files[key] =
+                                                        CompletableDeferred(root to root.resolve(value))
                                                 }
                                             },
                                             launch {
                                                 entry.directoryToFiles.asSequence().asFlow().concurrent()
                                                     .collect { (key, value) ->
-                                                        directoryToFiles[key] =
-                                                            CompletableDeferred(value.mapKeys { root to root.resolve(it.key) })
+                                                        directoryToFiles.computeIfAbsent(key) { ConcurrentHashMap() } += value.mapKeys {
+                                                            root to root.resolve(
+                                                                it.key
+                                                            )
+                                                        }
                                                     }
                                             }
                                         )
                                     }
                                 }
                             )
+
+                            for (it in directoryToFiles) {
+                                this@GenericPackResourcesCache.directoryToFiles[it.key] =
+                                    CompletableDeferred(it.value)
+                            }
                         } catch (e: Exception) {
                             logger.error("Error loading pack cache ${pack.packId()}#$hash. Re-create cache", e)
                             lock.lock(this@GenericPackResourcesCache)

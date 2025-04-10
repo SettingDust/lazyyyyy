@@ -129,7 +129,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         val deferred = getter()
         if (deferred != null) {
             return if (deferred.isCompleted) deferred.getCompleted()
-            else runBlocking { deferred.await() }
+            else runBlocking(scope.coroutineContext) { deferred.await() }
         } else if (allCompleted.isCompleted) {
             // ConcurrentHashMap may overlap get and put.
             return getter()?.getCompleted()
@@ -137,9 +137,9 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
             var result = getter()
             if (result != null) {
                 return if (result.isCompleted) result.getCompleted()
-                else runBlocking { result.await() }
+                else runBlocking(scope.coroutineContext) { result.await() }
             }
-            runBlocking {
+            runBlocking(scope.coroutineContext) {
                 while (result == null) {
                     delay(300.nanoseconds)
                     result = getter()
@@ -147,7 +147,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
                 }
             }
             return if (result == null) null
-            else runBlocking { result.await() }
+            else runBlocking(scope.coroutineContext) { result.await() }
         }
     }
 }

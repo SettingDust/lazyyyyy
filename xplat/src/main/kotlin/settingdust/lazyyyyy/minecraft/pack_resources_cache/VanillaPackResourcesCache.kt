@@ -112,6 +112,9 @@ class VanillaPackResourcesCache(
                     lock.unlock(this@VanillaPackResourcesCache)
                     val cachedData = cachedDataDeferred.getCompleted()
                     try {
+                        val directoryToFiles =
+                            ConcurrentHashMap<String, MutableMap<Pair<Path, Path>, String>>()
+
                         cachedData.roots.asSequence().asFlow().concurrent().collect { (rootHash, entry) ->
                             val root = rootHashes.getCompleted().inverse()[rootHash]
                                 ?: error("No valid root for ${pack.packId()} $rootHash")
@@ -125,11 +128,18 @@ class VanillaPackResourcesCache(
                                 launch {
                                     entry.directoryToFiles.asSequence().asFlow().concurrent()
                                         .collect { (key, value) ->
-                                            directoryToFiles[key] =
-                                                CompletableDeferred(value.mapKeys { root to root.resolve(it.key) })
+                                            directoryToFiles.computeIfAbsent(key) { ConcurrentHashMap() } += value.mapKeys {
+                                                root to root.resolve(
+                                                    it.key
+                                                )
+                                            }
                                         }
                                 }
                             )
+                        }
+
+                        for (it in directoryToFiles) {
+                            this@VanillaPackResourcesCache.directoryToFiles[it.key] = CompletableDeferred(it.value)
                         }
                     } catch (e: Exception) {
                         logger.error("Error loading pack cache ${pack.packId()}#$HASH. Re-create cache", e)
