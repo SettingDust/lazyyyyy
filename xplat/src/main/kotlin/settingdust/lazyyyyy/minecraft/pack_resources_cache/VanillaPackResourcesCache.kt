@@ -60,7 +60,7 @@ class VanillaPackResourcesCache(
     suspend fun PackResourcesCache.consumePackType(
         root: Path,
         strategy: CachingStrategy,
-        directoryToFiles: MutableMap<String, MutableMap<Pair<Path, Path>, String>>
+        directoryToFiles: MutableMap<String, MutableMap<Path, String>>
     ) {
         coroutineScope {
             val entries = root.listDirectoryEntries()
@@ -112,7 +112,7 @@ class VanillaPackResourcesCache(
                     val cachedData = cachedDataDeferred.getCompleted()
                     try {
                         val directoryToFiles =
-                            ConcurrentHashMap<String, MutableMap<Pair<Path, Path>, String>>()
+                            ConcurrentHashMap<String, MutableMap<Path, String>>()
 
                         cachedData.roots.asSequence().asFlow().concurrent().collect { (rootHash, entry) ->
                             val root = rootHashes.getCompleted().inverse()[rootHash]
@@ -121,16 +121,18 @@ class VanillaPackResourcesCache(
                             joinAll(
                                 launch {
                                     entry.files.asSequence().asFlow().concurrent().collect { (key, value) ->
-                                        files[key] = CompletableDeferred(root to root.resolve(value))
+                                        val path = root.resolve(value)
+                                        pathToRoot[path] = root
+                                        files[key] = CompletableDeferred(path)
                                     }
                                 },
                                 launch {
                                     entry.directoryToFiles.asSequence().asFlow().concurrent()
                                         .collect { (key, value) ->
                                             directoryToFiles.computeIfAbsent(key) { ConcurrentHashMap() } += value.mapKeys {
-                                                root to root.resolve(
-                                                    it.key
-                                                )
+                                                val path = root.resolve(it.key)
+                                                pathToRoot[path] = root
+                                                path
                                             }
                                         }
                                 }
@@ -156,7 +158,7 @@ class VanillaPackResourcesCache(
     private suspend fun CoroutineScope.cachePack() {
         joinAll(
             launch {
-                val directoryToFiles = ConcurrentHashMap<String, MutableMap<Pair<Path, Path>, String>>()
+                val directoryToFiles = ConcurrentHashMap<String, MutableMap<Path, String>>()
                 pathsForType.asSequence().asFlow().concurrent()
                     .flatMap { (type, paths) -> paths.asFlow().map { type to it } }
                     .collect { (type, packTypeRoot) ->

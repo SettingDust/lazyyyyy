@@ -58,8 +58,10 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
 
     val allCompleted = Job()
 
-    val files: MutableMap<String, CompletableDeferred<Pair<Path, Path>>> = ConcurrentHashMap()
-    val directoryToFiles: MutableMap<String, CompletableDeferred<Map<Pair<Path, Path>, String>>> = ConcurrentHashMap()
+    val files: MutableMap<String, CompletableDeferred<Path>> = ConcurrentHashMap()
+    val directoryToFiles: MutableMap<String, CompletableDeferred<Map<Path, String>>> = ConcurrentHashMap()
+
+    val pathToRoot: MutableMap<Path, Path> = ConcurrentHashMap()
 
     fun join(vararg paths: String?) = when (paths.size) {
         0 -> ""
@@ -95,7 +97,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
                 }
                 .merge(false)
                 .collect { (location, path) ->
-                    output.accept(location, IoSupplier.create(path.second))
+                    output.accept(location, IoSupplier.create(path))
                 }
         }
     }
@@ -108,7 +110,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun getOrWaitResource(path: String): Path? {
-        return getOrWait { files[path] }?.second
+        return getOrWait { files[path] }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -116,11 +118,9 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         type: PackType?,
         namespace: String,
         prefix: String
-    ): Map<Pair<Path, Path>, String>? {
+    ): Map<Path, String>? {
         val pathString = "${type?.directory?.let { "${it}/" } ?: ""}$namespace/$prefix"
-        return getOrWait {
-            directoryToFiles[pathString]
-        }
+        return getOrWait { directoryToFiles[pathString] }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -162,7 +162,8 @@ suspend fun PackResourcesCache.consumeFile(
     joinAll(
         scope.launch {
             val key = strategy.getRelativePathString(relativePath)
-            files.putIfAbsent(key, CompletableDeferred(root to file))
+            pathToRoot[file] = root
+            files.putIfAbsent(key, CompletableDeferred(file))
         },
         scope.launch { fileConsumer?.invoke(file) }
     )
@@ -172,7 +173,7 @@ suspend fun PackResourcesCache.consumeFile(
 suspend fun PackResourcesCache.consumeResourceDirectory(
     root: Path,
     directory: Path,
-    directoryToFiles: MutableMap<String, MutableMap<Pair<Path, Path>, String>>,
+    directoryToFiles: MutableMap<String, MutableMap<Path, String>>,
     strategy: CachingStrategy,
     fileConsumer: FileConsumer? = null
 ) {
@@ -193,7 +194,8 @@ suspend fun PackResourcesCache.consumeResourceDirectory(
         val fileConsumer = if (shouldCacheDirectoryToFiles)
             { path: Path ->
                 Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#directory/$relativePathString#fileConsumer/$path] caching") }
-                directoryToFiles[relativePathString]!![root to path] = JOINER.join(namespaceRoot.relativize(path))
+                pathToRoot[path] = root
+                directoryToFiles[relativePathString]!![path] = JOINER.join(namespaceRoot.relativize(path))
                 fileConsumer?.invoke(path)
                 Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#directory/$relativePathString#fileConsumer/$path] cached") }
             } else fileConsumer
@@ -232,7 +234,8 @@ suspend fun PackResourcesCache.filesToCache(
     roots: MutableMap<Long, PackResourcesCacheDataEntry>,
     rootsHashes: Map<Path, Long>
 ) = files.asSequence().asFlow().concurrent().collect { (key, file) ->
-    val (root, file) = file.getCompleted()
+    val file = file.getCompleted()
+    val root = pathToRoot[file] ?: error("Missing root for $file")
     val rootHash = rootsHashes[root] ?: error("Missing root hash for $root to $file. Roots: $rootsHashes")
     val rootEntry = (roots[rootHash] ?: error("Missing root entry for $rootHash"))
     rootEntry.files[key] = root.relativize(file).toString()
@@ -246,10 +249,10 @@ suspend fun PackResourcesCache.directoryToFilesToCache(
     val map = value.getCompleted()
     map.asSequence().asFlow().concurrent().collect {
         val (path, string) = it
-        val (root, file) = path
-        val rootHash = rootsHashes[root] ?: error("Missing root hash for $root to $file. Roots: $rootsHashes")
+        val root = pathToRoot[path] ?: error("Missing root for $path")
+        val rootHash = rootsHashes[root] ?: error("Missing root hash for $root to $path. Roots: $rootsHashes")
         val rootEntry = (roots[rootHash] ?: error("Missing root entry for $rootHash"))
         rootEntry.directoryToFiles
-            .computeIfAbsent(key) { ConcurrentHashMap() }[root.relativize(file).toString()] = string
+            .computeIfAbsent(key) { ConcurrentHashMap() }[root.relativize(path).toString()] = string
     }
 }

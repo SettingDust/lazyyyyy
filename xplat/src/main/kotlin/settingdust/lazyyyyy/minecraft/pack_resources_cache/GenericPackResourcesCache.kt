@@ -69,7 +69,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
         namespaces.computeIfAbsent(type) { ConcurrentHashMap.newKeySet() }
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type] caching") }
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/entries] caching") }
-        val directoryToFiles = ConcurrentHashMap<String, MutableMap<Pair<Path, Path>, String>>()
+        val directoryToFiles = ConcurrentHashMap<String, MutableMap<Path, String>>()
         directory.listDirectoryEntries().asFlow().concurrent().collect { path ->
             if (path.isDirectory()) {
                 namespaces[type]!! += path.name
@@ -160,7 +160,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
 
                         if (cachedData.hash == hash!!) {
                             val directoryToFiles =
-                                ConcurrentHashMap<String, MutableMap<Pair<Path, Path>, String>>()
+                                ConcurrentHashMap<String, MutableMap<Path, String>>()
                             try {
                                 joinAll(
                                     launch {
@@ -177,19 +177,19 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
 
                                                 joinAll(
                                                     launch {
-                                                        entry.files.asSequence().asFlow().concurrent()
-                                                            .collect { (key, value) ->
-                                                                this@GenericPackResourcesCache.files[key] =
-                                                                    CompletableDeferred(root to root.resolve(value))
-                                                            }
+                                                        entry.files.asSequence().asFlow().concurrent().collect { (key, value) ->
+                                                            val path = root.resolve(value)
+                                                            pathToRoot[path] = root
+                                                            files[key] = CompletableDeferred(path)
+                                                        }
                                                     },
                                                     launch {
                                                         entry.directoryToFiles.asSequence().asFlow().concurrent()
                                                             .collect { (key, value) ->
                                                                 directoryToFiles.computeIfAbsent(key) { ConcurrentHashMap() } += value.mapKeys {
-                                                                    root to root.resolve(
-                                                                        it.key
-                                                                    )
+                                                                    val path = root.resolve(it.key)
+                                                                    pathToRoot[path] = root
+                                                                    path
                                                                 }
                                                             }
                                                     }

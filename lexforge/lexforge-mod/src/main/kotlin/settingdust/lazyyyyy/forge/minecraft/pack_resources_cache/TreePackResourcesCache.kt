@@ -39,7 +39,7 @@ class TreePackResourcesCache(pack: TreeResourcePack, treePackTypeRoots: List<Pat
         namespaces: MutableSet<String>
     ) {
         val strategy = CachingStrategy.PackRoot(directory, directory)
-        val directoryToFiles = ConcurrentHashMap<String, MutableMap<Pair<Path, Path>, String>>()
+        val directoryToFiles = ConcurrentHashMap<String, MutableMap<Path, String>>()
         directory.listDirectoryEntries().asFlow().concurrent().collect { path ->
             if (path.isDirectory()) {
                 namespaces += path.name
