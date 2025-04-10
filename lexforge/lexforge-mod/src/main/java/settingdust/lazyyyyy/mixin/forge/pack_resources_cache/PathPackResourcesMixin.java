@@ -1,6 +1,5 @@
 package settingdust.lazyyyyy.mixin.forge.pack_resources_cache;
 
-import com.google.common.hash.HashCode;
 import net.minecraft.server.packs.PathPackResources;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,7 +24,7 @@ public class PathPackResourcesMixin implements HashablePackResources {
     }
 
     @Override
-    public @Nullable HashCode lazyyyyy$getHash() {
+    public @Nullable Long lazyyyyy$getHash() {
         if (lazyyyyy$filePath != null) {
             return PackResourcesCacheManager.INSTANCE.getFileHash(lazyyyyy$filePath);
         }

@@ -1,6 +1,5 @@
 package settingdust.lazyyyyy.mixin.forge.pack_resources_cache;
 
-import com.google.common.hash.HashCode;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -41,7 +40,7 @@ public abstract class ForgePathPackResourcesMixin implements CachingPackResource
     }
 
     @Override
-    public @Nullable HashCode lazyyyyy$getHash() {
+    public @Nullable Long lazyyyyy$getHash() {
         if (lazyyyyy$filePath == null) return null;
         return PackResourcesCacheManager.INSTANCE.getFileHash(lazyyyyy$filePath);
     }

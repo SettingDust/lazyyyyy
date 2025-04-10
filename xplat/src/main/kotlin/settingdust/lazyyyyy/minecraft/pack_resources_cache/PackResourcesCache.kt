@@ -1,7 +1,6 @@
 package settingdust.lazyyyyy.minecraft.pack_resources_cache
 
 import com.google.common.base.Joiner
-import com.google.common.hash.HashCode
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -230,8 +229,8 @@ suspend fun PackResourcesCache.consumeRootDirectory(
 
 @OptIn(ExperimentalCoroutinesApi::class)
 suspend fun PackResourcesCache.filesToCache(
-    roots: MutableMap<HashCode, PackResourcesCacheDataEntry>,
-    rootsHashes: Map<Path, HashCode>
+    roots: MutableMap<Long, PackResourcesCacheDataEntry>,
+    rootsHashes: Map<Path, Long>
 ) = files.asSequence().asFlow().concurrent().collect { (key, file) ->
     val (root, file) = file.getCompleted()
     val rootHash = rootsHashes[root] ?: error("Missing root hash for $root to $file. Roots: $rootsHashes")
@@ -241,8 +240,8 @@ suspend fun PackResourcesCache.filesToCache(
 
 @OptIn(ExperimentalCoroutinesApi::class)
 suspend fun PackResourcesCache.directoryToFilesToCache(
-    roots: MutableMap<HashCode, PackResourcesCacheDataEntry>,
-    rootsHashes: Map<Path, HashCode>
+    roots: MutableMap<Long, PackResourcesCacheDataEntry>,
+    rootsHashes: Map<Path, Long>
 ) = directoryToFiles.asSequence().asFlow().concurrent().collect { (key, value) ->
     val map = value.getCompleted()
     map.asSequence().asFlow().concurrent().collect {

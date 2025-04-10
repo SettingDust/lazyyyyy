@@ -1,7 +1,6 @@
 package settingdust.lazyyyyy.minecraft.pack_resources_cache
 
 import com.google.common.collect.HashBiMap
-import com.google.common.hash.HashCode
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -36,7 +35,7 @@ class VanillaPackResourcesCache(
     private val pathsForType: Map<PackType, List<Path>>
 ) : PackResourcesCache(pack, roots) {
     companion object {
-        val HASH = HashCode.fromInt(DetectedVersion.BUILT_IN.dataVersion.version)
+        val HASH = DetectedVersion.BUILT_IN.dataVersion.version.toLong()
     }
 
     init {
@@ -83,19 +82,19 @@ class VanillaPackResourcesCache(
                 val rootHashes =
                     async {
                         (pathsForType.values.flatMap { it } + roots).toSet()
-                            .associateWithTo(HashBiMap.create()) { HashCode.fromInt(PlatformService.getPathHash(it)) }
+                            .associateWithTo(HashBiMap.create()) { PlatformService.getPathHash(it).toLong() }
                     }
-                val key = pack.packId() to HASH
+                val key = pack.packId()
                 val lock = PackResourcesCacheManager.getLock(key)
                 lock.lock(this@VanillaPackResourcesCache)
                 val cachePath =
-                    PackResourcesCacheManager.dir.resolve("${key.first}-${key.second}.json.gz".toValidFileName())
+                    PackResourcesCacheManager.dir.resolve("$key.json.gz".toValidFileName())
                 val cachedDataDeferred = PackResourcesCacheManager.get(key, cachePath)
                 rootHashes.join()
                 @OptIn(ExperimentalCoroutinesApi::class)
                 suspend fun cacheEntry() {
                     cachePack()
-                    val roots = ConcurrentHashMap<HashCode, PackResourcesCacheDataEntry>()
+                    val roots = ConcurrentHashMap<Long, PackResourcesCacheDataEntry>()
                     for ((_, hash) in rootHashes.getCompleted()) {
                         roots[hash] = PackResourcesCacheDataEntry(ConcurrentHashMap(), ConcurrentHashMap())
                     }
@@ -104,7 +103,7 @@ class VanillaPackResourcesCache(
 
                     joinAll(deferredFiles, deferredDirectoryToFiles)
 
-                    PackResourcesCacheManager.save(key, PackResourcesCacheData(roots), cachePath)
+                    PackResourcesCacheManager.save(key, PackResourcesCacheData(HASH, roots), cachePath)
                     lock.unlock(this@VanillaPackResourcesCache)
                 }
 

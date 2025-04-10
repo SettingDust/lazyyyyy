@@ -1,6 +1,5 @@
 package settingdust.lazyyyyy.mixin.pack_resources_cache;
 
-import com.google.common.hash.HashCode;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.server.packs.FilePackResources;
@@ -84,7 +83,7 @@ public abstract class FilePackResourcesMixin implements CachingPackResources, Ha
     }
 
     @Override
-    public @Nullable HashCode lazyyyyy$getHash() {
+    public @Nullable Long lazyyyyy$getHash() {
         return PackResourcesCacheManager.INSTANCE.getFileHash(file);
     }
 }

@@ -1,7 +1,6 @@
 package settingdust.lazyyyyy.minecraft.pack_resources_cache
 
 import com.google.common.collect.HashBiMap
-import com.google.common.hash.HashCode
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -116,34 +115,40 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                     val rootHashes =
                         async {
                             roots.associateWithTo(HashBiMap.create(roots.size)) {
-                                HashCode.fromInt(PlatformService.getPathHash(it))
+                                PlatformService.getPathHash(it).toLong()
                             }
                         }
-                    val key = pack.packId() to hash!!
+                    val key = pack.packId()
                     val lock = PackResourcesCacheManager.getLock(key)
                     lock.lock(this@GenericPackResourcesCache)
                     val cachePath =
-                        PackResourcesCacheManager.dir.resolve("${key.first}-${key.second}.json.gz".toValidFileName())
+                        PackResourcesCacheManager.dir.resolve("$key.json.gz".toValidFileName())
                     val cachedDataDeferred = PackResourcesCacheManager.get(key, cachePath)
                     rootHashes.join()
 
                     @OptIn(ExperimentalCoroutinesApi::class)
                     suspend fun cacheEntry() {
                         cachePack()
-                        val roots = ConcurrentHashMap<HashCode, PackResourcesCacheDataEntry>()
-                        for ((_, hash) in rootHashes.getCompleted()) {
-                            roots[hash] = PackResourcesCacheDataEntry(ConcurrentHashMap(), ConcurrentHashMap())
+                        val roots = ConcurrentHashMap<Long, PackResourcesCacheDataEntry>()
+                        for ((_, rootHash) in rootHashes.getCompleted()) {
+                            roots[rootHash] = PackResourcesCacheDataEntry(ConcurrentHashMap(), ConcurrentHashMap())
                         }
-                        val deferredFiles = async { filesToCache(roots, rootHashes.getCompleted()) }
-                        val deferredDirectoryToFiles =
-                            async { directoryToFilesToCache(roots, rootHashes.getCompleted()) }
+
                         val deferredNamespaces = async { namespaces.mapValues { it.value.getCompleted() } }
 
-                        joinAll(deferredFiles, deferredDirectoryToFiles, deferredNamespaces)
+                        joinAll(
+                            launch { filesToCache(roots, rootHashes.getCompleted()) },
+                            launch { directoryToFilesToCache(roots, rootHashes.getCompleted()) },
+                            deferredNamespaces
+                        )
 
                         PackResourcesCacheManager.save(
                             key,
-                            PackResourcesCacheData(roots, deferredNamespaces.getCompleted()),
+                            PackResourcesCacheData(
+                                hash!!,
+                                roots,
+                                deferredNamespaces.getCompleted()
+                            ),
                             cachePath
                         )
                         lock.unlock(this@GenericPackResourcesCache)
@@ -153,52 +158,59 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                         lock.unlock(this@GenericPackResourcesCache)
                         val cachedData = cachedDataDeferred.getCompleted()
 
-                        val directoryToFiles =
-                            ConcurrentHashMap<String, MutableMap<Pair<Path, Path>, String>>()
-                        try {
-                            joinAll(
-                                launch {
-                                    cachedData.namespaces.asSequence().asFlow().concurrent().collect { (key, value) ->
-                                        namespaces[key] = CompletableDeferred(value)
-                                    }
-                                },
-                                launch {
-                                    cachedData.roots.asSequence().asFlow().concurrent().collect { (rootHash, entry) ->
-                                        val root = rootHashes.getCompleted().inverse()[rootHash]
-                                            ?: error("No valid root for ${pack.packId()} $rootHash")
-
-                                        joinAll(
-                                            launch {
-                                                entry.files.asSequence().asFlow().concurrent().collect { (key, value) ->
-                                                    this@GenericPackResourcesCache.files[key] =
-                                                        CompletableDeferred(root to root.resolve(value))
-                                                }
-                                            },
-                                            launch {
-                                                entry.directoryToFiles.asSequence().asFlow().concurrent()
-                                                    .collect { (key, value) ->
-                                                        directoryToFiles.computeIfAbsent(key) { ConcurrentHashMap() } += value.mapKeys {
-                                                            root to root.resolve(
-                                                                it.key
-                                                            )
-                                                        }
-                                                    }
+                        if (cachedData.hash == hash!!) {
+                            val directoryToFiles =
+                                ConcurrentHashMap<String, MutableMap<Pair<Path, Path>, String>>()
+                            try {
+                                joinAll(
+                                    launch {
+                                        cachedData.namespaces.asSequence().asFlow().concurrent()
+                                            .collect { (key, value) ->
+                                                namespaces[key] = CompletableDeferred(value)
                                             }
-                                        )
-                                    }
-                                }
-                            )
+                                    },
+                                    launch {
+                                        cachedData.roots.asSequence().asFlow().concurrent()
+                                            .collect { (rootHash, entry) ->
+                                                val root = rootHashes.getCompleted().inverse()[rootHash]
+                                                    ?: error("No valid root for ${pack.packId()} $rootHash")
 
-                            for (it in directoryToFiles) {
-                                this@GenericPackResourcesCache.directoryToFiles[it.key] =
-                                    CompletableDeferred(it.value)
+                                                joinAll(
+                                                    launch {
+                                                        entry.files.asSequence().asFlow().concurrent()
+                                                            .collect { (key, value) ->
+                                                                this@GenericPackResourcesCache.files[key] =
+                                                                    CompletableDeferred(root to root.resolve(value))
+                                                            }
+                                                    },
+                                                    launch {
+                                                        entry.directoryToFiles.asSequence().asFlow().concurrent()
+                                                            .collect { (key, value) ->
+                                                                directoryToFiles.computeIfAbsent(key) { ConcurrentHashMap() } += value.mapKeys {
+                                                                    root to root.resolve(
+                                                                        it.key
+                                                                    )
+                                                                }
+                                                            }
+                                                    }
+                                                )
+                                            }
+                                    }
+                                )
+
+                                for (it in directoryToFiles) {
+                                    this@GenericPackResourcesCache.directoryToFiles[it.key] =
+                                        CompletableDeferred(it.value)
+                                }
+                            } catch (e: Exception) {
+                                logger.error("Error loading pack disk cache ${pack.packId()}. Re-create cache", e)
+                                lock.lock(this@GenericPackResourcesCache)
+                                cacheEntry()
                             }
-                        } catch (e: Exception) {
-                            logger.error("Error loading pack cache ${pack.packId()}#$hash. Re-create cache", e)
-                            lock.lock(this@GenericPackResourcesCache)
+                            allCompleted.complete()
+                        } else {
                             cacheEntry()
                         }
-                        allCompleted.complete()
                     } else {
                         cacheEntry()
                     }

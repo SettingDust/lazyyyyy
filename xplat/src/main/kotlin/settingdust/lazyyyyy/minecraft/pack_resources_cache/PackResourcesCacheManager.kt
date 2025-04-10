@@ -1,6 +1,6 @@
 package settingdust.lazyyyyy.minecraft.pack_resources_cache
 
-import com.google.common.hash.HashCode
+import com.dynatrace.hash4j.file.FileHashing
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -9,7 +9,6 @@ import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
-import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import java.io.File
@@ -35,17 +34,17 @@ object PackResourcesCacheManager {
         }
     }
 
-    val cache = ConcurrentHashMap<Pair<String, HashCode>, CompletableDeferred<PackResourcesCacheData>>()
-    val cacheLocks = ConcurrentHashMap<Pair<String, HashCode>, Mutex>()
+    val cache = ConcurrentHashMap<String, CompletableDeferred<PackResourcesCacheData>>()
+    val cacheLocks = ConcurrentHashMap<String, Mutex>()
 
-    fun getFileHash(file: File): HashCode = HashCode.fromBytes(DigestUtils.md5(file.inputStream().buffered()))
+    fun getFileHash(file: File) = FileHashing.imohash1_0_2().hashFileTo128Bits(file).asLong
 
-    fun getFileHash(path: Path): HashCode = HashCode.fromBytes(DigestUtils.md5(path.inputStream().buffered()))
+    fun getFileHash(path: Path) = FileHashing.imohash1_0_2().hashFileTo128Bits(path).asLong
 
-    fun getLock(key: Pair<String, HashCode>) =
+    fun getLock(key: String) =
         cacheLocks.computeIfAbsent(key) { Mutex() }
 
-    fun get(key: Pair<String, HashCode>, cachePath: Path): CompletableDeferred<PackResourcesCacheData> {
+    fun get(key: String, cachePath: Path): CompletableDeferred<PackResourcesCacheData> {
         val deferred = cache.computeIfAbsent(key) { CompletableDeferred() }
         if (!deferred.isCompleted) {
             val data = load(cachePath)
@@ -68,7 +67,7 @@ object PackResourcesCacheManager {
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun save(key: Pair<String, HashCode>, data: PackResourcesCacheData, cachePath: Path) {
+    fun save(key: String, data: PackResourcesCacheData, cachePath: Path) {
         cache[key]!!.complete(data)
         if (!cachePath.parent.exists()) cachePath.createParentDirectories()
         if (!cachePath.exists()) cachePath.createFile()

@@ -1,6 +1,5 @@
 package settingdust.lazyyyyy.mixin.pack_resources_cache;
 
-import com.google.common.hash.HashCode;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.resources.ResourceLocation;
@@ -83,7 +82,7 @@ public class VanillaPackResourcesMixin implements CachingPackResources, Hashable
     }
 
     @Override
-    public @Nullable HashCode lazyyyyy$getHash() {
+    public @Nullable Long lazyyyyy$getHash() {
         return VanillaPackResourcesCache.Companion.getHASH();
     }
 }

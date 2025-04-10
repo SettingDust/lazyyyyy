@@ -149,6 +149,9 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     val reflect = "1.4.0"
     library("reflect", "net.lenni0451", "Reflect").version(reflect)
+
+    val hash4j = "0.21.0"
+    library("hash4j", "com.dynatrace.hash4j", "hash4j").version(hash4j)
 }
 
 plugins {

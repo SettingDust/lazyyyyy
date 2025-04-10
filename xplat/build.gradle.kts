@@ -63,6 +63,8 @@ dependencies {
     modImplementation(catalog.badOptimizations)
 
     implementation(catalog.reflect)
+
+    implementation(catalog.hash4j)
 }
 
 tasks {
