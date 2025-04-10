@@ -1,73 +1,33 @@
 package settingdust.lazyyyyy.mixin.forge.pack_resources_cache;
 
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.server.packs.PackResources;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.IoSupplier;
-import net.minecraftforge.resource.PathPackResources;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.server.packs.PathPackResources;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingPackResources;
-import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCache;
-import settingdust.lazyyyyy.minecraft.pack_resources_cache.SimplePackResourcesCache;
+import settingdust.lazyyyyy.PlatformService;
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.HashablePackResources;
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCacheManager;
 
-import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.Set;
 
-@Mixin(PathPackResources.class)
-public abstract class PathPackResourcesMixin implements CachingPackResources {
+@Mixin(value = PathPackResources.class, priority = 999)
+public class PathPackResourcesMixin implements HashablePackResources {
     @Unique
-    protected PackResourcesCache lazyyyyy$cache;
+    protected Path lazyyyyy$filePath = null;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    protected void lazyyyyy$init(final String packId, final boolean isBuiltin, final Path source, final CallbackInfo ci) {
-        lazyyyyy$cache = new SimplePackResourcesCache(source, (PackResources) this);
-    }
-
-    @WrapOperation(
-        method = "getNamespaces",
-        at = @At(
-            value = "INVOKE",
-            remap = false,
-            target = "Lnet/minecraftforge/resource/PathPackResources;getNamespacesFromDisk(Lnet/minecraft/server/packs/PackType;)Ljava/util/Set;"
-        )
-    )
-    private Set<String> lazyyyyy$getNamespaces(
-        final PathPackResources instance, final PackType packType, final Operation<Set<String>> original
-    ) {
-        return lazyyyyy$cache.getNamespaces(packType);
-    }
-
-    @WrapMethod(
-        method = "getRootResource"
-    )
-    private IoSupplier<InputStream> lazyyyyy$getRootResource(
-        final String[] paths,
-        final Operation<IoSupplier<InputStream>> original
-    ) {
-        return lazyyyyy$cache.getResource(lazyyyyy$cache.join(paths));
-    }
-
-    @WrapMethod(method = "listResources")
-    private void lazyyyyy$listResources(
-        final PackType packType,
-        final String string,
-        final String string2,
-        final PackResources.ResourceOutput resourceOutput,
-        final Operation<Void> original
-    ) {
-        lazyyyyy$cache.listResources(packType, string, string2, resourceOutput);
+    protected void lazyyyyy$init(final String string, final Path path, final boolean bl, final CallbackInfo ci) {
+        lazyyyyy$filePath = PlatformService.Companion.getFileSystemPath(path);
     }
 
     @Override
-    public @NotNull PackResourcesCache getLazyyyyy$cache() {
-        return lazyyyyy$cache;
+    public @Nullable Long lazyyyyy$getHash() {
+        if (lazyyyyy$filePath != null) {
+            return PackResourcesCacheManager.INSTANCE.getFileHash(lazyyyyy$filePath);
+        }
+        return null;
     }
 }

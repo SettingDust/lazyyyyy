@@ -19,6 +19,12 @@ architectury {
     common("forge", "fabric")
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs = listOf("-Xjvm-default=all")
+    }
+}
+
 dependencies {
     minecraft(catalog.minecraft)
     mappings(loom.officialMojangMappings())
@@ -55,6 +61,10 @@ dependencies {
     modImplementation(catalog.almostUnified.fabric)
 
     modImplementation(catalog.badOptimizations)
+
+    implementation(catalog.reflect)
+
+    implementation(catalog.hash4j)
 
     modImplementation(catalog.moonlight.fabric)
     modImplementation(catalog.everyCompat.fabric)

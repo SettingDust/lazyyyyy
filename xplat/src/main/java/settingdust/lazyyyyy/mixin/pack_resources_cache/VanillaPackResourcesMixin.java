@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingPackResources;
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.HashablePackResources;
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCache;
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.VanillaPackResourcesCache;
 
@@ -26,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Mixin(VanillaPackResources.class)
-public class VanillaPackResourcesMixin implements CachingPackResources {
+public class VanillaPackResourcesMixin implements CachingPackResources, HashablePackResources {
     @Unique
     private VanillaPackResourcesCache lazyyyyy$cache;
 
@@ -39,6 +40,11 @@ public class VanillaPackResourcesMixin implements CachingPackResources {
         final CallbackInfo ci
     ) {
         lazyyyyy$cache = new VanillaPackResourcesCache((PackResources) this, rootPaths, pathsForType);
+    }
+
+    @Inject(method = "close", remap = false, at = @At("TAIL"))
+    private void lazyyyyy$close(final CallbackInfo ci) {
+        lazyyyyy$cache.close();
     }
 
     @Override
@@ -73,5 +79,10 @@ public class VanillaPackResourcesMixin implements CachingPackResources {
         final Operation<Void> original
     ) {
         lazyyyyy$cache.listResources(packType, namespace, prefix, resourceOutput);
+    }
+
+    @Override
+    public @Nullable Long lazyyyyy$getHash() {
+        return VanillaPackResourcesCache.Companion.getHASH();
     }
 }
