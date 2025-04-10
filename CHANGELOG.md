@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.1] - 2025-04-10
+### :bug: Bug Fixes
+- [`f8271f3`](https://github.com/SettingDust/lazyyyyy/commit/f8271f30c9c475d1dfc44102da876ded56b5a67d) - disable badoptimization features in apply *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.11.0] - 2025-04-10
 ### :sparkles: New Features
 - [`f002f80`](https://github.com/SettingDust/lazyyyyy/commit/f002f80f11e257e2527a00eb0216498256289d9b) - **pack-resources-cache**: add cache by hash *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -478,3 +483,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.9.0]: https://github.com/SettingDust/lazyyyyy/compare/0.8.12...0.9.0
 [0.10.0]: https://github.com/SettingDust/lazyyyyy/compare/0.9.0...0.10.0
 [0.11.0]: https://github.com/SettingDust/lazyyyyy/compare/0.10.0...0.11.0
+[0.11.1]: https://github.com/SettingDust/lazyyyyy/compare/0.11.0...0.11.1
