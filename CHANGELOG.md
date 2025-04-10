@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2025-04-10
+### :sparkles: New Features
+- [`f002f80`](https://github.com/SettingDust/lazyyyyy/commit/f002f80f11e257e2527a00eb0216498256289d9b) - **pack-resources-cache**: add cache by hash *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`cff12dd`](https://github.com/SettingDust/lazyyyyy/commit/cff12ddb708790519174b337a659c90db6867f9b) - **pack-resources-cache**: add disk cache for forge packs *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`cadf4b0`](https://github.com/SettingDust/lazyyyyy/commit/cadf4b0a1ab6a8dc7c25f9aded5480af564bff08) - **pack-resources-cache**: don't cache twice *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`7d64378`](https://github.com/SettingDust/lazyyyyy/commit/7d6437823d4901e487fbf35572f53103771065cc) - **pack-resources-cache**: cache the vanilla pack *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`662b71e`](https://github.com/SettingDust/lazyyyyy/commit/662b71eaa18d40cb2ec7e6a56309d3b9bd43d9c9) - **pack-resources-cache**: cache in concurrent *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :bug: Bug Fixes
+- [`8aa10dd`](https://github.com/SettingDust/lazyyyyy/commit/8aa10dd069942371c29fa16773c3305c8e0163be) - **pack-resources-cache**: close the cache stream *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`3fec18a`](https://github.com/SettingDust/lazyyyyy/commit/3fec18ac8d2527c09f034ef50f86d4939e21ec8e) - **pack-resources-cache**: check all completed in `getNamespaces` since the scope may be cancelled *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`d72bf7c`](https://github.com/SettingDust/lazyyyyy/commit/d72bf7cea2ff34761ece819dedd524a59eb32c81) - **pack-resources-cache**: catch the cancellation exception *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`a36c6f9`](https://github.com/SettingDust/lazyyyyy/commit/a36c6f9eacbbfde22f3ebd59c07300e514ad1175) - **pack-resources-cache**: add pack to cache name for compat with mods including multiple packs *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`edf0581`](https://github.com/SettingDust/lazyyyyy/commit/edf0581ff65ce10adb064c2525ce6ce605385b60) - **pack-resources-cache**: save the relative path instead of absolute path *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`cd7e983`](https://github.com/SettingDust/lazyyyyy/commit/cd7e98314dee9155aed2b5f2e1fc4ca15658c6c7) - **pack-resources-cache**: serialize the hashcode *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`5272216`](https://github.com/SettingDust/lazyyyyy/commit/52722164a8f8124100f07c32009f7df77bd66a02) - **pack-resources-cache**: strict json format & re cache when error *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`ae0e7e8`](https://github.com/SettingDust/lazyyyyy/commit/ae0e7e80b2e141d05865d9b66779fcf31d34e502) - **pack-resources-cache**: avoid ignoring the other roots' directoryToFiles *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`56b6b85`](https://github.com/SettingDust/lazyyyyy/commit/56b6b851b86952a0b29f3e819553b2793e8291a9) - **pack-resources-cache**: lock the cache before cache *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :zap: Performance Improvements
+- [`c0540e6`](https://github.com/SettingDust/lazyyyyy/commit/c0540e6b5543f4daf05523110124f5e4ebbb6c05) - **pack-resources-cache**: close the cache when pack closing *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :recycle: Refactors
+- [`ff8b35f`](https://github.com/SettingDust/lazyyyyy/commit/ff8b35f2dcc69ca0a32c4cc015bc62ca0020e412) - **pack-resources-cache**: respect the root of the cache *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`3997ae7`](https://github.com/SettingDust/lazyyyyy/commit/3997ae7c57967e747b26881a81e7a67a5d4df01b) - **pack-resources-cache**: use platform service for get file system hash *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`ea2e28f`](https://github.com/SettingDust/lazyyyyy/commit/ea2e28f03f95b33cc59e003c965dfcce571018a5) - **pack-resources-cache**: use hash4j and long hash *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`95bf244`](https://github.com/SettingDust/lazyyyyy/commit/95bf244618e25f5f24354df3de09ce0e50ef491e) - **pack-resources-cache**: use another map for root of paths *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.10.0] - 2025-04-06
 ### :sparkles: New Features
 - [`f680601`](https://github.com/SettingDust/lazyyyyy/commit/f68060140e7680abee7ce6a3a1bd295d3bec54a2) - **wood-good**: faster config *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -448,3 +477,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.8.12]: https://github.com/SettingDust/lazyyyyy/compare/0.8.11...0.8.12
 [0.9.0]: https://github.com/SettingDust/lazyyyyy/compare/0.8.12...0.9.0
 [0.10.0]: https://github.com/SettingDust/lazyyyyy/compare/0.9.0...0.10.0
+[0.11.0]: https://github.com/SettingDust/lazyyyyy/compare/0.10.0...0.11.0
