@@ -209,6 +209,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                             }
                             allCompleted.complete()
                         } else {
+                            lock.lock(this@GenericPackResourcesCache)
                             cacheEntry()
                         }
                     } else {
