@@ -43,9 +43,9 @@ class TreePackResourcesCache(pack: TreeResourcePack, treePackTypeRoots: List<Pat
         directory.listDirectoryEntries().asFlow().concurrent().collect { path ->
             if (path.isDirectory()) {
                 namespaces += path.name
-                consumeResourceDirectory(directory, path, directoryToFiles, strategy)
+                consumeResourceDirectory(path, directoryToFiles, strategy)
             } else {
-                consumeFile(this, directory, path, strategy)
+                consumeFile(this, path, strategy)
             }
         }
         for ((path, files) in directoryToFiles) {

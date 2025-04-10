@@ -50,25 +50,24 @@ class VanillaPackResourcesCache(
             val firstPath = relativePath.firstOrNull()
             if (firstPath?.name in blacklisted) return@collect
             if (path.isDirectory()) {
-                consumeRootDirectory(this, root, path, strategy)
+                consumeRootDirectory(this, path, strategy)
             } else {
-                consumeFile(this, root, path, strategy)
+                consumeFile(this, path, strategy)
             }
         }
     }
 
     suspend fun PackResourcesCache.consumePackType(
-        root: Path,
         strategy: CachingStrategy,
         directoryToFiles: MutableMap<String, MutableMap<Path, String>>
     ) {
         coroutineScope {
-            val entries = root.listDirectoryEntries()
+            val entries = strategy.root.listDirectoryEntries()
             entries.asFlow().concurrent().collect { path ->
                 if (path.isDirectory()) {
-                    consumeResourceDirectory(root, path, directoryToFiles, strategy)
+                    consumeResourceDirectory(path, directoryToFiles, strategy)
                 } else {
-                    consumeFile(this, root, path, strategy)
+                    consumeFile(this, path, strategy)
                 }
             }
         }
@@ -98,10 +97,11 @@ class VanillaPackResourcesCache(
                     for ((_, hash) in rootHashes.getCompleted()) {
                         roots[hash] = PackResourcesCacheDataEntry(ConcurrentHashMap(), ConcurrentHashMap())
                     }
-                    val deferredFiles = async { filesToCache(roots, rootHashes.getCompleted()) }
-                    val deferredDirectoryToFiles = async { directoryToFilesToCache(roots, rootHashes.getCompleted()) }
 
-                    joinAll(deferredFiles, deferredDirectoryToFiles)
+                    joinAll(
+                        launch { filesToCache(roots, rootHashes.getCompleted()) },
+                        launch { directoryToFilesToCache(roots, rootHashes.getCompleted()) }
+                    )
 
                     PackResourcesCacheManager.save(key, PackResourcesCacheData(HASH, roots), cachePath)
                     lock.unlock(this@VanillaPackResourcesCache)
@@ -142,12 +142,12 @@ class VanillaPackResourcesCache(
                         for (it in directoryToFiles) {
                             this@VanillaPackResourcesCache.directoryToFiles[it.key] = CompletableDeferred(it.value)
                         }
+                        allCompleted.complete()
                     } catch (e: Exception) {
                         logger.error("Error loading pack cache ${pack.packId()}#$HASH. Re-create cache", e)
                         lock.lock(this@VanillaPackResourcesCache)
                         cacheEntry()
                     }
-                    allCompleted.complete()
                 } else {
                     cacheEntry()
                 }
@@ -163,7 +163,7 @@ class VanillaPackResourcesCache(
                     .flatMap { (type, paths) -> paths.asFlow().map { type to it } }
                     .collect { (type, packTypeRoot) ->
                         val strategy = CachingStrategy.PackTypeRoot(packTypeRoot, type.directory)
-                        consumePackType(packTypeRoot, strategy, directoryToFiles)
+                        consumePackType(strategy, directoryToFiles)
                     }
                 for ((path, files) in directoryToFiles) {
                     this@VanillaPackResourcesCache.directoryToFiles[path]!!.complete(files)

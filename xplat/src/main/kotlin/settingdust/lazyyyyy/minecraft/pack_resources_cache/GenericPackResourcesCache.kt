@@ -51,16 +51,15 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
             if (path.isDirectory()) {
                 val firstPath = relativePath.firstOrNull()
                 val packType = packTypeByDirectory[firstPath?.name] ?: return@collect
-                consumePackType(root, packType, path, PackRoot(root, path), namespaces)
+                consumePackType(packType, path, PackRoot(root, path), namespaces)
             } else {
-                consumeFile(this, root, path, strategy)
+                consumeFile(this, path, strategy)
             }
         }
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#root/$root] cached") }
     }
 
     private suspend fun CoroutineScope.consumePackType(
-        root: Path,
         type: PackType,
         directory: Path,
         strategy: CachingStrategy,
@@ -73,9 +72,9 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
         directory.listDirectoryEntries().asFlow().concurrent().collect { path ->
             if (path.isDirectory()) {
                 namespaces[type]!! += path.name
-                consumeResourceDirectory(root, path, directoryToFiles, strategy)
+                consumeResourceDirectory(path, directoryToFiles, strategy)
             } else {
-                consumeFile(this, root, path, strategy)
+                consumeFile(this, path, strategy)
             }
         }
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/directoryToFiles] caching") }

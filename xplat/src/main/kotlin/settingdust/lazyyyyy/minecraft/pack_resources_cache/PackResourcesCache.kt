@@ -153,7 +153,6 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
 
 suspend fun PackResourcesCache.consumeFile(
     scope: CoroutineScope,
-    root: Path,
     file: Path,
     strategy: CachingStrategy,
     fileConsumer: FileConsumer? = null
@@ -162,7 +161,7 @@ suspend fun PackResourcesCache.consumeFile(
     joinAll(
         scope.launch {
             val key = strategy.getRelativePathString(relativePath)
-            pathToRoot[file] = root
+            pathToRoot[file] = strategy.root
             files.putIfAbsent(key, CompletableDeferred(file))
         },
         scope.launch { fileConsumer?.invoke(file) }
@@ -171,7 +170,6 @@ suspend fun PackResourcesCache.consumeFile(
 
 @OptIn(ExperimentalCoroutinesApi::class)
 suspend fun PackResourcesCache.consumeResourceDirectory(
-    root: Path,
     directory: Path,
     directoryToFiles: MutableMap<String, MutableMap<Path, String>>,
     strategy: CachingStrategy,
@@ -194,7 +192,7 @@ suspend fun PackResourcesCache.consumeResourceDirectory(
         val fileConsumer = if (shouldCacheDirectoryToFiles)
             { path: Path ->
                 Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#directory/$relativePathString#fileConsumer/$path] caching") }
-                pathToRoot[path] = root
+                pathToRoot[path] = strategy.root
                 directoryToFiles[relativePathString]!![path] = JOINER.join(namespaceRoot.relativize(path))
                 fileConsumer?.invoke(path)
                 Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#directory/$relativePathString#fileConsumer/$path] cached") }
@@ -204,9 +202,9 @@ suspend fun PackResourcesCache.consumeResourceDirectory(
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#directory#entries/$relativePathString] caching $entries") }
         entries.asFlow().concurrent().collect { path ->
             if (path.isDirectory()) {
-                consumeResourceDirectory(root, path, directoryToFiles, strategy, fileConsumer)
+                consumeResourceDirectory(path, directoryToFiles, strategy, fileConsumer)
             } else {
-                consumeFile(this, root, path, strategy, fileConsumer)
+                consumeFile(this, path, strategy, fileConsumer)
             }
         }
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#directory#entries/$relativePathString] cached") }
@@ -216,15 +214,14 @@ suspend fun PackResourcesCache.consumeResourceDirectory(
 @OptIn(ExperimentalCoroutinesApi::class)
 suspend fun PackResourcesCache.consumeRootDirectory(
     scope: CoroutineScope,
-    root: Path,
     directory: Path,
     strategy: CachingStrategy
 ) {
     directory.listDirectoryEntries().asFlow().concurrent().collect { path ->
         if (path.isDirectory()) {
-            consumeRootDirectory(scope, root, path, strategy)
+            consumeRootDirectory(scope, path, strategy)
         } else {
-            consumeFile(scope, root, path, strategy)
+            consumeFile(scope, path, strategy)
         }
     }
 }
