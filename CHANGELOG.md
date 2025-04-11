@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.2] - 2025-04-11
+### :bug: Bug Fixes
+- [`43d02ea`](https://github.com/SettingDust/lazyyyyy/commit/43d02ea24506d4aafc5e17be41f19081a8e38637) - **pack-resources-cache**: add hash to cache name since data pack and resource pack can have the same name *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`527aa79`](https://github.com/SettingDust/lazyyyyy/commit/527aa792225da222ea48d20a9af73579cdc72b9d) - **pack-resources-cache**: avoid crash when missing root to work with vanilla pack *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`72a12ab`](https://github.com/SettingDust/lazyyyyy/commit/72a12abc6d61715fafdff0f4b79dbbb0ad52ee4c) - **deps**: bump net.bytebuddy:byte-buddy-agent from 1.17.4 to 1.17.5 *(commit by [@dependabot[bot]](https://github.com/apps/dependabot))*
+- [`c9fa389`](https://github.com/SettingDust/lazyyyyy/commit/c9fa389aa44ee5d8956a40ee622fc76f615d1188) - **pack-resources-cache**: needn't to pass the root *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`a9a2d3e`](https://github.com/SettingDust/lazyyyyy/commit/a9a2d3e42c33eb3024004264d59a5668ab200a01) - **pack-resources-cache**: use hex for hash *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.11.1] - 2025-04-10
 ### :bug: Bug Fixes
 - [`f8271f3`](https://github.com/SettingDust/lazyyyyy/commit/f8271f30c9c475d1dfc44102da876ded56b5a67d) - disable badoptimization features in apply *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -484,3 +495,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.10.0]: https://github.com/SettingDust/lazyyyyy/compare/0.9.0...0.10.0
 [0.11.0]: https://github.com/SettingDust/lazyyyyy/compare/0.10.0...0.11.0
 [0.11.1]: https://github.com/SettingDust/lazyyyyy/compare/0.11.0...0.11.1
+[0.11.2]: https://github.com/SettingDust/lazyyyyy/compare/0.11.1...0.11.2
