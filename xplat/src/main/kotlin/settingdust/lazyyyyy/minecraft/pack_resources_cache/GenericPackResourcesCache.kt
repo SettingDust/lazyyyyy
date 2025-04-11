@@ -169,8 +169,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                                 launch {
                                     cachedData.roots.asSequence().asFlow().concurrent()
                                         .collect { (rootHash, entry) ->
-                                            val root = rootHashes.getCompleted().inverse()[rootHash]
-                                                ?: error("No valid root for ${pack.packId()} $rootHash")
+                                            val root = rootHashes.getCompleted().inverse()[rootHash] ?: return@collect
 
                                             joinAll(
                                                 launch {
