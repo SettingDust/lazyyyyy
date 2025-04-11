@@ -104,7 +104,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}] cached") }
     }
 
-    @OptIn(ExperimentalPathApi::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalPathApi::class, ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
     private suspend fun CoroutineScope.loadCache() =
         withContext(CoroutineName("Simple pack cache #${pack.packId()}")) {
             val time = measureTime {
@@ -121,7 +121,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                     val lock = PackResourcesCacheManager.getLock(key)
                     lock.lock(this@GenericPackResourcesCache)
                     val cachePath =
-                        PackResourcesCacheManager.dir.resolve("$key-$hash.json.gz".toValidFileName())
+                        PackResourcesCacheManager.dir.resolve("${key}_${hash!!.toHexString()}.json.gz".toValidFileName())
                     val cachedDataDeferred = PackResourcesCacheManager.get(key, cachePath)
                     rootHashes.join()
 

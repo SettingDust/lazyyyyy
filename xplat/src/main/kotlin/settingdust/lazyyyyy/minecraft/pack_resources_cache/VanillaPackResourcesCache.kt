@@ -73,7 +73,7 @@ class VanillaPackResourcesCache(
         }
     }
 
-    @OptIn(ExperimentalPathApi::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalPathApi::class, ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
     private suspend fun CoroutineScope.loadCache() =
         withContext(CoroutineName("Vanilla pack cache #${pack.packId()}")) {
             val time = measureTime {
@@ -87,7 +87,7 @@ class VanillaPackResourcesCache(
                 val lock = PackResourcesCacheManager.getLock(key)
                 lock.lock(this@VanillaPackResourcesCache)
                 val cachePath =
-                    PackResourcesCacheManager.dir.resolve("$key-$HASH.json.gz".toValidFileName())
+                    PackResourcesCacheManager.dir.resolve("${key}_${HASH.toHexString()}.json.gz".toValidFileName())
                 val cachedDataDeferred = PackResourcesCacheManager.get(key, cachePath)
                 rootHashes.join()
                 @OptIn(ExperimentalCoroutinesApi::class)
