@@ -5,7 +5,7 @@ import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.pathString
 
-val isPlatformServiceFailedToLoad by lazy {
+val minecraftHasEarlyError by lazy {
     try {
         PlatformService.hasEarlyError()
     } catch (e: Throwable) {
