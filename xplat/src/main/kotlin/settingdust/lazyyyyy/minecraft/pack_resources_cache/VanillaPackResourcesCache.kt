@@ -87,7 +87,7 @@ class VanillaPackResourcesCache(
                 val lock = PackResourcesCacheManager.getLock(key)
                 lock.lock(this@VanillaPackResourcesCache)
                 val cachePath =
-                    PackResourcesCacheManager.dir.resolve("$key.json.gz".toValidFileName())
+                    PackResourcesCacheManager.dir.resolve("$key-$HASH.json.gz".toValidFileName())
                 val cachedDataDeferred = PackResourcesCacheManager.get(key, cachePath)
                 rootHashes.join()
                 @OptIn(ExperimentalCoroutinesApi::class)
@@ -103,7 +103,7 @@ class VanillaPackResourcesCache(
                         launch { directoryToFilesToCache(roots, rootHashes.getCompleted()) }
                     )
 
-                    PackResourcesCacheManager.save(key, PackResourcesCacheData(HASH, roots), cachePath)
+                    PackResourcesCacheManager.save(key, PackResourcesCacheData(roots), cachePath)
                     lock.unlock(this@VanillaPackResourcesCache)
                 }
 
