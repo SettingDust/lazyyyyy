@@ -5,8 +5,18 @@ import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.pathString
 
+val isPlatformServiceFailedToLoad by lazy {
+    try {
+        PlatformService.hasEarlyError()
+    } catch (e: Throwable) {
+        Lazyyyyy.logger.error(e)
+        true
+    }
+}
+
 interface PlatformService {
-    companion object : PlatformService by ServiceLoader.load(PlatformService::class.java).first()
+    companion object : PlatformService by ServiceLoader.load(PlatformService::class.java).firstOrNull()
+        ?: error("No platform service found")
 
     val configDir: Path
 

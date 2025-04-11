@@ -63,10 +63,13 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
             config = defaultConfig.toMutableMap()
             config.putAll(json.decodeFromStream(configPath.inputStream()))
         }
-        for ((feature, mods) in conflictings) {
-            val conflicting = mods.firstOrNull { PlatformService.isModLoaded(it) } ?: continue
-            logger.warn("Disabling feature $feature due to conflicting mod $conflicting")
-            config[feature] = false
+
+        if (!isPlatformServiceFailedToLoad) {
+            for ((feature, mods) in conflictings) {
+                val conflicting = mods.firstOrNull { PlatformService.isModLoaded(it) } ?: continue
+                logger.warn("Disabling feature $feature due to conflicting mod $conflicting")
+                config[feature] = false
+            }
         }
         json.encodeToStream(config, configPath.outputStream())
     }
@@ -113,7 +116,7 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
             }
         }
 
-        if (PlatformService.hasEarlyError()) return false
+        if (isPlatformServiceFailedToLoad) return false
 
         if (!mixinClassName.startsWith(mixinPackage)) return super.shouldApplyMixin(targetClassName, mixinClassName)
         val relativeName = mixinClassName.removePrefix("${mixinPackage}.").removePrefix("forge.")
