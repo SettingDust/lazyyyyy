@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2025-04-12
+### :sparkles: New Features
+- [`21442bc`](https://github.com/SettingDust/lazyyyyy/commit/21442bcc97e2025f2d2b723a9b608e5f1d8e72fa) - **simply_swords/faster_config**: tweak simply swords config loading *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.12.0] - 2025-04-12
 ### :sparkles: New Features
 - [`644fdd0`](https://github.com/SettingDust/lazyyyyy/commit/644fdd0b60a38473586c9b78a58a29233349307a) - **ice_and_fire/faster_model_loading**: tweak ice and fire model loading *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -506,3 +511,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.11.1]: https://github.com/SettingDust/lazyyyyy/compare/0.11.0...0.11.1
 [0.11.2]: https://github.com/SettingDust/lazyyyyy/compare/0.11.1...0.11.2
 [0.12.0]: https://github.com/SettingDust/lazyyyyy/compare/0.11.2...0.12.0
+[0.13.0]: https://github.com/SettingDust/lazyyyyy/compare/0.12.0...0.13.0
