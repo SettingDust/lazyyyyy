@@ -68,6 +68,8 @@ dependencies {
 
     modImplementation(catalog.moonlight.fabric)
     modImplementation(catalog.everyCompat.fabric)
+
+    modImplementation(catalog.simplySwords.fabric)
 }
 
 tasks {

@@ -24,7 +24,8 @@ Take advantage from index for trading the cpu time with the memory and disk.
     - https://github.com/openjdk/jdk/pull/15926 for reference
 - (WeaponMaster) Faster initialize
 - (Puzzles Lib) Fabric api implementation for model baking events
-- (Every Compat: Wood Good) Faster config. Improve the world loading time a lot.
+- (Every Compat: Wood Good) Faster config.
+  - Improve the world loading time.
 - (Ice And Fire) Faster model loading
 
 ![yourkit](https://www.yourkit.com/images/yklogo.png)  

@@ -160,6 +160,10 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     val everyCompat = "1.20-2.7.25"
     library("everyCompat-fabric", "maven.modrinth", "every-compat").version("$everyCompat-fabric")
     library("everyCompat-forge", "maven.modrinth", "every-compat").version("$everyCompat-forge")
+
+    val simplySwords = "1.56.0-1.20.1"
+    library("simplySwords-fabric", "maven.modrinth", "simply-swords").version("$simplySwords-fabric")
+    library("simplySwords-forge", "maven.modrinth", "simply-swords").version("$simplySwords-forge")
 }
 
 plugins {

@@ -73,6 +73,8 @@ dependencies {
 
     modImplementation(catalog.moonlight.forge)
     modImplementation(catalog.everyCompat.forge)
+
+    modImplementation(catalog.simplySwords.forge)
 }
 
 sourceSets {

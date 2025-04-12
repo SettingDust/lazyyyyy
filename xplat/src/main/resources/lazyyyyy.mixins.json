@@ -11,6 +11,7 @@
         "pack_resources_cache.FilePackResourcesMixin",
         "pack_resources_cache.PathPackResourcesMixin",
         "pack_resources_cache.VanillaPackResourcesMixin",
+        "simply_swords.faster_config.ConfigMixin",
         "toomanyplayers.async_networking.TooManyPlayersMixin"
     ],
     "client": [
