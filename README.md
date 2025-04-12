@@ -7,6 +7,8 @@ Mainly through asynchronous and lazy loading so that unnecessary logic doesn't p
 Take advantage from index for trading the cpu time with the memory and disk.  
 
 ## Features
+
+### Game launching
 - **Faster mixin config loading**. Need Sinytra Connector or Mixin Booster on Forge to work.
 - (YACL) [**YACL image resource lazy and async loading.** ](https://github.com/isXander/YetAnotherConfigLib/issues/218)
     - Load when trying to render it. Won't render before loaded
@@ -24,9 +26,11 @@ Take advantage from index for trading the cpu time with the memory and disk.
     - https://github.com/openjdk/jdk/pull/15926 for reference
 - (WeaponMaster) Faster initialize
 - (Puzzles Lib) Fabric api implementation for model baking events
-- (Every Compat: Wood Good) Faster config.
-  - Improve the world loading time.
 - (Ice And Fire) Faster model loading
+
+### World Loading
+- (Simply Swords) Faster config
+- (Every Compat: Wood Good) Faster config.
 
 ![yourkit](https://www.yourkit.com/images/yklogo.png)  
 YourKit supports open source projects with innovative and intelligent tools
