@@ -7,6 +7,7 @@
     "plugin": "settingdust.lazyyyyy.LazyyyyyMixinPlugin",
     "mixins": [
         "avoid_redundant_list_resources.DelegatingPackResourcesMixin",
+        "ice_and_fire.faster_model_loader.TabulaModelHandlerHelperMixin",
         "kiwi.faster_annotation.AnnotatedTypeLoaderMixin",
         "lazy_entity_renderers.EntityRenderDispatcherMixin",
         "lazy_entity_renderers.supplementaries.SignPostBlockTileRendererMixin",

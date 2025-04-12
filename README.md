@@ -25,6 +25,7 @@ Take advantage from index for trading the cpu time with the memory and disk.
 - (WeaponMaster) Faster initialize
 - (Puzzles Lib) Fabric api implementation for model baking events
 - (Every Compat: Wood Good) Faster config. Improve the world loading time a lot.
+- (Ice And Fire) Faster model loading
 
 ![yourkit](https://www.yourkit.com/images/yklogo.png)  
 YourKit supports open source projects with innovative and intelligent tools
