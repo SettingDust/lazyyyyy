@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2025-04-12
+### :sparkles: New Features
+- [`644fdd0`](https://github.com/SettingDust/lazyyyyy/commit/644fdd0b60a38473586c9b78a58a29233349307a) - **ice_and_fire/faster_model_loading**: tweak ice and fire model loading *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`1b4df5d`](https://github.com/SettingDust/lazyyyyy/commit/1b4df5dd3608be48e8a9ca7d85f6fadd039d8e35) - avoid minecraft blaming platform service when missing dependencies *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`33d28f1`](https://github.com/SettingDust/lazyyyyy/commit/33d28f1ab4c6a9cd8b1bc92bb44b9cf7d4280168) - rename the `isPlatformServiceFailedToLoad` to `minecraftHasEarlyError` *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.11.2] - 2025-04-11
 ### :bug: Bug Fixes
 - [`43d02ea`](https://github.com/SettingDust/lazyyyyy/commit/43d02ea24506d4aafc5e17be41f19081a8e38637) - **pack-resources-cache**: add hash to cache name since data pack and resource pack can have the same name *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -496,3 +505,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.11.0]: https://github.com/SettingDust/lazyyyyy/compare/0.10.0...0.11.0
 [0.11.1]: https://github.com/SettingDust/lazyyyyy/compare/0.11.0...0.11.1
 [0.11.2]: https://github.com/SettingDust/lazyyyyy/compare/0.11.1...0.11.2
+[0.12.0]: https://github.com/SettingDust/lazyyyyy/compare/0.11.2...0.12.0
