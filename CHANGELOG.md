@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.2] - 2025-04-12
+### :bug: Bug Fixes
+- [`b4ef52a`](https://github.com/SettingDust/lazyyyyy/commit/b4ef52a711723e74843b3adb1acf8a0b3389a67b) - **pack-resources-cache**: root can be null *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.13.1] - 2025-04-12
 ### :bug: Bug Fixes
 - [`d1ca5ef`](https://github.com/SettingDust/lazyyyyy/commit/d1ca5ef30e35fb789a9a732bef0914a322de7f63) - **pack-resources-cache**: namespace root logic wrong *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -518,3 +523,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.12.0]: https://github.com/SettingDust/lazyyyyy/compare/0.11.2...0.12.0
 [0.13.0]: https://github.com/SettingDust/lazyyyyy/compare/0.12.0...0.13.0
 [0.13.1]: https://github.com/SettingDust/lazyyyyy/compare/0.13.0...0.13.1
+[0.13.2]: https://github.com/SettingDust/lazyyyyy/compare/0.13.1...0.13.2
