@@ -31,6 +31,13 @@ dependencies {
 
     implementation(catalog.kotlinx.coroutines.debug)
 
+    implementation(catalog.reflect)
+
+    implementation(catalog.hash4j)
+
+    implementation(catalog.caffeine)
+    implementation(catalog.caffeine.coroutines)
+
     implementation(catalog.mixinsquared.common)
     annotationProcessor(catalog.mixinsquared.common)
 
@@ -61,10 +68,6 @@ dependencies {
     modImplementation(catalog.almostUnified.fabric)
 
     modImplementation(catalog.badOptimizations)
-
-    implementation(catalog.reflect)
-
-    implementation(catalog.hash4j)
 
     modImplementation(catalog.moonlight.fabric)
     modImplementation(catalog.everyCompat.fabric)

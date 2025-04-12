@@ -164,6 +164,9 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     val simplySwords = "1.56.0-1.20.1"
     library("simplySwords-fabric", "maven.modrinth", "simply-swords").version("$simplySwords-fabric")
     library("simplySwords-forge", "maven.modrinth", "simply-swords").version("$simplySwords-forge")
+
+    val lowDragLib = "mc1.20.1-1.0.38.d"
+    library("lowDragLib-forge", "maven.modrinth", "ldlib").version("$lowDragLib-forge")
 }
 
 plugins {

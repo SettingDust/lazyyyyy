@@ -1,6 +1,8 @@
 package settingdust.lazyyyyy.minecraft.pack_resources_cache
 
 import com.dynatrace.hash4j.file.FileHashing
+import com.github.benmanes.caffeine.cache.Caffeine
+import dev.hsbrysk.caffeine.buildCoroutine
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -15,6 +17,7 @@ import java.io.File
 import java.nio.file.FileSystem
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.Path
 import kotlin.io.path.createFile
@@ -34,7 +37,8 @@ object PackResourcesCacheManager {
         }
     }
 
-    val cache = ConcurrentHashMap<String, CompletableDeferred<PackResourcesCacheData>>()
+    val cache = Caffeine.newBuilder().maximumSize(256).expireAfterAccess(Duration.ofSeconds(30))
+        .buildCoroutine<String, CompletableDeferred<PackResourcesCacheData>> { CompletableDeferred() }
     val cacheLocks = ConcurrentHashMap<String, Mutex>()
 
     fun getFileHash(file: File) = FileHashing.imohash1_0_2().hashFileTo128Bits(file).asLong
@@ -44,8 +48,8 @@ object PackResourcesCacheManager {
     fun getLock(key: String) =
         cacheLocks.computeIfAbsent(key) { Mutex() }
 
-    fun get(key: String, cachePath: Path): CompletableDeferred<PackResourcesCacheData> {
-        val deferred = cache.computeIfAbsent(key) { CompletableDeferred() }
+    suspend fun get(key: String, cachePath: Path): CompletableDeferred<PackResourcesCacheData> {
+        val deferred = cache.get(key)!!
         if (!deferred.isCompleted) {
             val data = load(cachePath)
             if (data != null) deferred.complete(data)
@@ -67,8 +71,8 @@ object PackResourcesCacheManager {
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun save(key: String, data: PackResourcesCacheData, cachePath: Path) {
-        cache[key]!!.complete(data)
+    suspend fun save(key: String, data: PackResourcesCacheData, cachePath: Path) {
+        cache.get(key)!!.complete(data)
         if (!cachePath.parent.exists()) cachePath.createParentDirectories()
         if (!cachePath.exists()) cachePath.createFile()
         GzipCompressorOutputStream(cachePath.outputStream(StandardOpenOption.TRUNCATE_EXISTING))
