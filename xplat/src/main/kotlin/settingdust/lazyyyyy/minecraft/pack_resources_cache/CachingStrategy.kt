@@ -12,7 +12,7 @@ interface CachingStrategy {
 
     class PackRoot(override val root: Path, val packTypeRoot: Path?) : CachingStrategy {
         override fun getNamespaceRoot(path: Path): Path? = try {
-            path.subpath(0, packTypeRoot!!.nameCount + 1)
+            packTypeRoot!!.root.resolve(path.subpath(0, packTypeRoot.nameCount + 1))
         } catch (_: IllegalArgumentException) {
             null
         }
@@ -20,7 +20,7 @@ interface CachingStrategy {
 
     class PackTypeRoot(override val root: Path, val type: String) : CachingStrategy {
         override fun getNamespaceRoot(path: Path): Path? = try {
-            path.subpath(0, root.nameCount + 1)
+            root.root.resolve(path.subpath(0, root.nameCount + 1))
         } catch (_: IllegalArgumentException) {
             null
         }
