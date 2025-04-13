@@ -27,6 +27,13 @@ dependencies {
 
     implementation(catalog.kotlinx.coroutines.debug)
 
+    implementation(catalog.reflect)
+
+    implementation(catalog.hash4j)
+
+    implementation(catalog.caffeine)
+    implementation(catalog.caffeine.coroutines)
+
     implementation(project(":xplat"))
 
     implementation(catalog.sinytra.connector)
@@ -66,10 +73,6 @@ dependencies {
     modImplementation(catalog.almostUnified.forge)
 
     modImplementation(catalog.badOptimizations)
-
-    implementation(catalog.reflect)
-
-    implementation(catalog.hash4j)
 
     modImplementation(catalog.moonlight.forge)
     modImplementation(catalog.everyCompat.forge)

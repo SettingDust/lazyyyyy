@@ -167,6 +167,9 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     val lowDragLib = "mc1.20.1-1.0.38.d"
     library("lowDragLib-forge", "maven.modrinth", "ldlib").version("$lowDragLib-forge")
+
+    val tenshilib = "1.20.1-1.7.6"
+    library("tenshilib-forge", "maven.modrinth", "tenshilib").version("$tenshilib-forge")
 }
 
 plugins {

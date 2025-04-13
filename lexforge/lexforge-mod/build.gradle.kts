@@ -120,6 +120,8 @@ dependencies {
     modImplementation("maven.modrinth:blue-skies:1.3.31")
 
     modImplementation("curse.maven:packmenu-358191:5503481")
+
+    modImplementation(catalog.tenshilib.forge)
 }
 
 tasks {
