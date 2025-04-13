@@ -1,8 +1,6 @@
 package settingdust.lazyyyyy.mixin.lazy_entity_renderers;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.world.entity.EntityType;
@@ -16,6 +14,7 @@ import settingdust.lazyyyyy.minecraft.LazyEntityRenderDispatcher;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Mixin(EntityRenderDispatcher.class)
 public class EntityRenderDispatcherMixin implements LazyEntityRenderDispatcher {
@@ -34,7 +33,7 @@ public class EntityRenderDispatcherMixin implements LazyEntityRenderDispatcher {
         )
     )
     private Map<EntityType<?>, EntityRenderer<?>> lazyyyyy$initLazyEntityRenderers(final Map<EntityType<?>, EntityRenderer<?>> original) {
-        lazyyyyy$renderers = new Reference2ReferenceOpenHashMap<>(original);
+        lazyyyyy$renderers = new ConcurrentHashMap<>(original);
         return original;
     }
 
@@ -46,7 +45,7 @@ public class EntityRenderDispatcherMixin implements LazyEntityRenderDispatcher {
         )
     )
     private Map<String, EntityRenderer<? extends Player>> lazyyyyy$initLazyPlayerRenderers(final Map<String, EntityRenderer<? extends Player>> original) {
-        lazyyyyy$playerRenderers = new Object2ReferenceOpenHashMap<>(original);
+        lazyyyyy$playerRenderers = new ConcurrentHashMap<>(original);
         return original;
     }
 

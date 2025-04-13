@@ -304,7 +304,7 @@ var EntityRenderDispatcher.renderers: Map<EntityType<*>, EntityRenderer<*>>
         (this as EntityRenderDispatcherAccessor).renderers = value
     }
 
-var EntityRenderDispatcher.playerRenderers: Map<String, EntityRenderer<out Player>>
+var EntityRenderDispatcher.playerRenderers: MutableMap<String, EntityRenderer<out Player>>
     get() = (this as EntityRenderDispatcherAccessor).playerRenderers
     set(value) {
         (this as EntityRenderDispatcherAccessor).playerRenderers = value

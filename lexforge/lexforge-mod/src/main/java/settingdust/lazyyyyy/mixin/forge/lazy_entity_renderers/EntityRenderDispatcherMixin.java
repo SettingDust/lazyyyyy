@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * After {@link settingdust.lazyyyyy.mixin.lazy_entity_renderers.EntityRenderDispatcherMixin}
  */
-@Mixin(value = EntityRenderDispatcher.class, priority = 999)
+@Mixin(value = EntityRenderDispatcher.class, priority = 1001)
 public class EntityRenderDispatcherMixin {
     @Shadow public Map<EntityType<?>, EntityRenderer<?>> renderers;
 
@@ -49,7 +49,7 @@ public class EntityRenderDispatcherMixin {
             target = "Lnet/minecraft/client/renderer/entity/EntityRenderers;createPlayerRenderers(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/Map;"
         )
     )
-    private Map<String, EntityRenderer<? extends Player>> lazyyyyy$filterLazyPlayerRenderers(
+    private Map<String, EntityRenderer<? extends Player>> lazyyyyy$replaceWithDummyPlayerRenderers(
         final Map<String, EntityRenderer<? extends Player>> original,
         @Local EntityRendererProvider.Context context
     ) {

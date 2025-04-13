@@ -32,14 +32,13 @@ object LazyEntityRenderersForge {
                     if (renderer !is LivingEntityRenderer<*, *>) return@collect
                     val originalRenderers = entityRenderDispatcher.renderers
                     entityRenderDispatcher.renderers = mapOf(type to renderer)
-                    ModLoader.get()
-                        .postEvent(
-                            EntityRenderersEvent.AddLayers(
-                                entityRenderDispatcher.renderers,
-                                emptyMap(),
-                                context
-                            )
+                    ModLoader.get().postEvent(
+                        EntityRenderersEvent.AddLayers(
+                            entityRenderDispatcher.renderers,
+                            emptyMap(),
+                            context
                         )
+                    )
                     entityRenderDispatcher.renderers = originalRenderers
                 }
             }
@@ -47,17 +46,14 @@ object LazyEntityRenderersForge {
             launch(CoroutineName("Lazy player renderer loaded handler")) {
                 LazyPlayerRenderer.onLoaded.collect { (type, context, renderer) ->
                     val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
-                    val originalRenderers = entityRenderDispatcher.playerRenderers
-                    entityRenderDispatcher.playerRenderers = mapOf(type to renderer)
-                    ModLoader.get()
-                        .postEvent(
-                            EntityRenderersEvent.AddLayers(
-                                emptyMap(),
-                                entityRenderDispatcher.playerRenderers,
-                                context
-                            )
+                    entityRenderDispatcher.playerRenderers[type] = renderer
+                    ModLoader.get().postEvent(
+                        EntityRenderersEvent.AddLayers(
+                            emptyMap(),
+                            entityRenderDispatcher.playerRenderers,
+                            context
                         )
-                    entityRenderDispatcher.playerRenderers = originalRenderers
+                    )
                 }
             }
         }
