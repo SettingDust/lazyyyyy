@@ -126,6 +126,8 @@ dependencies {
     modImplementation("maven.modrinth:blood-magic:1.20.1-3.3.3-45")
 
     modImplementation("maven.modrinth:jitl:2.2.3-forge")
+
+    modImplementation("maven.modrinth:nuclearcraft-neoteric:1.2.0")
 }
 
 tasks {

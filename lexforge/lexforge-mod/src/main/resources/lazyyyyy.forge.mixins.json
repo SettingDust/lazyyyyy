@@ -9,6 +9,7 @@
         "minVersion": "0.5.0-beta.4"
     },
     "mixins": [
+        "assets_protector.lazy_decrypt.ResourceMixin",
         "avoid_redundant_list_resources.DelegatingPackResourcesMixin",
         "ice_and_fire.faster_model_loader.TabulaModelHandlerHelperMixin",
         "jitl.fix_login_crash.ClientLoginCheckerMixin",
@@ -16,6 +17,7 @@
         "lazy_entity_renderers.EntityRenderDispatcherMixin",
         "lazy_entity_renderers.supplementaries.SignPostBlockTileRendererMixin",
         "lazy_entity_renderers.what_are_you_voting_for_2023.ClientEventBusSubscriberMixin",
+        "nuclear_craft.faster_texture_util.TextureUtilMixin",
         "pack_resources_cache.ForgePathPackResourcesMixin",
         "pack_resources_cache.PathPackResourcesMixin",
         "pack_resources_cache.ResourcePackLoaderMixin",
