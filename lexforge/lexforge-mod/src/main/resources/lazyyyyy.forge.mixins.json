@@ -5,13 +5,16 @@
     "compatibilityLevel": "JAVA_17",
     "refmap": "lazyyyyy.forge.refmap.json",
     "plugin": "settingdust.lazyyyyy.LazyyyyyMixinPlugin",
+    "mixinextras": {
+        "minVersion": "0.5.0-beta.4"
+    },
     "mixins": [
         "avoid_redundant_list_resources.DelegatingPackResourcesMixin",
         "ice_and_fire.faster_model_loader.TabulaModelHandlerHelperMixin",
+        "jitl.fix_login_crash.ClientLoginCheckerMixin",
         "kiwi.faster_annotation.AnnotatedTypeLoaderMixin",
         "lazy_entity_renderers.EntityRenderDispatcherMixin",
         "lazy_entity_renderers.supplementaries.SignPostBlockTileRendererMixin",
-        "lazy_entity_renderers.tenshilib.ClientPatreonImplMixin",
         "lazy_entity_renderers.what_are_you_voting_for_2023.ClientEventBusSubscriberMixin",
         "pack_resources_cache.ForgePathPackResourcesMixin",
         "pack_resources_cache.PathPackResourcesMixin",

@@ -122,6 +122,10 @@ dependencies {
     modImplementation("curse.maven:packmenu-358191:5503481")
 
     modImplementation(catalog.tenshilib.forge)
+
+    modImplementation("maven.modrinth:blood-magic:1.20.1-3.3.3-45")
+
+    modImplementation("maven.modrinth:jitl:2.2.3-forge")
 }
 
 tasks {
