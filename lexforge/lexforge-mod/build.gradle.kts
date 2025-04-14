@@ -123,7 +123,7 @@ dependencies {
 
     modImplementation(catalog.tenshilib.forge)
 
-    modImplementation("maven.modrinth:blood-magic:1.20.1-3.3.3-45")
+    modImplementation("maven.modrinth:blood-magic:3.3.2-44")
 
     modImplementation("maven.modrinth:jitl:2.2.3-forge")
 
