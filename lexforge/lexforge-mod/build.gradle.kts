@@ -117,7 +117,7 @@ dependencies {
 
     modImplementation("maven.modrinth:timeless-and-classics-zero:1.1.4-hotfix,1.20.1")
 
-    modImplementation("maven.modrinth:blue-skies:1.3.31")
+    modImplementation("maven.modrinth:blue-skies:1.3.32")
 
     modImplementation("curse.maven:packmenu-358191:5503481")
 
