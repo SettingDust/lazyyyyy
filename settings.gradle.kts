@@ -173,7 +173,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.9.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
 }
 
 val name: String by settings
