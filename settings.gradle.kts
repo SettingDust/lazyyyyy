@@ -170,6 +170,8 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     val tenshilib = "1.20.1-1.7.6"
     library("tenshilib-forge", "maven.modrinth", "tenshilib").version("$tenshilib-forge")
+
+    library("spectrum", "maven.modrinth", "spectrum").version("1.8.5")
 }
 
 plugins {

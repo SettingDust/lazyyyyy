@@ -78,6 +78,8 @@ dependencies {
     modImplementation(catalog.everyCompat.forge)
 
     modImplementation(catalog.simplySwords.forge)
+
+    implementation(catalog.spectrum)
 }
 
 sourceSets {
