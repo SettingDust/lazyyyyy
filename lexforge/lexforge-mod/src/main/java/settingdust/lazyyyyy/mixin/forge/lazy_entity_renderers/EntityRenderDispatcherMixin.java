@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * After {@link settingdust.lazyyyyy.mixin.lazy_entity_renderers.EntityRenderDispatcherMixin}
  */
-@Mixin(value = EntityRenderDispatcher.class, priority = 1001)
+@Mixin(value = EntityRenderDispatcher.class, priority = 999)
 public class EntityRenderDispatcherMixin {
     @Shadow public Map<EntityType<?>, EntityRenderer<?>> renderers;
 
