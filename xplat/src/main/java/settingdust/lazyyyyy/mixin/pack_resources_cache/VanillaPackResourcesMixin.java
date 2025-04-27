@@ -82,7 +82,7 @@ public class VanillaPackResourcesMixin implements CachingPackResources, Hashable
     }
 
     @Override
-    public @Nullable Long lazyyyyy$getHash() {
+    public byte @Nullable [] lazyyyyy$getHash() {
         return VanillaPackResourcesCache.Companion.getHASH();
     }
 }

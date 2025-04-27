@@ -83,7 +83,7 @@ public abstract class FilePackResourcesMixin implements CachingPackResources, Ha
     }
 
     @Override
-    public @Nullable Long lazyyyyy$getHash() {
+    public byte @Nullable [] lazyyyyy$getHash() {
         return PackResourcesCacheManager.INSTANCE.getFileHash(file);
     }
 }

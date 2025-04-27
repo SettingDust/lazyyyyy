@@ -21,6 +21,7 @@ import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCacheMan
 import settingdust.lazyyyyy.util.collect
 import settingdust.lazyyyyy.util.concurrent
 import settingdust.lazyyyyy.util.flatMap
+import settingdust.lazyyyyy.util.toByteArray
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.ExperimentalPathApi
@@ -35,7 +36,7 @@ class VanillaPackResourcesCache(
     private val pathsForType: Map<PackType, List<Path>>
 ) : PackResourcesCache(pack, roots) {
     companion object {
-        val HASH = DetectedVersion.BUILT_IN.dataVersion.version.toLong()
+        val HASH = DetectedVersion.BUILT_IN.dataVersion.version.toByteArray()
     }
 
     init {

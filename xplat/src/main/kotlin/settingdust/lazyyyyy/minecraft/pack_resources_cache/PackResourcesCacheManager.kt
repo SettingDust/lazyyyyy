@@ -35,9 +35,9 @@ object PackResourcesCacheManager {
         .buildCoroutine<String, CompletableDeferred<PackResourcesCacheData>> { CompletableDeferred() }
     val cacheLocks = ConcurrentHashMap<String, Mutex>()
 
-    fun getFileHash(file: File) = FileHashing.imohash1_0_2().hashFileTo128Bits(file).asLong
+    fun getFileHash(file: File) = FileHashing.imohash1_0_2().hashFileTo128Bits(file).toByteArray()
 
-    fun getFileHash(path: Path) = FileHashing.imohash1_0_2().hashFileTo128Bits(path).asLong
+    fun getFileHash(path: Path) = FileHashing.imohash1_0_2().hashFileTo128Bits(path).toByteArray()
 
     fun getLock(key: String) =
         cacheLocks.computeIfAbsent(key) { Mutex() }

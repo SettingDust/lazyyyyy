@@ -24,7 +24,7 @@ public class PathPackResourcesMixin implements HashablePackResources {
     }
 
     @Override
-    public @Nullable Long lazyyyyy$getHash() {
+    public byte @Nullable [] lazyyyyy$getHash() {
         if (lazyyyyy$filePath != null) {
             return PackResourcesCacheManager.INSTANCE.getFileHash(lazyyyyy$filePath);
         }

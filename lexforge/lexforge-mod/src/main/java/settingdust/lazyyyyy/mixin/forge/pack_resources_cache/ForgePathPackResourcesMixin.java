@@ -40,7 +40,7 @@ public abstract class ForgePathPackResourcesMixin implements CachingPackResource
     }
 
     @Override
-    public @Nullable Long lazyyyyy$getHash() {
+    public byte @Nullable [] lazyyyyy$getHash() {
         if (lazyyyyy$filePath == null) return null;
         return PackResourcesCacheManager.INSTANCE.getFileHash(lazyyyyy$filePath);
     }
