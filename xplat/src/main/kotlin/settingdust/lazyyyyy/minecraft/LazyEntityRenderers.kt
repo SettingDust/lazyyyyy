@@ -1,5 +1,6 @@
 package settingdust.lazyyyyy.minecraft
 
+import com.google.common.collect.ForwardingMap
 import com.mojang.blaze3d.vertex.PoseStack
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -288,12 +289,10 @@ class LazyBlockEntityRenderer<T : BlockEntity>(
         handle({ shouldRender(blockEntity, vec3) }, { super.shouldRender(blockEntity, vec3) })
 }
 
-class ObservableMap<K, V>(val original: Map<K, V>, val onGet: (K) -> V?) : HashMap<K, V>() {
-    init {
-        putAll(original)
-    }
+class ObservableMap<K, V>(private val original: Map<K, V>, val onGet: (K?) -> V?) : ForwardingMap<K, V>() {
+    override fun delegate() = original
 
-    override fun get(key: K): V? {
+    override fun get(key: K?): V? {
         return onGet(key) ?: super.get(key)
     }
 }

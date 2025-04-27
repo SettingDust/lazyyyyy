@@ -9,8 +9,6 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.contextual
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import java.io.File
@@ -31,10 +29,6 @@ object PackResourcesCacheManager {
     val dir = Path(".lazyyyyy", "pack-cache")
     private val json = Json {
         classDiscriminator = "_t"
-
-        serializersModule = SerializersModule {
-            contextual(HashCodeSerializer)
-        }
     }
 
     val cache = Caffeine.newBuilder().maximumSize(256).expireAfterAccess(Duration.ofSeconds(30))
