@@ -1,7 +1,6 @@
 package settingdust.lazyyyyy.mixin.forge.lazy_model_bake.refined_storage;
 
 import com.moulberry.mixinconstraints.annotations.IfModLoaded;
-import com.refinedmods.refinedstorage.RS;
 import com.refinedmods.refinedstorage.render.BakedModelOverrideRegistry;
 import com.refinedmods.refinedstorage.setup.ClientSetup;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -24,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-@IfModLoaded(RS.ID)
+//@IfModLoaded(RS.ID)
 @IfModLoaded(ModernFix.MODID)
 @Mixin(ClientSetup.class)
 public class ClientSetupMixin implements ModernFixClientIntegration {

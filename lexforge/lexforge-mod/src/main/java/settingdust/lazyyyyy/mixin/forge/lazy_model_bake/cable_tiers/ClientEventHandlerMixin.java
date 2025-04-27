@@ -2,7 +2,6 @@ package settingdust.lazyyyyy.mixin.forge.lazy_model_bake.cable_tiers;
 
 import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import com.refinedmods.refinedstorage.render.BakedModelOverrideRegistry;
-import com.ultramega.cabletiers.CableTiers;
 import com.ultramega.cabletiers.registry.ClientEventHandler;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
@@ -24,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-@IfModLoaded(CableTiers.MOD_ID)
+//@IfModLoaded(CableTiers.MOD_ID)
 @IfModLoaded(ModernFix.MODID)
 @Mixin(ClientEventHandler.class)
 public class ClientEventHandlerMixin implements ModernFixClientIntegration {
