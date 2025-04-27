@@ -9,14 +9,14 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
-import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import java.io.File
 import java.nio.file.FileSystem
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
 import kotlin.io.path.Path
 import kotlin.io.path.createFile
 import kotlin.io.path.createParentDirectories
@@ -55,7 +55,7 @@ object PackResourcesCacheManager {
     fun load(cachePath: Path): PackResourcesCacheData? {
         if (!cachePath.exists()) return null
         try {
-            return GzipCompressorInputStream(cachePath.inputStream())
+            return GZIPInputStream(cachePath.inputStream())
                 .use { json.decodeFromStream<PackResourcesCacheData>(it) }
         } catch (e: Exception) {
             PackResourcesCache.logger.error("Failed to load cache from $cachePath", e)
@@ -69,7 +69,7 @@ object PackResourcesCacheManager {
         cache.get(key)!!.complete(data)
         if (!cachePath.parent.exists()) cachePath.createParentDirectories()
         if (!cachePath.exists()) cachePath.createFile()
-        GzipCompressorOutputStream(cachePath.outputStream(StandardOpenOption.TRUNCATE_EXISTING))
+        GZIPOutputStream(cachePath.outputStream(StandardOpenOption.TRUNCATE_EXISTING))
             .use { json.encodeToStream(data, it) }
     }
 

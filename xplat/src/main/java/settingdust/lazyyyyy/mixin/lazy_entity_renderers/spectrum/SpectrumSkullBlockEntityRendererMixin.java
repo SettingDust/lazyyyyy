@@ -1,5 +1,6 @@
 package settingdust.lazyyyyy.mixin.lazy_entity_renderers.spectrum;
 
+import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import de.dafuqs.spectrum.SpectrumCommon;
 import de.dafuqs.spectrum.blocks.mob_head.SpectrumSkullType;
 import de.dafuqs.spectrum.blocks.mob_head.client.SpectrumSkullBlockEntityRenderer;
@@ -13,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import settingdust.lazyyyyy.minecraft.LazyEntityRenderersKt;
 
+@IfModLoaded(SpectrumCommon.MOD_ID)
 @Mixin(SpectrumSkullBlockEntityRenderer.class)
 public class SpectrumSkullBlockEntityRendererMixin {
     @Inject(method = "getRenderLayer", remap = false, at = @At("HEAD"))
