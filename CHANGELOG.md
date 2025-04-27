@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2025-04-27
+### :sparkles: New Features
+- [`b3b6582`](https://github.com/SettingDust/lazyyyyy/commit/b3b65821883ff5778f86e3efcca914c2543c9636) - **jitl**: avoid crash if can't connect to GitHub *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`0b931c9`](https://github.com/SettingDust/lazyyyyy/commit/0b931c9453ea53567f2389d67a0c9c50c6ee22ba) - **nuclear_craft**: optimize texture util *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`02302e3`](https://github.com/SettingDust/lazyyyyy/commit/02302e3d69b0fa627cda6ba006f13e778e24787f) - **lazy_model_bake**: refined storage and cable tiers supporting modernfix lazy model baking api *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`a3aa819`](https://github.com/SettingDust/lazyyyyy/commit/a3aa81931a8090109a7e04951fecf7202aa1578b) - **lazy-entity-renderers**: support spectrum skull blocks *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :bug: Bug Fixes
+- [`025eef2`](https://github.com/SettingDust/lazyyyyy/commit/025eef2a5e8d6ec506075c541450221f59872120) - **lazy-entity-renderers**: avoid null pointer with tenshilib *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`a507674`](https://github.com/SettingDust/lazyyyyy/commit/a507674eb2bf9c4edf744f26a9658ab1b686f63e) - **lazy-entity-renderers**: don't trim off the player renderers for better compat with mods *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`1f20d05`](https://github.com/SettingDust/lazyyyyy/commit/1f20d05ea3d91209b81644d853b38764b714ee13) - **lazy_model_bake**: avoid crash since MixinConstraints multiple annotation has issue *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`3e39129`](https://github.com/SettingDust/lazyyyyy/commit/3e39129da590994522f0a8a723be4f64b20a3680) - **lazy-entity-renderers**: wrong mixin priority causing renderers empty *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :zap: Performance Improvements
+- [`1bedbf8`](https://github.com/SettingDust/lazyyyyy/commit/1bedbf847f7f13ff9d639004ebf38ec78874a5ef) - **pack-resources-cache**: limit the cache size for pack disk cache for less memory *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`0eae0ab`](https://github.com/SettingDust/lazyyyyy/commit/0eae0ab87aa4a127e4c109ff9bf67afed09d3569) - **pack-resources-cache**: calc the hash correctly *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.13.2] - 2025-04-12
 ### :bug: Bug Fixes
 - [`b4ef52a`](https://github.com/SettingDust/lazyyyyy/commit/b4ef52a711723e74843b3adb1acf8a0b3389a67b) - **pack-resources-cache**: root can be null *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -524,3 +544,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.13.0]: https://github.com/SettingDust/lazyyyyy/compare/0.12.0...0.13.0
 [0.13.1]: https://github.com/SettingDust/lazyyyyy/compare/0.13.0...0.13.1
 [0.13.2]: https://github.com/SettingDust/lazyyyyy/compare/0.13.1...0.13.2
+[0.14.0]: https://github.com/SettingDust/lazyyyyy/compare/0.13.2...0.14.0
