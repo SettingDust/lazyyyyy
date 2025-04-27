@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.1] - 2025-04-27
+### :bug: Bug Fixes
+- [`8912fa0`](https://github.com/SettingDust/lazyyyyy/commit/8912fa0a3c2c7e1edc33d012549d305986e144ae) - **pack-resources-cache**: use java gzip since apache compress isn't exists in Minecraft libraries *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.14.0] - 2025-04-27
 ### :sparkles: New Features
 - [`b3b6582`](https://github.com/SettingDust/lazyyyyy/commit/b3b65821883ff5778f86e3efcca914c2543c9636) - **jitl**: avoid crash if can't connect to GitHub *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -545,3 +550,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.13.1]: https://github.com/SettingDust/lazyyyyy/compare/0.13.0...0.13.1
 [0.13.2]: https://github.com/SettingDust/lazyyyyy/compare/0.13.1...0.13.2
 [0.14.0]: https://github.com/SettingDust/lazyyyyy/compare/0.13.2...0.14.0
+[0.14.1]: https://github.com/SettingDust/lazyyyyy/compare/0.14.0...0.14.1
