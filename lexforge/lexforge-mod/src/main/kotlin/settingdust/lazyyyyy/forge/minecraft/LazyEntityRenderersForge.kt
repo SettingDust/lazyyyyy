@@ -46,7 +46,9 @@ object LazyEntityRenderersForge {
             launch(CoroutineName("Lazy player renderer loaded handler")) {
                 LazyPlayerRenderer.onLoaded.collect { (type, context, renderer) ->
                     val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
-                    entityRenderDispatcher.playerRenderers[type] = renderer
+                    val originalRenderers = entityRenderDispatcher.playerRenderers
+                    entityRenderDispatcher.playerRenderers =
+                        originalRenderers.mapValuesTo(mutableMapOf()) { if (it.key == type) renderer else DummyPlayerRenderer.INSTANCE!! }
                     ModLoader.get().postEvent(
                         EntityRenderersEvent.AddLayers(
                             emptyMap(),
@@ -54,6 +56,7 @@ object LazyEntityRenderersForge {
                             context
                         )
                     )
+                    entityRenderDispatcher.playerRenderers = originalRenderers
                 }
             }
         }
@@ -75,7 +78,11 @@ fun Map<EntityType<*>, EntityRenderer<*>>.replaceWithDummyLivingEntity(context: 
  * https://github.com/WayofTime/BloodMagic/blob/1.20.1/src/main/java/wayoftime/bloodmagic/client/ClientEvents.java#L250-L256
  */
 fun Map<String, EntityRenderer<out Player>>.replaceWithDummyPlayer(context: EntityRendererProvider.Context) =
-    mapValues { (_, renderer) -> if (renderer is LazyPlayerRenderer) DummyPlayerRenderer(context) else renderer }
+    mapValues { (_, renderer) -> if (renderer is LazyPlayerRenderer) {
+        DummyPlayerRenderer.INSTANCE ?: DummyPlayerRenderer(context).also {
+            DummyPlayerRenderer.INSTANCE = it
+        }
+    } else renderer }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 fun Map<EntityType<*>, EntityRenderer<*>>.observeEntityRenderers() = ObservableMap(this) {

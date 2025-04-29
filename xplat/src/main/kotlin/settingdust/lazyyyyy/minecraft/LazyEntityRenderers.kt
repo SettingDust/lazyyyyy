@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.Minecraft
 import net.minecraft.client.model.EntityModel
+import net.minecraft.client.model.PlayerModel
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher
@@ -24,6 +25,7 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.LivingEntityRenderer
+import net.minecraft.client.renderer.entity.layers.RenderLayer
 import net.minecraft.client.renderer.entity.player.PlayerRenderer
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite
 import net.minecraft.core.BlockPos
@@ -85,6 +87,7 @@ class LazyEntityRenderer<T : Entity>(
                         CopyOnWriteArrayList((renderer as LivingEntityRendererAccessor).layers)
                 }
                 Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
+                Minecraft.getInstance().entityRenderDispatcher.renderers[type] = renderer
                 runBlocking { onLoaded.emit(Triple(type, context, renderer)) }
             }
         }
@@ -168,6 +171,7 @@ class LazyPlayerRenderer(
             (renderer as LivingEntityRendererAccessor).layers =
                 CopyOnWriteArrayList((renderer as LivingEntityRendererAccessor).layers)
             Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$playerRenderers`[type] = renderer
+            Minecraft.getInstance().entityRenderDispatcher.playerRenderers[type] = renderer
             runBlocking { onLoaded.emit(Triple(type, context, renderer)) }
             renderer as EntityRenderer<AbstractClientPlayer>
         }
@@ -239,7 +243,15 @@ class LazyPlayerRenderer(
         { super.renderNameTag(entity, component, poseStack, multiBufferSource, i) })
 }
 
-class DummyPlayerRenderer(context: EntityRendererProvider.Context) : PlayerRenderer(context, false)
+class DummyPlayerRenderer(context: EntityRendererProvider.Context) : PlayerRenderer(context, false) {
+    companion object {
+        var INSTANCE: DummyPlayerRenderer? = null
+    }
+
+    override fun addLayer(renderLayer: RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>>): Boolean {
+        return false
+    }
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LazyBlockEntityRenderer<T : BlockEntity>(
@@ -297,7 +309,7 @@ class ObservableMap<K, V>(private val original: Map<K, V>, val onGet: (K?) -> V?
     }
 }
 
-var EntityRenderDispatcher.renderers: Map<EntityType<*>, EntityRenderer<*>>
+var EntityRenderDispatcher.renderers: MutableMap<EntityType<*>, EntityRenderer<*>>
     get() = (this as EntityRenderDispatcherAccessor).renderers
     set(value) {
         (this as EntityRenderDispatcherAccessor).renderers = value
