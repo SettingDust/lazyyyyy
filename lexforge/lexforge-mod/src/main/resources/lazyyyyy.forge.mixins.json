@@ -14,6 +14,7 @@
         "jitl.fix_login_crash.ClientLoginCheckerMixin",
         "kiwi.faster_annotation.AnnotatedTypeLoaderMixin",
         "lazy_entity_renderers.EntityRenderDispatcherMixin",
+        "lazy_entity_renderers.curios.Curios_ClientProxyMixin",
         "lazy_entity_renderers.supplementaries.SignPostBlockTileRendererMixin",
         "lazy_entity_renderers.what_are_you_voting_for_2023.ClientEventBusSubscriberMixin",
         "lazy_model_bake.cable_tiers.ClientEventHandlerMixin",
@@ -32,6 +33,7 @@
         "lazy_entity_renderers.big_brain.BigBrainRendererEventsMixin",
         "lazy_entity_renderers.bovines_and_buttercups.BovinesAndButtercupsClientForgeMixin",
         "lazy_entity_renderers.cloudstorage.ClientProxyMixin",
+        "lazy_entity_renderers.curios.EntityRenderDispatcherMixin",
         "lazy_entity_renderers.quark.UsesForCursesModule_ClientMixin",
         "lazy_entity_renderers.taniwha.TForgeClientEventsMixin"
     ],
