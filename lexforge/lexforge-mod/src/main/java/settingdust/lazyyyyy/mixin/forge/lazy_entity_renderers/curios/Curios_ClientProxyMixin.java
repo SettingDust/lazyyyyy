@@ -11,6 +11,7 @@ import top.theillusivec4.curios.Curios;
 public class Curios_ClientProxyMixin {
     @Redirect(
         method = "addLayers",
+        remap = false,
         at = @At(value = "INVOKE", target = "Ltop/theillusivec4/curios/api/client/CuriosRendererRegistry;load()V")
     )
     private static void lazyyyyy$avoidLoad() {}
