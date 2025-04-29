@@ -80,6 +80,9 @@ dependencies {
     modImplementation(catalog.simplySwords.forge)
 
     implementation(catalog.spectrum)
+
+    modImplementation(catalog.botania.forge)
+    modImplementation(catalog.patchouli.forge)
 }
 
 sourceSets {

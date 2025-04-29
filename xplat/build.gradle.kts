@@ -75,6 +75,9 @@ dependencies {
     modImplementation(catalog.simplySwords.fabric)
 
     modImplementation(catalog.spectrum)
+
+    modImplementation(catalog.botania.fabric)
+    modImplementation(catalog.patchouli.fabric)
 }
 
 tasks {

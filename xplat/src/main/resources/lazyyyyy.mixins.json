@@ -29,6 +29,8 @@
         "lazy_entity_renderers.EntityRendererAccessor",
         "lazy_entity_renderers.EntityRenderersMixin",
         "lazy_entity_renderers.LivingEntityRendererAccessor",
+        "lazy_entity_renderers.botania.EntityRenderDispatcherMixin",
+        "lazy_entity_renderers.botania.GaiaGuardianRendererMixin",
         "lazy_entity_renderers.spectrum.SpectrumSkullBlockEntityRendererMixin",
         "moremcmeta.avoid_duplicate_sprites.TextureAtlasMixin",
         "yacl.lazy_animated_image.AnimatedDynamicTextureImageMixin"

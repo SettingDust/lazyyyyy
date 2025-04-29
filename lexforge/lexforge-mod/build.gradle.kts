@@ -133,6 +133,8 @@ dependencies {
     modImplementation("maven.modrinth:refined-storage:1.12.4")
 
     modImplementation(catalog.modernfix.forge)
+
+    modImplementation("maven.modrinth:curios:5.14.1+1.20.1")
 }
 
 tasks {

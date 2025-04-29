@@ -172,6 +172,14 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     library("tenshilib-forge", "maven.modrinth", "tenshilib").version("$tenshilib-forge")
 
     library("spectrum", "maven.modrinth", "spectrum").version("1.8.5")
+
+    val botania = "1.20.1-448"
+    library("botania-fabric", "maven.modrinth", "botania").version("$botania-fabric")
+    library("botania-forge", "maven.modrinth", "botania").version("$botania-forge")
+
+    val patchouli = "1.20.1-84.1"
+    library("patchouli-fabric", "maven.modrinth", "patchouli").version("$patchouli-fabric")
+    library("patchouli-forge", "maven.modrinth", "patchouli").version("$patchouli-forge")
 }
 
 plugins {
