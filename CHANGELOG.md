@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.2] - 2025-04-29
+### :bug: Bug Fixes
+- [`37cd642`](https://github.com/SettingDust/lazyyyyy/commit/37cd64223764306e6ee0c5a124905a49ebae6f38) - **lazy-entity-renderers**: fix crash when render botania armor *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`a2d01f0`](https://github.com/SettingDust/lazyyyyy/commit/a2d01f09441089321bd01176ba2e23d6d0f01d9f) - **lazy-entity-renderers**: avoid duplicate add layers to player renderers *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.14.1] - 2025-04-27
 ### :bug: Bug Fixes
 - [`8912fa0`](https://github.com/SettingDust/lazyyyyy/commit/8912fa0a3c2c7e1edc33d012549d305986e144ae) - **pack-resources-cache**: use java gzip since apache compress isn't exists in Minecraft libraries *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -551,3 +557,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.13.2]: https://github.com/SettingDust/lazyyyyy/compare/0.13.1...0.13.2
 [0.14.0]: https://github.com/SettingDust/lazyyyyy/compare/0.13.2...0.14.0
 [0.14.1]: https://github.com/SettingDust/lazyyyyy/compare/0.14.0...0.14.1
+[0.14.2]: https://github.com/SettingDust/lazyyyyy/compare/0.14.1...0.14.2
