@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.3] - 2025-04-29
+### :bug: Bug Fixes
+- [`8b054c0`](https://github.com/SettingDust/lazyyyyy/commit/8b054c0c8d7ffa4591e3b33f196a45e2b82fa2ef) - **lazy-entity-renderers**: fix mixin remap *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :zap: Performance Improvements
+- [`469441f`](https://github.com/SettingDust/lazyyyyy/commit/469441f6b8b910e62568369ed433ba9ef2963c27) - **lazy-entity-renderers**: avoid curios load the renderers multiple times *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.14.2] - 2025-04-29
 ### :bug: Bug Fixes
 - [`37cd642`](https://github.com/SettingDust/lazyyyyy/commit/37cd64223764306e6ee0c5a124905a49ebae6f38) - **lazy-entity-renderers**: fix crash when render botania armor *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -558,3 +566,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.14.0]: https://github.com/SettingDust/lazyyyyy/compare/0.13.2...0.14.0
 [0.14.1]: https://github.com/SettingDust/lazyyyyy/compare/0.14.0...0.14.1
 [0.14.2]: https://github.com/SettingDust/lazyyyyy/compare/0.14.1...0.14.2
+[0.14.3]: https://github.com/SettingDust/lazyyyyy/compare/0.14.2...0.14.3
