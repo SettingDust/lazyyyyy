@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.4] - 2025-05-06
+### :bug: Bug Fixes
+- [`63033c5`](https://github.com/SettingDust/lazyyyyy/commit/63033c5511d6394aded02b3fd0340cda10553ebe) - disable modernfix dynamic entity renderers when use lazy entity renderers *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.14.3] - 2025-04-29
 ### :bug: Bug Fixes
 - [`8b054c0`](https://github.com/SettingDust/lazyyyyy/commit/8b054c0c8d7ffa4591e3b33f196a45e2b82fa2ef) - **lazy-entity-renderers**: fix mixin remap *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -567,3 +572,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.14.1]: https://github.com/SettingDust/lazyyyyy/compare/0.14.0...0.14.1
 [0.14.2]: https://github.com/SettingDust/lazyyyyy/compare/0.14.1...0.14.2
 [0.14.3]: https://github.com/SettingDust/lazyyyyy/compare/0.14.2...0.14.3
+[0.14.4]: https://github.com/SettingDust/lazyyyyy/compare/0.14.3...0.14.4
