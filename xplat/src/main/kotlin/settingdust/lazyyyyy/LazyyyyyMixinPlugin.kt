@@ -102,6 +102,14 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
 
             if (config.any { it.key.startsWith("lazy_entity_renderers") && it.value }) {
                 try {
+                    ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.dynamic_entity_renderers.EntityRenderDispatcherMixin"] =
+                        "lazyyyyy"
+                    ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.dynamic_entity_renderers.EntityRenderersMixin"] =
+                        "lazyyyyy"
+                    logger.info("Disabled ModernFix dynamic_entity_renderers")
+                } catch (_: NoClassDefFoundError) {
+                }
+                try {
                     forge.me.thosea.badoptimizations.other.Config.enable_entity_renderer_caching = false
                     forge.me.thosea.badoptimizations.other.Config.enable_block_entity_renderer_caching = false
                     logger.info("Disabled BadOptimizations `enable_entity_renderer_caching` and `enable_block_entity_renderer_caching`")
