@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.5] - 2025-05-07
+### :bug: Bug Fixes
+- [`82f4e4f`](https://github.com/SettingDust/lazyyyyy/commit/82f4e4fa6764384b50a356a1462c21e22de3454b) - **pack-resources-cache**: use full 128 hash for cache *(commit by [@SettingDust](https://github.com/SettingDust))*
+- [`7455c10`](https://github.com/SettingDust/lazyyyyy/commit/7455c10d99d5afce95ccf3d0daac7489be8abe8f) - re-generate cache when missing roots in cache *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.14.4] - 2025-05-06
 ### :bug: Bug Fixes
 - [`63033c5`](https://github.com/SettingDust/lazyyyyy/commit/63033c5511d6394aded02b3fd0340cda10553ebe) - disable modernfix dynamic entity renderers when use lazy entity renderers *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -573,3 +579,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.14.2]: https://github.com/SettingDust/lazyyyyy/compare/0.14.1...0.14.2
 [0.14.3]: https://github.com/SettingDust/lazyyyyy/compare/0.14.2...0.14.3
 [0.14.4]: https://github.com/SettingDust/lazyyyyy/compare/0.14.3...0.14.4
+[0.14.5]: https://github.com/SettingDust/lazyyyyy/compare/0.14.4...0.14.5
