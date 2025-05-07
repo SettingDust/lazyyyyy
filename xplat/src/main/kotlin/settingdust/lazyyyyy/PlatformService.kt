@@ -1,5 +1,7 @@
 package settingdust.lazyyyyy
 
+import com.dynatrace.hash4j.hashing.HashValue128
+import com.dynatrace.hash4j.hashing.Hashing
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.getZipFileSystemPath
 import java.nio.file.Path
 import java.util.*
@@ -26,11 +28,12 @@ interface PlatformService {
 
     fun getFileSystemPath(path: Path): Path? = path.getZipFileSystemPath()
 
-    fun getPathHash(path: Path): Int {
-        var result = path.pathString.hashCode()
+    fun getPathHash(path: Path): HashValue128 {
+        val hashStream = Hashing.xxh3_128().hashStream()
+        hashStream.putString(path.pathString)
         getFileSystemPath(path)?.let {
-            result = Objects.hash(result, it.pathString.hashCode())
+            hashStream.putString(it.pathString)
         }
-        return result
+        return hashStream.get()
     }
 }

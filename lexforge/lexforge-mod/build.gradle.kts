@@ -135,6 +135,8 @@ dependencies {
     modImplementation(catalog.modernfix.forge)
 
     modImplementation("maven.modrinth:curios:5.14.1+1.20.1")
+
+    modImplementation("maven.modrinth:chloride:FORGE-mc1.20.1-v1.7.0")
 }
 
 tasks {

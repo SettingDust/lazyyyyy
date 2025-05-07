@@ -95,7 +95,7 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
                         "lazyyyyy"
                     ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ForgePathPackResourcesMixin"] =
                         "lazyyyyy"
-                    logger.info("Disabled ModernFix resourcepacks cache")
+                    logger.info("Disabled ModernFix perf.resourcepacks")
                 } catch (_: NoClassDefFoundError) {
                 }
             }
@@ -106,7 +106,7 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
                         "lazyyyyy"
                     ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.dynamic_entity_renderers.EntityRenderersMixin"] =
                         "lazyyyyy"
-                    logger.info("Disabled ModernFix dynamic_entity_renderers")
+                    logger.info("Disabled ModernFix perf.dynamic_entity_renderers")
                 } catch (_: NoClassDefFoundError) {
                 }
                 try {

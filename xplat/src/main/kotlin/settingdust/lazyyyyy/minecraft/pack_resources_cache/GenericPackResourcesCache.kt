@@ -21,7 +21,6 @@ import settingdust.lazyyyyy.util.collect
 import settingdust.lazyyyyy.util.concurrent
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
@@ -104,7 +103,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}] cached") }
     }
 
-    @OptIn(ExperimentalPathApi::class, ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
     private suspend fun CoroutineScope.loadCache() =
         withContext(CoroutineName("Simple pack cache #${pack.packId()}")) {
             val time = measureTime {
@@ -114,7 +113,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                     val rootHashes =
                         async {
                             roots.associateWithTo(HashBiMap.create(roots.size)) {
-                                PlatformService.getPathHash(it).toLong()
+                                PlatformService.getPathHash(it).toByteArray().toHexString()
                             }
                         }
                     val key = pack.packId()
@@ -128,7 +127,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                     @OptIn(ExperimentalCoroutinesApi::class)
                     suspend fun cacheEntry() {
                         cachePack()
-                        val roots = ConcurrentHashMap<Long, PackResourcesCacheDataEntry>()
+                        val roots = ConcurrentHashMap<String, PackResourcesCacheDataEntry>()
                         for ((_, rootHash) in rootHashes.getCompleted()) {
                             roots[rootHash] = PackResourcesCacheDataEntry(ConcurrentHashMap(), ConcurrentHashMap())
                         }

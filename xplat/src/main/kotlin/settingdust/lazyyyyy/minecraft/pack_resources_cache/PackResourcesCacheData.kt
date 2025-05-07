@@ -5,7 +5,7 @@ import net.minecraft.server.packs.PackType
 
 @Serializable
 data class PackResourcesCacheData(
-    val roots: Map<Long, PackResourcesCacheDataEntry> = emptyMap(),
+    val roots: Map<String, PackResourcesCacheDataEntry> = emptyMap(),
     val namespaces: Map<PackType, Set<String>> = emptyMap()
 )
 

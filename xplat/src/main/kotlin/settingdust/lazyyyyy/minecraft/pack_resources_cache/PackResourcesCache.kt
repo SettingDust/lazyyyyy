@@ -228,8 +228,8 @@ suspend fun PackResourcesCache.consumeRootDirectory(
 
 @OptIn(ExperimentalCoroutinesApi::class)
 suspend fun PackResourcesCache.filesToCache(
-    roots: MutableMap<Long, PackResourcesCacheDataEntry>,
-    rootsHashes: Map<Path, Long>
+    roots: MutableMap<String, PackResourcesCacheDataEntry>,
+    rootsHashes: Map<Path, String>
 ) = files.asSequence().asFlow().concurrent().collect { (key, file) ->
     val file = file.getCompleted()
     val root = pathToRoot[file] ?: error("Missing root for $file")
@@ -240,8 +240,8 @@ suspend fun PackResourcesCache.filesToCache(
 
 @OptIn(ExperimentalCoroutinesApi::class)
 suspend fun PackResourcesCache.directoryToFilesToCache(
-    roots: MutableMap<Long, PackResourcesCacheDataEntry>,
-    rootsHashes: Map<Path, Long>
+    roots: MutableMap<String, PackResourcesCacheDataEntry>,
+    rootsHashes: Map<Path, String>
 ) = directoryToFiles.asSequence().asFlow().concurrent().collect { (key, value) ->
     val map = value.getCompleted()
     map.asSequence().asFlow().concurrent().collect {

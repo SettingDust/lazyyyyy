@@ -81,8 +81,10 @@ class VanillaPackResourcesCache(
                 require(pack is HashablePackResources)
                 val rootHashes =
                     async {
-                        (pathsForType.values.flatMap { it } + roots).toSet()
-                            .associateWithTo(HashBiMap.create()) { PlatformService.getPathHash(it).toLong() }
+                        (pathsForType.values.flatten() + roots).toSet()
+                            .associateWithTo(HashBiMap.create()) {
+                                PlatformService.getPathHash(it).toByteArray().toHexString()
+                            }
                     }
                 val key = pack.packId()
                 val lock = PackResourcesCacheManager.getLock(key)
@@ -94,7 +96,7 @@ class VanillaPackResourcesCache(
                 @OptIn(ExperimentalCoroutinesApi::class)
                 suspend fun cacheEntry() {
                     cachePack()
-                    val roots = ConcurrentHashMap<Long, PackResourcesCacheDataEntry>()
+                    val roots = ConcurrentHashMap<String, PackResourcesCacheDataEntry>()
                     for ((_, hash) in rootHashes.getCompleted()) {
                         roots[hash] = PackResourcesCacheDataEntry(ConcurrentHashMap(), ConcurrentHashMap())
                     }
