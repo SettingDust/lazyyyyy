@@ -159,6 +159,9 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                         val directoryToFiles =
                             ConcurrentHashMap<String, MutableMap<Path, String>>()
                         try {
+                            if (!cachedData.roots.keys.containsAll(rootHashes.getCompleted().values)) {
+                                throw IllegalStateException("Missing roots in cache. Cached: ${cachedData.roots.keys}. Requested: ${rootHashes.getCompleted().values}")
+                            }
                             joinAll(
                                 launch {
                                     cachedData.namespaces.asSequence().asFlow().concurrent()

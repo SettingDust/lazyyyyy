@@ -113,6 +113,9 @@ class VanillaPackResourcesCache(
                     lock.unlock(this@VanillaPackResourcesCache)
                     val cachedData = cachedDataDeferred.getCompleted()
                     try {
+                        if (!cachedData.roots.keys.containsAll(rootHashes.getCompleted().values)) {
+                            throw IllegalStateException("Missing roots in cache. Cached: ${cachedData.roots.keys}. Requested: ${rootHashes.getCompleted().values}")
+                        }
                         val directoryToFiles =
                             ConcurrentHashMap<String, MutableMap<Path, String>>()
 
