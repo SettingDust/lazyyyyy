@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.6] - 2025-05-07
+### :bug: Bug Fixes
+- [`8e549b8`](https://github.com/SettingDust/lazyyyyy/commit/8e549b8dcf37231ec6262ac2aefc8b6848eaa594) - use mixin squared for cancel mixins from ModernFix and BadOptimizations *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.14.5] - 2025-05-07
 ### :bug: Bug Fixes
 - [`82f4e4f`](https://github.com/SettingDust/lazyyyyy/commit/82f4e4fa6764384b50a356a1462c21e22de3454b) - **pack-resources-cache**: use full 128 hash for cache *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -580,3 +585,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.14.3]: https://github.com/SettingDust/lazyyyyy/compare/0.14.2...0.14.3
 [0.14.4]: https://github.com/SettingDust/lazyyyyy/compare/0.14.3...0.14.4
 [0.14.5]: https://github.com/SettingDust/lazyyyyy/compare/0.14.4...0.14.5
+[0.14.6]: https://github.com/SettingDust/lazyyyyy/compare/0.14.5...0.14.6
