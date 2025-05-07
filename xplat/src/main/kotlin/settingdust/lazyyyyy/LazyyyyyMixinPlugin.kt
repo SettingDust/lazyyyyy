@@ -8,7 +8,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import org.apache.logging.log4j.LogManager
-import org.embeddedt.modernfix.core.ModernFixMixinPlugin
 import org.objectweb.asm.tree.ClassNode
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo
 import kotlin.io.path.Path
@@ -21,13 +20,12 @@ import kotlin.io.path.outputStream
 class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
     companion object {
         private var firstLoad = true
-        private var firstApply = true
     }
 
     lateinit var mixinPackage: String
         private set
 
-    val defaultConfig = mapOf<String, Boolean>(
+    val defaultConfig = mapOf(
         "debug" to false,
         "async_model_baking" to false,
         "axiom.async_check_commercial" to true,
@@ -41,7 +39,7 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         "avoid_redundant_list_resources" to true
     )
 
-    val conflictings = mapOf<String, MutableSet<String>>(
+    val conflictings = mapOf(
         "async_model_baking" to mutableSetOf("duclib")
     )
 
@@ -87,43 +85,6 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
     }
 
     override fun shouldApplyMixin(targetClassName: String, mixinClassName: String): Boolean {
-        if (firstApply) {
-            firstApply = false
-            if (config.any { it.key.startsWith("pack_resources_cache") && it.value }) {
-                try {
-                    ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ReloadableResourceManagerMixin"] =
-                        "lazyyyyy"
-                    ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.resourcepacks.ForgePathPackResourcesMixin"] =
-                        "lazyyyyy"
-                    logger.info("Disabled ModernFix perf.resourcepacks")
-                } catch (_: NoClassDefFoundError) {
-                }
-            }
-
-            if (config.any { it.key.startsWith("lazy_entity_renderers") && it.value }) {
-                try {
-                    ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.dynamic_entity_renderers.EntityRenderDispatcherMixin"] =
-                        "lazyyyyy"
-                    ModernFixMixinPlugin.instance.config.permanentlyDisabledMixins["perf.dynamic_entity_renderers.EntityRenderersMixin"] =
-                        "lazyyyyy"
-                    logger.info("Disabled ModernFix perf.dynamic_entity_renderers")
-                } catch (_: NoClassDefFoundError) {
-                }
-                try {
-                    forge.me.thosea.badoptimizations.other.Config.enable_entity_renderer_caching = false
-                    forge.me.thosea.badoptimizations.other.Config.enable_block_entity_renderer_caching = false
-                    logger.info("Disabled BadOptimizations `enable_entity_renderer_caching` and `enable_block_entity_renderer_caching`")
-                } catch (_: NoClassDefFoundError) {
-                }
-                try {
-                    fabric.me.thosea.badoptimizations.other.Config.enable_entity_renderer_caching = false
-                    fabric.me.thosea.badoptimizations.other.Config.enable_block_entity_renderer_caching = false
-                    logger.info("Disabled BadOptimizations `enable_entity_renderer_caching` and `enable_block_entity_renderer_caching`")
-                } catch (_: NoClassDefFoundError) {
-                }
-            }
-        }
-
         if (minecraftHasEarlyError) return false
 
         if (!mixinClassName.startsWith(mixinPackage)) return super.shouldApplyMixin(targetClassName, mixinClassName)
@@ -143,11 +104,6 @@ class LazyyyyyMixinPlugin : ConstraintsMixinPlugin() {
         mixinClassName: String,
         mixinInfo: IMixinInfo
     ) {
-        when (mixinClassName) {
-            "settingdust.lazyyyyy.mixin.entity_texture_features.async_compat.ETFManagerMixin" -> {
-
-            }
-        }
         super.postApply(targetClassName, targetClass, mixinClassName, mixinInfo)
     }
 }

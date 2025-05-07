@@ -52,6 +52,11 @@ dependencies {
         implementation(it)
     }
 
+    catalog.mixinsquared.lexforge.let {
+        include(it)
+        implementation(it)
+    }
+
     catalog.kotlinx.coroutines.debug.let {
 //        shadow(it) {
 //            isTransitive = false
