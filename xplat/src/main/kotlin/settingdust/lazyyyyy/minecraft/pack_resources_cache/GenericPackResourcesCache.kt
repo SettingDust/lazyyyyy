@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -39,10 +40,10 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
         }
     }
 
-    private suspend fun CoroutineScope.consumeRoot(
+    private suspend fun consumeRoot(
         root: Path,
         namespaces: ConcurrentHashMap<PackType, MutableSet<String>>
-    ) {
+    ) = coroutineScope  {
         val strategy = PackRoot(root, null)
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#root/$root] caching") }
         root.listDirectoryEntries().asFlow().concurrent().collect { path ->
@@ -86,7 +87,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type] cached") }
     }
 
-    private suspend fun CoroutineScope.cachePack() {
+    private suspend fun cachePack() = coroutineScope  {
         for (type in PackType.entries) {
             namespaces.computeIfAbsent(type) { CompletableDeferred() }
         }
@@ -104,7 +105,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
     }
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
-    private suspend fun CoroutineScope.loadCache() =
+    private suspend fun loadCache() =
         withContext(CoroutineName("Simple pack cache #${pack.packId()}")) {
             val time = measureTime {
                 val hash by lazy { (pack as HashablePackResources).`lazyyyyy$getHash`() }

@@ -4,7 +4,9 @@ import com.dynatrace.hash4j.file.FileHashing
 import com.github.benmanes.caffeine.cache.Caffeine
 import dev.hsbrysk.caffeine.buildCoroutine
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -69,8 +71,10 @@ object PackResourcesCacheManager {
         cache.get(key)!!.complete(data)
         if (!cachePath.parent.exists()) cachePath.createParentDirectories()
         if (!cachePath.exists()) cachePath.createFile()
-        GZIPOutputStream(cachePath.outputStream(StandardOpenOption.TRUNCATE_EXISTING))
-            .use { json.encodeToStream(data, it) }
+        withContext(Dispatchers.IO) {
+            GZIPOutputStream(cachePath.outputStream(StandardOpenOption.TRUNCATE_EXISTING))
+                .use { json.encodeToStream(data, it) }
+        }
     }
 
     fun String.toValidFileName(replacement: String = "_"): String {

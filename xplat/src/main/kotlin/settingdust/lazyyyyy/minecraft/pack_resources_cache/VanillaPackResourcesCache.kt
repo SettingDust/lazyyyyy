@@ -24,7 +24,6 @@ import settingdust.lazyyyyy.util.flatMap
 import settingdust.lazyyyyy.util.toByteArray
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
@@ -58,7 +57,7 @@ class VanillaPackResourcesCache(
         }
     }
 
-    suspend fun PackResourcesCache.consumePackType(
+    private suspend fun PackResourcesCache.consumePackType(
         strategy: CachingStrategy,
         directoryToFiles: MutableMap<String, MutableMap<Path, String>>
     ) {
@@ -74,8 +73,8 @@ class VanillaPackResourcesCache(
         }
     }
 
-    @OptIn(ExperimentalPathApi::class, ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
-    private suspend fun CoroutineScope.loadCache() =
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
+    private suspend fun loadCache() =
         withContext(CoroutineName("Vanilla pack cache #${pack.packId()}")) {
             val time = measureTime {
                 require(pack is HashablePackResources)
@@ -157,7 +156,7 @@ class VanillaPackResourcesCache(
             Lazyyyyy.logger.debug("Cache vanilla pack ${pack.packId()} in $time")
         }
 
-    private suspend fun CoroutineScope.cachePack() {
+    private suspend fun cachePack() = coroutineScope {
         joinAll(
             launch {
                 val directoryToFiles = ConcurrentHashMap<String, MutableMap<Path, String>>()

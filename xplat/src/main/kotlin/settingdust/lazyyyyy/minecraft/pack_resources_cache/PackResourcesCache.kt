@@ -32,7 +32,6 @@ import java.io.InputStream
 import java.nio.file.Path
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.time.Duration.Companion.nanoseconds
@@ -69,14 +68,13 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         else -> JOINER.join(paths.iterator())
     } ?: error("Paths shouldn't be null '${paths.joinToString()}'")
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     abstract fun getNamespaces(type: PackType?): Set<String>
 
     fun getResource(type: PackType?, location: ResourceLocation) =
         getResource("${type?.directory?.let { "${it}/" } ?: ""}${location.namespace}/${location.path}")
 
-    fun getResource(path: String): IoSupplier<InputStream>? {
-        val path = getOrWaitResource(path) ?: return null
+    fun getResource(pathString: String): IoSupplier<InputStream>? {
+        val path = getOrWaitResource(pathString) ?: return null
         return try {
             IoSupplier.create(path)
         } catch (_: IOException) {
@@ -84,7 +82,6 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         }
     }
 
-    @OptIn(ExperimentalPathApi::class, ExperimentalCoroutinesApi::class)
     fun listResources(type: PackType?, namespace: String, prefix: String, output: PackResources.ResourceOutput) {
         val filesInDir = listOrWaitResources(type, namespace, prefix) ?: return
 
@@ -108,12 +105,10 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         if (job.isCompleted) runBlocking { job.join() }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun getOrWaitResource(path: String): Path? {
         return getOrWait { files[path] }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun listOrWaitResources(
         type: PackType?,
         namespace: String,
@@ -136,7 +131,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
             var result = getter()
             if (result != null) {
                 return if (result.isCompleted) result.getCompleted()
-                else runBlocking(scope.coroutineContext) { result.await() }
+                else runBlocking(scope.coroutineContext) { result!!.await() }
             }
             runBlocking(scope.coroutineContext) {
                 while (result == null) {
@@ -146,7 +141,7 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
                 }
             }
             return if (result == null) null
-            else runBlocking(scope.coroutineContext) { result.await() }
+            else runBlocking(scope.coroutineContext) { result!!.await() }
         }
     }
 }
@@ -168,7 +163,6 @@ suspend fun PackResourcesCache.consumeFile(
     )
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 suspend fun PackResourcesCache.consumeResourceDirectory(
     directory: Path,
     directoryToFiles: MutableMap<String, MutableMap<Path, String>>,
@@ -189,11 +183,11 @@ suspend fun PackResourcesCache.consumeResourceDirectory(
     }
 
     coroutineScope {
-        val fileConsumer = if (shouldCacheDirectoryToFiles)
+        val newFileConsumer = if (shouldCacheDirectoryToFiles)
             { path: Path ->
                 Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#directory/$relativePathString#fileConsumer/$path] caching") }
                 pathToRoot[path] = strategy.root
-                directoryToFiles[relativePathString]!![path] = JOINER.join(namespaceRoot.relativize(path))
+                directoryToFiles[relativePathString]!![path] = JOINER.join(namespaceRoot!!.relativize(path))
                 fileConsumer?.invoke(path)
                 Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#directory/$relativePathString#fileConsumer/$path] cached") }
             } else fileConsumer
@@ -202,16 +196,15 @@ suspend fun PackResourcesCache.consumeResourceDirectory(
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#directory#entries/$relativePathString] caching $entries") }
         entries.asFlow().concurrent().collect { path ->
             if (path.isDirectory()) {
-                consumeResourceDirectory(path, directoryToFiles, strategy, fileConsumer)
+                consumeResourceDirectory(path, directoryToFiles, strategy, newFileConsumer)
             } else {
-                consumeFile(this, path, strategy, fileConsumer)
+                consumeFile(this, path, strategy, newFileConsumer)
             }
         }
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#directory#entries/$relativePathString] cached") }
     }
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 suspend fun PackResourcesCache.consumeRootDirectory(
     scope: CoroutineScope,
     directory: Path,
@@ -230,8 +223,8 @@ suspend fun PackResourcesCache.consumeRootDirectory(
 suspend fun PackResourcesCache.filesToCache(
     roots: MutableMap<String, PackResourcesCacheDataEntry>,
     rootsHashes: Map<Path, String>
-) = files.asSequence().asFlow().concurrent().collect { (key, file) ->
-    val file = file.getCompleted()
+) = files.asSequence().asFlow().concurrent().collect { (key, fileDeferred) ->
+    val file = fileDeferred.getCompleted()
     val root = pathToRoot[file] ?: error("Missing root for $file")
     val rootHash = rootsHashes[root] ?: error("Missing root hash for $root to $file. Roots: $rootsHashes")
     val rootEntry = (roots[rootHash] ?: error("Missing root entry for $rootHash"))
