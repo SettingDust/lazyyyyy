@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import settingdust.lazyyyyy.forge.minecraft.LazyEntityRenderersForgeKt;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -61,7 +62,9 @@ public class EntityRenderDispatcherMixin {
      */
     @Inject(method = "onResourceManagerReload", at = @At("TAIL"))
     private void lazyyyyy$observeRenderers(final ResourceManager resourceManager, final CallbackInfo ci) {
-        renderers = LazyEntityRenderersForgeKt.observeEntityRenderers(renderers);
+        // Some mods will overwrite the fields. So, we wrap the field in a hash map again
+        // https://github.com/BluSunrize/ImmersiveEngineering/blob/1.20.1/src/main/java/blusunrize/immersiveengineering/client/render/entity/ShaderMinecartRenderer.java#L175-L191
+        renderers = LazyEntityRenderersForgeKt.observeEntityRenderers(new HashMap<>(renderers));
         playerRenderers = LazyEntityRenderersForgeKt.observePlayerRenderers(playerRenderers);
     }
 }
