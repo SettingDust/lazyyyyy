@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.7] - 2025-05-09
+### :bug: Bug Fixes
+- [`d6e4f52`](https://github.com/SettingDust/lazyyyyy/commit/d6e4f52bb0cba42476b4287e2f2c2bd3940e9624) - BadOptimizations package name has loader prefix *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.14.6] - 2025-05-07
 ### :bug: Bug Fixes
 - [`8e549b8`](https://github.com/SettingDust/lazyyyyy/commit/8e549b8dcf37231ec6262ac2aefc8b6848eaa594) - use mixin squared for cancel mixins from ModernFix and BadOptimizations *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -586,3 +591,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.14.4]: https://github.com/SettingDust/lazyyyyy/compare/0.14.3...0.14.4
 [0.14.5]: https://github.com/SettingDust/lazyyyyy/compare/0.14.4...0.14.5
 [0.14.6]: https://github.com/SettingDust/lazyyyyy/compare/0.14.5...0.14.6
+[0.14.7]: https://github.com/SettingDust/lazyyyyy/compare/0.14.6...0.14.7
