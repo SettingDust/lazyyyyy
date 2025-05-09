@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.9] - 2025-05-09
+### :bug: Bug Fixes
+- [`263d323`](https://github.com/SettingDust/lazyyyyy/commit/263d3231cd8b5e67ddf336e4954c8846fbe002cc) - **lazy-entity-renderers**: allow mods use add layer event to modify the renderers *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.14.8] - 2025-05-09
 ### :bug: Bug Fixes
 - [`294a710`](https://github.com/SettingDust/lazyyyyy/commit/294a7107a7d58a0ba0696b587bfa3b39f6b22569) - **lazy-entity-renderers**: `UnsupportedOperationException` when mod overwrite the renderers field ith immutable map *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -598,3 +603,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.14.6]: https://github.com/SettingDust/lazyyyyy/compare/0.14.5...0.14.6
 [0.14.7]: https://github.com/SettingDust/lazyyyyy/compare/0.14.6...0.14.7
 [0.14.8]: https://github.com/SettingDust/lazyyyyy/compare/0.14.7...0.14.8
+[0.14.9]: https://github.com/SettingDust/lazyyyyy/compare/0.14.8...0.14.9
