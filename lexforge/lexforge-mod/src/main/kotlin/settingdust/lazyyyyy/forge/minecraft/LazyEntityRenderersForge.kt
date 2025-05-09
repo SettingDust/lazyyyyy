@@ -39,6 +39,7 @@ object LazyEntityRenderersForge {
                             context
                         )
                     )
+                    originalRenderers[type] = entityRenderDispatcher.renderers[type]
                     entityRenderDispatcher.renderers = originalRenderers
                 }
             }
@@ -56,6 +57,7 @@ object LazyEntityRenderersForge {
                             context
                         )
                     )
+                    originalRenderers[type] = entityRenderDispatcher.playerRenderers[type]!!
                     entityRenderDispatcher.playerRenderers = originalRenderers
                 }
             }
