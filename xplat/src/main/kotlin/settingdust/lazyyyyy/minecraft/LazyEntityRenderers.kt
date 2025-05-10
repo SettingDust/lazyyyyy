@@ -2,6 +2,7 @@ package settingdust.lazyyyyy.minecraft
 
 import com.google.common.collect.ForwardingMap
 import com.mojang.blaze3d.vertex.PoseStack
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -47,6 +48,11 @@ import settingdust.lazyyyyy.util.concurrent
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.BiConsumer
 
+private val coroutineExceptionHandler = CoroutineExceptionHandler { context, throwable ->
+    if (throwable is Exception || throwable is Error)
+        Lazyyyyy.logger.error("Error loading renderer in $context", throwable)
+}
+
 fun createEntityRenderersAsync(
     providers: Map<EntityType<*>, EntityRendererProvider<*>>,
     consumer: BiConsumer<EntityType<*>, EntityRendererProvider<*>>
@@ -74,23 +80,24 @@ class LazyEntityRenderer<T : Entity>(
             MutableSharedFlow<Triple<EntityType<*>, EntityRendererProvider.Context, EntityRenderer<*>>>()
     }
 
-    val loading = CoroutineScope(Dispatchers.IO + CoroutineName("Lazy Entity Renderer $type"))
-        .async(start = CoroutineStart.LAZY) { wrapped() }.also { loading ->
-            loading.invokeOnCompletion {
-                if (it != null) {
-                    Lazyyyyy.logger.error("Failed to create entity renderer for $type", it)
-                    return@invokeOnCompletion
+    val loading =
+        CoroutineScope(Dispatchers.IO + CoroutineName("Lazy Entity Renderer $type") + coroutineExceptionHandler)
+            .async(start = CoroutineStart.LAZY) { wrapped() }.also { loading ->
+                loading.invokeOnCompletion {
+                    if (it != null) {
+                        Lazyyyyy.logger.error("Failed to create entity renderer for $type", it)
+                        return@invokeOnCompletion
+                    }
+                    val renderer = loading.getCompleted()
+                    if (renderer is LivingEntityRenderer<*, *>) {
+                        (renderer as LivingEntityRendererAccessor).layers =
+                            CopyOnWriteArrayList((renderer as LivingEntityRendererAccessor).layers)
+                    }
+                    Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
+                    Minecraft.getInstance().entityRenderDispatcher.renderers[type] = renderer
+                    runBlocking { onLoaded.emit(Triple(type, context, renderer)) }
                 }
-                val renderer = loading.getCompleted()
-                if (renderer is LivingEntityRenderer<*, *>) {
-                    (renderer as LivingEntityRendererAccessor).layers =
-                        CopyOnWriteArrayList((renderer as LivingEntityRendererAccessor).layers)
-                }
-                Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
-                Minecraft.getInstance().entityRenderDispatcher.renderers[type] = renderer
-                runBlocking { onLoaded.emit(Triple(type, context, renderer)) }
             }
-        }
 
     private fun <R> handle(loaded: EntityRenderer<T>.() -> R, loading: () -> R) =
         if (this.loading.isCompleted) {
@@ -165,16 +172,17 @@ class LazyPlayerRenderer(
             MutableSharedFlow<Triple<String, EntityRendererProvider.Context, EntityRenderer<AbstractClientPlayer>>>()
     }
 
-    val loading = CoroutineScope(Dispatchers.IO + CoroutineName("Lazy Player Renderer $type"))
-        .async(start = CoroutineStart.LAZY) {
-            val renderer = wrapped()
-            (renderer as LivingEntityRendererAccessor).layers =
-                CopyOnWriteArrayList((renderer as LivingEntityRendererAccessor).layers)
-            Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$playerRenderers`[type] = renderer
-            Minecraft.getInstance().entityRenderDispatcher.playerRenderers[type] = renderer
-            runBlocking { onLoaded.emit(Triple(type, context, renderer)) }
-            renderer as EntityRenderer<AbstractClientPlayer>
-        }
+    val loading =
+        CoroutineScope(Dispatchers.IO + CoroutineName("Lazy Player Renderer $type") + coroutineExceptionHandler)
+            .async(start = CoroutineStart.LAZY) {
+                val renderer = wrapped()
+                (renderer as LivingEntityRendererAccessor).layers =
+                    CopyOnWriteArrayList((renderer as LivingEntityRendererAccessor).layers)
+                Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$playerRenderers`[type] = renderer
+                Minecraft.getInstance().entityRenderDispatcher.playerRenderers[type] = renderer
+                runBlocking { onLoaded.emit(Triple(type, context, renderer)) }
+                renderer as EntityRenderer<AbstractClientPlayer>
+            }
 
     private fun <R> handle(loaded: EntityRenderer<AbstractClientPlayer>.() -> R, loading: () -> R) =
         if (this.loading.isCompleted) {
@@ -260,7 +268,7 @@ class LazyBlockEntityRenderer<T : BlockEntity>(
     val wrapped: () -> BlockEntityRenderer<T>
 ) : BlockEntityRenderer<T> {
     val loading =
-        CoroutineScope(Dispatchers.IO + CoroutineName("Lazy Block Entity Renderer ${BlockEntityType.getKey(type)}"))
+        CoroutineScope(Dispatchers.IO + CoroutineName("Lazy Block Entity Renderer ${BlockEntityType.getKey(type)}") + coroutineExceptionHandler)
             .async(start = CoroutineStart.LAZY) { wrapped() }.also { loading ->
                 loading.invokeOnCompletion {
                     if (it != null) {
