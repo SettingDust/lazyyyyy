@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.minecraft.DetectedVersion
 import net.minecraft.server.packs.PackResources
 import net.minecraft.server.packs.PackType
@@ -39,7 +38,7 @@ class VanillaPackResourcesCache(
     }
 
     init {
-        scope.launch { loadCache() }
+        loadCache()
     }
 
     private suspend fun CoroutineScope.consumeRoot(root: Path) {
@@ -74,8 +73,8 @@ class VanillaPackResourcesCache(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
-    private suspend fun loadCache() =
-        withContext(CoroutineName("Vanilla pack cache #${pack.packId()}")) {
+    private fun loadCache() {
+        scope.launch(CoroutineName("Vanilla pack cache #${pack.packId()}")) {
             val time = measureTime {
                 require(pack is HashablePackResources)
                 val rootHashes =
@@ -158,6 +157,7 @@ class VanillaPackResourcesCache(
             }
             Lazyyyyy.logger.debug("Cache vanilla pack ${pack.packId()} in $time")
         }
+    }
 
     private suspend fun cachePack() = coroutineScope {
         joinAll(

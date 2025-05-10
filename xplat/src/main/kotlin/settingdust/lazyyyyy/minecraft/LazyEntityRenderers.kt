@@ -94,7 +94,6 @@ class LazyEntityRenderer<T : Entity>(
                             CopyOnWriteArrayList((renderer as LivingEntityRendererAccessor).layers)
                     }
                     Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$renderers`[type] = renderer
-                    Minecraft.getInstance().entityRenderDispatcher.renderers[type] = renderer
                     runBlocking { onLoaded.emit(Triple(type, context, renderer)) }
                 }
             }
@@ -179,7 +178,6 @@ class LazyPlayerRenderer(
                 (renderer as LivingEntityRendererAccessor).layers =
                     CopyOnWriteArrayList((renderer as LivingEntityRendererAccessor).layers)
                 Minecraft.getInstance().entityRenderDispatcher.`lazyyyyy$playerRenderers`[type] = renderer
-                Minecraft.getInstance().entityRenderDispatcher.playerRenderers[type] = renderer
                 runBlocking { onLoaded.emit(Triple(type, context, renderer)) }
                 renderer as EntityRenderer<AbstractClientPlayer>
             }

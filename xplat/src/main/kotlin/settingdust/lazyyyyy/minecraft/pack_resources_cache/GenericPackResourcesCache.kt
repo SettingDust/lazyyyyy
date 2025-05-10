@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import net.minecraft.server.packs.PackResources
 import net.minecraft.server.packs.PackType
 import settingdust.lazyyyyy.Lazyyyyy
@@ -32,13 +31,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
 
     var namespaces: MutableMap<PackType, CompletableDeferred<Set<String>>> = ConcurrentHashMap()
 
-    init {
-        try {
-            scope.launch { loadCache() }
-        } catch (e: Exception) {
-            logger.error("Error loading pack cache in $pack", e)
-        }
-    }
+    init { loadCache() }
 
     private suspend fun consumeRoot(
         root: Path,
@@ -88,10 +81,6 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
     }
 
     private suspend fun cachePack() = coroutineScope  {
-        for (type in PackType.entries) {
-            namespaces.computeIfAbsent(type) { CompletableDeferred() }
-        }
-
         val namespaces = ConcurrentHashMap<PackType, MutableSet<String>>()
 
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}] caching") }
@@ -105,8 +94,12 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
     }
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
-    private suspend fun loadCache() =
-        withContext(CoroutineName("Simple pack cache #${pack.packId()}")) {
+    private fun loadCache() {
+        for (type in PackType.entries) {
+            namespaces.computeIfAbsent(type) { CompletableDeferred() }
+        }
+
+        scope.launch(CoroutineName("Simple pack cache #${pack.packId()}")) {
             val time = measureTime {
                 val hash by lazy { (pack as HashablePackResources).`lazyyyyy$getHash`() }
 
@@ -166,7 +159,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
                                 launch {
                                     cachedData.namespaces.asSequence().asFlow().concurrent()
                                         .collect { (key, value) ->
-                                            namespaces[key] = CompletableDeferred(value)
+                                            namespaces[key]!!.complete(value)
                                         }
                                 },
                                 launch {
@@ -217,6 +210,7 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
             }
             Lazyyyyy.logger.debug("Cache pack ${pack.packId()} in $time")
         }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getNamespaces(type: PackType?): Set<String> {
