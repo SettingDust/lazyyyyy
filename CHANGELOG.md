@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.10] - 2025-05-10
+### :bug: Bug Fixes
+- [`e3dfe53`](https://github.com/SettingDust/lazyyyyy/commit/e3dfe53076492ba47002dbc105a3c4b79f80649b) - correct the loader prefir for BadOptimizations *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+### :wrench: Chores
+- [`e633b09`](https://github.com/SettingDust/lazyyyyy/commit/e633b0901a267d6a94f458dda07c4ebbd237e949) - **lazy-entity-renderers**: add exception handler for coroutine *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.14.9] - 2025-05-09
 ### :bug: Bug Fixes
 - [`263d323`](https://github.com/SettingDust/lazyyyyy/commit/263d3231cd8b5e67ddf336e4954c8846fbe002cc) - **lazy-entity-renderers**: allow mods use add layer event to modify the renderers *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -604,3 +612,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.14.7]: https://github.com/SettingDust/lazyyyyy/compare/0.14.6...0.14.7
 [0.14.8]: https://github.com/SettingDust/lazyyyyy/compare/0.14.7...0.14.8
 [0.14.9]: https://github.com/SettingDust/lazyyyyy/compare/0.14.8...0.14.9
+[0.14.10]: https://github.com/SettingDust/lazyyyyy/compare/0.14.9...0.14.10
