@@ -19,7 +19,7 @@ class LazyyyyyMixinCanceller : MixinCanceller {
             logger.info("Disabled ModernFix perf.resourcepacks")
             true
         }
-        mixinClassName.removePrefix("fabric").removePrefix("forge").startsWith("me.thosea.badoptimizations.mixin.renderer") -> {
+        mixinClassName.removePrefix("fabric.").removePrefix("forge.").startsWith("me.thosea.badoptimizations.mixin.renderer") -> {
             logger.info("Disabled BadOptimizations `enable_entity_renderer_caching` and `enable_block_entity_renderer_caching`")
             true
         }
