@@ -147,7 +147,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     val badOptimizations = "2.2.1-1.20.1"
     library("badOptimizations", "maven.modrinth", "badoptimizations").version(badOptimizations)
 
-    val reflect = "1.4.0"
+    val reflect = "1.5.0"
     library("reflect", "net.lenni0451", "Reflect").version(reflect)
 
     val hash4j = "0.21.0"

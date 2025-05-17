@@ -3,7 +3,7 @@ package settingdust.lazyyyyy.forge.core;
 import cpw.mods.modlauncher.api.IEnvironment;
 import cpw.mods.modlauncher.api.ITransformationService;
 import cpw.mods.modlauncher.api.ITransformer;
-import net.bytebuddy.agent.ByteBuddyAgent;
+import net.lenni0451.reflect.Agents;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +13,7 @@ import settingdust.lazyyyyy.forge.core.faster_mixin.injected.FasterMixinServiceW
 import settingdust.lazyyyyy.forge.core.faster_module.FasterModuleInstrumentationHack;
 import sun.misc.Unsafe;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
@@ -30,16 +31,16 @@ public class LazyyyyyHacksInjector implements ITransformationService {
     public LazyyyyyHacksInjector() {
         LOGGER.info("Constructing");
         try {
-            try {
-                attachAgent();
-            } catch (Throwable t) {
-                LazyyyyyHacksInjector.LOGGER.warn(
-                    "Error attaching bytebuddy agent, the major optimization for module resolver won't work");
-                LazyyyyyHacksInjector.LOGGER.debug(
-                    "Error attaching bytebuddy agent, the major optimization for module resolver won't work",
-                    t
-                );
-            }
+//            try {
+//                attachAgent();
+//            } catch (Throwable t) {
+//                LazyyyyyHacksInjector.LOGGER.warn(
+//                    "Error attaching dummy agent, the major optimization for module resolver won't work");
+//                LazyyyyyHacksInjector.LOGGER.debug(
+//                    "Error attaching dummy agent, the major optimization for module resolver won't work",
+//                    t
+//                );
+//            }
             ClassLoaderInjector.injectBootstrap();
             FasterModuleInstrumentationHack.replaceModuleResolver();
             ClassLoaderInjector.injectMcBootstrap();
@@ -50,7 +51,8 @@ public class LazyyyyyHacksInjector implements ITransformationService {
 
     private static void attachAgent() throws
                                       ClassNotFoundException,
-                                      NoSuchFieldException {
+                                      NoSuchFieldException,
+                                      IOException {
 
         Field ALLOW_ATTACH_SELF =
             Class.forName("sun.tools.attach.HotSpotVirtualMachine")
@@ -59,7 +61,7 @@ public class LazyyyyyHacksInjector implements ITransformationService {
         long allowAttachSelfOffset = UNSAFE.staticFieldOffset(ALLOW_ATTACH_SELF);
         boolean defaultValue = UNSAFE.getBooleanVolatile(allowAttachSelfBase, allowAttachSelfOffset);
         UNSAFE.putBooleanVolatile(allowAttachSelfBase, allowAttachSelfOffset, true);
-        ByteBuddyAgent.install();
+        Agents.getInstrumentation();
         UNSAFE.putBooleanVolatile(allowAttachSelfBase, allowAttachSelfOffset, defaultValue);
     }
 

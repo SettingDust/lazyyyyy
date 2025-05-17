@@ -27,8 +27,9 @@ dependencies {
     include(project(":lexforge:lexforge-mod"))
     implementation(project(":lexforge:lexforge-mc-bootstrap"))
 
-    shadow("net.bytebuddy:byte-buddy-agent:1.17.5") {
-        isTransitive = false
+    catalog.reflect.let {
+        implementation(it)
+        shadow(it)
     }
 }
 
@@ -56,6 +57,8 @@ tasks {
 
         // FIXME Workaround for https://github.com/GradleUp/shadow/issues/111
         from(jar)
+
+        relocate("net.lenni0451.reflect", "${project.group}.shadow.reflect")
 
         manifest {
             attributes(
