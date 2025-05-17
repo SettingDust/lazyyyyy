@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.12] - 2025-05-17
+### :recycle: Refactors
+- [`85c84e6`](https://github.com/SettingDust/lazyyyyy/commit/85c84e66e8df6b9353fe5ae77ca38d1295c2a014) - **lexforge/core**: rewrite the mixin injection *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.14.11] - 2025-05-10
 ### :bug: Bug Fixes
 - [`5bf5c00`](https://github.com/SettingDust/lazyyyyy/commit/5bf5c009eca103d44838b913500f40ec53fbc768) - **pack-resources-cache**: fix builtin pack won't be loaded *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -619,3 +624,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.14.9]: https://github.com/SettingDust/lazyyyyy/compare/0.14.8...0.14.9
 [0.14.10]: https://github.com/SettingDust/lazyyyyy/compare/0.14.9...0.14.10
 [0.14.11]: https://github.com/SettingDust/lazyyyyy/compare/0.14.10...0.14.11
+[0.14.12]: https://github.com/SettingDust/lazyyyyy/compare/0.14.11...0.14.12
