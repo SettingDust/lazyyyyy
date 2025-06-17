@@ -52,16 +52,12 @@ class AsyncImageRenderer(val original: Lazy<ImageRendererFactory.ImageSupplier>)
 fun asyncPrepareImageFromTexture(
     resource: Resource,
     original: (InputStream) -> ImageRendererFactory.ImageSupplier
-): ImageRendererFactory.ImageSupplier = object : ImageRendererFactory.ImageSupplier {
-    override fun completeImage() = AsyncImageRenderer(lazy { original(resource.open()) })
-}
+): ImageRendererFactory.ImageSupplier = ImageRendererFactory.ImageSupplier { AsyncImageRenderer(lazy { original(resource.open()) }) }
 
 fun asyncPrepareImageFromPath(
     path: Path,
     original: (InputStream) -> ImageRendererFactory.ImageSupplier
-): ImageRendererFactory.ImageSupplier = object : ImageRendererFactory.ImageSupplier {
-    override fun completeImage() = AsyncImageRenderer(lazy { original(path.inputStream()) })
-}
+): ImageRendererFactory.ImageSupplier = ImageRendererFactory.ImageSupplier { AsyncImageRenderer(lazy { original(path.inputStream()) }) }
 
 fun syncCompleteImage(
     original: () -> ImageRenderer

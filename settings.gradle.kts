@@ -180,6 +180,10 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     val patchouli = "1.20.1-84.1"
     library("patchouli-fabric", "maven.modrinth", "patchouli").version("$patchouli-fabric")
     library("patchouli-forge", "maven.modrinth", "patchouli").version("$patchouli-forge")
+
+    val structurify = "1.0.14"
+    library("structurify-fabric", "maven.modrinth", "structurify").version("fabric-mc1.20.1-$structurify")
+    library("structurify-forge", "maven.modrinth", "structurify").version("forge-mc1.20.1-$structurify")
 }
 
 plugins {

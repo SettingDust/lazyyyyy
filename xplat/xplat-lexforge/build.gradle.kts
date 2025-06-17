@@ -83,6 +83,8 @@ dependencies {
 
     modImplementation(catalog.botania.forge)
     modImplementation(catalog.patchouli.forge)
+
+    modImplementation(catalog.structurify.forge)
 }
 
 sourceSets {

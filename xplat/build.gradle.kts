@@ -78,6 +78,8 @@ dependencies {
 
     modImplementation(catalog.botania.fabric)
     modImplementation(catalog.patchouli.fabric)
+
+    modImplementation(catalog.structurify.fabric)
 }
 
 tasks {
