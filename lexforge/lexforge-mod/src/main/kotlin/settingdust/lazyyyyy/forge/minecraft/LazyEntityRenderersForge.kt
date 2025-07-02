@@ -27,6 +27,9 @@ object LazyEntityRenderersForge {
     init {
         CoroutineScope(Dispatchers.Default).launch {
             launch(CoroutineName("Lazy entity renderer loaded handler")) {
+                val playerRenderers by lazy {
+                    Minecraft.getInstance().entityRenderDispatcher.playerRenderers.keys.associateWith { DummyPlayerRenderer.INSTANCE!! }
+                }
                 LazyEntityRenderer.onLoaded.collect { (type, context, renderer) ->
                     val entityRenderDispatcher = Minecraft.getInstance().entityRenderDispatcher
                     if (renderer !is LivingEntityRenderer<*, *>) return@collect
@@ -35,7 +38,7 @@ object LazyEntityRenderersForge {
                     ModLoader.get().postEvent(
                         EntityRenderersEvent.AddLayers(
                             entityRenderDispatcher.renderers,
-                            emptyMap(),
+                            playerRenderers,
                             context
                         )
                     )
