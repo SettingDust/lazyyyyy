@@ -112,7 +112,7 @@ dependencies {
 
     modImplementation("maven.modrinth:weapon-master:1.4.3-1.20.1")
 
-    modImplementation("maven.modrinth:dynamictrees:1.20.1-1.4.1")
+    modImplementation("maven.modrinth:dynamictrees:1.20.1-1.4.5")
 
     modImplementation("fuzs.puzzleslib:puzzleslib-forge:8.1.25")
 
