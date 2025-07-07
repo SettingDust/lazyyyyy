@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.15] - 2025-07-07
+### :bug: Bug Fixes
+- [`609a295`](https://github.com/SettingDust/lazyyyyy/commit/609a295616f3ab5917240d363ce0bbbcb0921f2e) - **lazy-entity-renderers**: compat with `Habitat` *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.14.14] - 2025-07-02
 ### :bug: Bug Fixes
 - [`6982356`](https://github.com/SettingDust/lazyyyyy/commit/69823563ba9880e5d4a6c89f8c0d86f9e35a20dc) - **lazy-entity-renderers**: compat with `Rubinated Nether` *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -637,3 +642,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.14.12]: https://github.com/SettingDust/lazyyyyy/compare/0.14.11...0.14.12
 [0.14.13]: https://github.com/SettingDust/lazyyyyy/compare/0.14.12...0.14.13
 [0.14.14]: https://github.com/SettingDust/lazyyyyy/compare/0.14.13...0.14.14
+[0.14.15]: https://github.com/SettingDust/lazyyyyy/compare/0.14.14...0.14.15
