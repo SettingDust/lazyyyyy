@@ -135,7 +135,7 @@ dependencies {
     modImplementation("maven.modrinth:nuclearcraft-neoteric:1.2.0")
 
     modImplementation("maven.modrinth:cable-tiers:1.20.1-1.2.2")
-    modImplementation("maven.modrinth:refined-storage:1.12.4")
+    modImplementation("maven.modrinth:refined-storage:6FjuIJa6")
 
     modImplementation(catalog.modernfix.forge)
 
