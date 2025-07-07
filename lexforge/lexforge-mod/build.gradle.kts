@@ -144,6 +144,8 @@ dependencies {
     modImplementation("maven.modrinth:chloride:FORGE-mc1.20.1-v1.7.0")
 
     modImplementation("maven.modrinth:the-impossible-library:0.4.4")
+
+    modImplementation("maven.modrinth:habitat:1.3.1")
 }
 
 tasks {

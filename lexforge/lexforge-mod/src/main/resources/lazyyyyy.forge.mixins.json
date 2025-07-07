@@ -15,6 +15,7 @@
         "kiwi.faster_annotation.AnnotatedTypeLoaderMixin",
         "lazy_entity_renderers.EntityRenderDispatcherMixin",
         "lazy_entity_renderers.curios.Curios_ClientProxyMixin",
+        "lazy_entity_renderers.habitat.HabitatChestItemMixin",
         "lazy_entity_renderers.supplementaries.SignPostBlockTileRendererMixin",
         "lazy_entity_renderers.what_are_you_voting_for_2023.ClientEventBusSubscriberMixin",
         "lazy_model_bake.cable_tiers.ClientEventHandlerMixin",
