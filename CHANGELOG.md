@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.16] - 2025-07-27
+### :sparkles: New Features
+- [`7cc3b74`](https://github.com/SettingDust/lazyyyyy/commit/7cc3b743994ddffb93617c2a8de9e2df9300bfec) - **lazy-entity-renderers**: compat with `joy of painting` *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.14.15] - 2025-07-07
 ### :bug: Bug Fixes
 - [`609a295`](https://github.com/SettingDust/lazyyyyy/commit/609a295616f3ab5917240d363ce0bbbcb0921f2e) - **lazy-entity-renderers**: compat with `Habitat` *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -643,3 +648,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.14.13]: https://github.com/SettingDust/lazyyyyy/compare/0.14.12...0.14.13
 [0.14.14]: https://github.com/SettingDust/lazyyyyy/compare/0.14.13...0.14.14
 [0.14.15]: https://github.com/SettingDust/lazyyyyy/compare/0.14.14...0.14.15
+[0.14.16]: https://github.com/SettingDust/lazyyyyy/compare/0.14.15...0.14.16
