@@ -146,6 +146,8 @@ dependencies {
     modImplementation("maven.modrinth:the-impossible-library:0.4.4")
 
     modImplementation("maven.modrinth:habitat:1.3.1")
+
+    modImplementation(catalog.joyOfPainting.forge)
 }
 
 tasks {

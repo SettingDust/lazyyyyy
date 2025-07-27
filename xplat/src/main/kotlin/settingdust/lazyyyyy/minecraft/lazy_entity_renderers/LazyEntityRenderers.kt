@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.minecraft
+package settingdust.lazyyyyy.minecraft.lazy_entity_renderers
 
 import com.google.common.collect.ForwardingMap
 import com.mojang.blaze3d.vertex.PoseStack
@@ -97,6 +97,8 @@ class LazyEntityRenderer<T : Entity>(
                     runBlocking { onLoaded.emit(Triple(type, context, renderer)) }
                 }
             }
+
+    fun load() = runBlocking { loading.await() }
 
     private fun <R> handle(loaded: EntityRenderer<T>.() -> R, loading: () -> R) =
         if (this.loading.isCompleted) {

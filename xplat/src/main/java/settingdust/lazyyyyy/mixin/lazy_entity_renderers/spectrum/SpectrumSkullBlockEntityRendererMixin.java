@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import settingdust.lazyyyyy.minecraft.LazyEntityRenderersKt;
+import settingdust.lazyyyyy.minecraft.lazy_entity_renderers.LazyEntityRenderersKt;
 
 @IfModLoaded(SpectrumCommon.MOD_ID)
 @Mixin(SpectrumSkullBlockEntityRenderer.class)

@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import settingdust.lazyyyyy.minecraft.LazyEntityRenderDispatcher;
+import settingdust.lazyyyyy.minecraft.lazy_entity_renderers.LazyEntityRenderDispatcher;
 
 import java.util.Collections;
 import java.util.Map;

@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import settingdust.lazyyyyy.minecraft.LazyBlockEntityRenderer;
+import settingdust.lazyyyyy.minecraft.lazy_entity_renderers.LazyBlockEntityRenderer;
 
 import java.util.Map;
 

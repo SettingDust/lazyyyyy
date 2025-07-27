@@ -35,6 +35,7 @@
         "lazy_entity_renderers.bovines_and_buttercups.BovinesAndButtercupsClientForgeMixin",
         "lazy_entity_renderers.cloudstorage.ClientProxyMixin",
         "lazy_entity_renderers.curios.EntityRenderDispatcherMixin",
+        "lazy_entity_renderers.joy_of_painting.EntityRenderDispatcherMixin",
         "lazy_entity_renderers.quark.UsesForCursesModule_ClientMixin",
         "lazy_entity_renderers.taniwha.TForgeClientEventsMixin"
     ],

@@ -184,6 +184,10 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     val structurify = "1.0.14"
     library("structurify-fabric", "maven.modrinth", "structurify").version("fabric-mc1.20.1-$structurify")
     library("structurify-forge", "maven.modrinth", "structurify").version("forge-mc1.20.1-$structurify")
+
+    val joyOfPainting = "1.20.1-1.0.1"
+    library("joyOfPainting-fabric", "maven.modrinth", "joy-of-painting").version("$joyOfPainting-fabric")
+    library("joyOfPainting-forge", "maven.modrinth", "joy-of-painting").version("$joyOfPainting-forge")
 }
 
 plugins {

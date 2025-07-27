@@ -13,6 +13,7 @@ import settingdust.lazyyyyy.yacl.AsyncImageRenderer;
 public class ImageButtonWidgetMixin {
     @WrapOperation(
         method = "lambda$new$0",
+        remap = false,
         at = @At(
             value = "INVOKE",
             target = "Ldev/isxander/yacl3/gui/image/impl/AnimatedDynamicTextureImage;createWEBPFromTexture(Lnet/minecraft/resources/ResourceLocation;)Ldev/isxander/yacl3/gui/image/ImageRendererFactory;"

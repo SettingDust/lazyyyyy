@@ -14,14 +14,14 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.player.Player
 import net.minecraftforge.client.event.EntityRenderersEvent
 import net.minecraftforge.fml.ModLoader
-import settingdust.lazyyyyy.minecraft.DummyLivingEntityRenderer
-import settingdust.lazyyyyy.minecraft.DummyPlayerRenderer
-import settingdust.lazyyyyy.minecraft.LazyEntityRenderer
-import settingdust.lazyyyyy.minecraft.LazyPlayerRenderer
-import settingdust.lazyyyyy.minecraft.ObservableMap
-import settingdust.lazyyyyy.minecraft.`lazyyyyy$playerRenderers`
-import settingdust.lazyyyyy.minecraft.`lazyyyyy$renderers`
-import settingdust.lazyyyyy.minecraft.playerRenderers
+import settingdust.lazyyyyy.minecraft.lazy_entity_renderers.DummyLivingEntityRenderer
+import settingdust.lazyyyyy.minecraft.lazy_entity_renderers.DummyPlayerRenderer
+import settingdust.lazyyyyy.minecraft.lazy_entity_renderers.LazyEntityRenderer
+import settingdust.lazyyyyy.minecraft.lazy_entity_renderers.LazyPlayerRenderer
+import settingdust.lazyyyyy.minecraft.lazy_entity_renderers.ObservableMap
+import settingdust.lazyyyyy.minecraft.lazy_entity_renderers.`lazyyyyy$playerRenderers`
+import settingdust.lazyyyyy.minecraft.lazy_entity_renderers.`lazyyyyy$renderers`
+import settingdust.lazyyyyy.minecraft.lazy_entity_renderers.playerRenderers
 
 object LazyEntityRenderersForge {
     init {
