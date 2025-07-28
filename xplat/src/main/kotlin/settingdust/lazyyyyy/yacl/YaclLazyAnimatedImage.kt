@@ -19,14 +19,16 @@ import kotlin.io.path.inputStream
 
 class AsyncImageRenderer(val original: Lazy<ImageRendererFactory.ImageSupplier>) : ImageRenderer {
     private val loading =
-        CoroutineScope(Dispatchers.IO + CoroutineName("YACL Image Renderer"))
+        CoroutineScope(CoroutineName("YACL Image Renderer") + Dispatchers.Unconfined)
             .async(start = CoroutineStart.LAZY) { original.value.completeImage() }
+
+    fun load() = runBlocking { loading.await() }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun <T> getOrStart(completed: (ImageRenderer) -> T, loading: () -> T) = if (this.loading.isCompleted) {
         completed(this.loading.getCompleted())
     } else {
-        this.loading.start()
+        runBlocking(Dispatchers.IO) { this@AsyncImageRenderer.loading.start() }
         loading()
     }
 
@@ -63,4 +65,3 @@ fun syncCompleteImage(
     original: () -> ImageRenderer
 ): ImageRenderer =
     if (Minecraft.getInstance().isSameThread) original() else runBlocking(Lazyyyyy.mainThreadContext) { original() }
-
