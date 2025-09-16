@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.18] - 2025-09-16
+### :bug: Bug Fixes
+- [`314bc3d`](https://github.com/SettingDust/lazyyyyy/commit/314bc3dadc2599e8a386473754aa1a57ccb36fbe) - **pack-resources-cache**: avoid crash when packs isn't using directory path *(commit by [@SettingDust](https://github.com/SettingDust))*
+
+
 ## [0.14.17] - 2025-07-28
 ### :bug: Bug Fixes
 - [`6a5904e`](https://github.com/SettingDust/lazyyyyy/commit/6a5904eafa243eebc038c8a00184275fa869b6b8) - **yacl/lazy_animated_image**: compat with `structurify` again *(commit by [@SettingDust](https://github.com/SettingDust))*
@@ -655,3 +660,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.14.15]: https://github.com/SettingDust/lazyyyyy/compare/0.14.14...0.14.15
 [0.14.16]: https://github.com/SettingDust/lazyyyyy/compare/0.14.15...0.14.16
 [0.14.17]: https://github.com/SettingDust/lazyyyyy/compare/0.14.16...0.14.17
+[0.14.18]: https://github.com/SettingDust/lazyyyyy/compare/0.14.17...0.14.18
