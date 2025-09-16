@@ -23,7 +23,6 @@
         "nuclear_craft.faster_texture_util.TextureUtilMixin",
         "pack_resources_cache.ForgePathPackResourcesMixin",
         "pack_resources_cache.PathPackResourcesMixin",
-        "pack_resources_cache.ResourcePackLoaderMixin",
         "pack_resources_cache.dynamic_trees.FlatTreeResourcePackMixin",
         "pack_resources_cache.sinytra_connector.ModNioResourcePackMixin",
         "prismlib.faster_colors_loader.WebColorsMixin",

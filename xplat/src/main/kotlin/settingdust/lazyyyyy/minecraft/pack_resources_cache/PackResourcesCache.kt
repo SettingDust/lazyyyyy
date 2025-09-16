@@ -29,6 +29,7 @@ import settingdust.lazyyyyy.util.merge
 import java.io.Closeable
 import java.io.IOException
 import java.io.InputStream
+import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ConcurrentHashMap
@@ -38,7 +39,7 @@ import kotlin.time.Duration.Companion.nanoseconds
 
 typealias FileConsumer = (Path) -> Unit?
 
-abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>) : Closeable {
+abstract class PackResourcesCache(val pack: PackResources, roots: List<Path>) : Closeable {
     companion object {
         val JOINER: Joiner = Joiner.on('/').useForNull("null")
 
@@ -49,6 +50,14 @@ abstract class PackResourcesCache(val pack: PackResources, val roots: List<Path>
         val coroutineExceptionHandler = CoroutineExceptionHandler { context, throwable ->
             if (throwable is Exception || throwable is Error)
                 Lazyyyyy.logger.error("Error loading pack cache in $context", throwable)
+        }
+    }
+
+    val roots: List<Path> = roots.map {
+        if (it.isDirectory()) {
+            it
+        } else {
+            FileSystems.newFileSystem(it).getPath("") ?: error("Path $it is not valid")
         }
     }
 
