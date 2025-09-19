@@ -45,9 +45,8 @@ public abstract class FilePackResourcesMixin implements CachingPackResources, Ha
     }
 
     @Inject(method = "close", remap = false, at = @At("TAIL"))
-    private void lazyyyyy$close(final CallbackInfo ci) throws IOException {
+    private void lazyyyyy$close(final CallbackInfo ci) {
         lazyyyyy$cache.close();
-        lazyyyyy$fs.close();
     }
 
     @WrapMethod(method = "getNamespaces")
