@@ -9,13 +9,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/lexforge" />
-            <option value="$PROJECT_DIR$/lexforge/lexforge-bootstrap" />
-            <option value="$PROJECT_DIR$/lexforge/lexforge-core" />
-            <option value="$PROJECT_DIR$/lexforge/lexforge-mc-bootstrap" />
-            <option value="$PROJECT_DIR$/lexforge/lexforge-mod" />
-            <option value="$PROJECT_DIR$/xplat" />
-            <option value="$PROJECT_DIR$/xplat/xplat-lexforge" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="true" />

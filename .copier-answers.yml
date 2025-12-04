@@ -1,0 +1,10 @@
+# Changes here will be overwritten by Copier
+_commit: 0.1.8-24-g3392e31
+_src_path: https://github.com/SettingDust/cloche-template
+author: SettingDust
+description: Optimizations for many points
+group: settingdust.lazyyyyy
+id: lazyyyyy
+license: Apache License 2.0
+name: Lazyyyyy
+slug: lazyyyyy

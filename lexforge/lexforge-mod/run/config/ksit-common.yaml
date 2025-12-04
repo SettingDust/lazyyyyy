@@ -1,0 +1,6 @@
+# Use Cloth Config mod for the descriptions.
+---
+sitOnSlab: true
+sitOnStairs: true
+sitOnCarpet: true
+sitOnBed: true
