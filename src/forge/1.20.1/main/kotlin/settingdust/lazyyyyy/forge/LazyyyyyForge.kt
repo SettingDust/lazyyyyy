@@ -1,11 +1,11 @@
 package settingdust.lazyyyyy.forge
 
+import dev.nyon.klf.MOD_BUS
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent
 import settingdust.lazyyyyy.Lazyyyyy
 import settingdust.lazyyyyy.util.Entrypoint
-import thedarkcolour.kotlinforforge.forge.MOD_BUS
 
 @Mod(Lazyyyyy.ID)
 object LazyyyyyForge {

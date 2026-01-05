@@ -40,7 +40,7 @@ plugins {
 
     id("com.gradleup.shadow") version "9.2.2"
 
-    id("earth.terrarium.cloche") version "0.16.21-dust"
+    id("earth.terrarium.cloche") version "0.17.4-dust.2"
 }
 
 val archive_name: String by rootProject.properties
@@ -67,6 +67,16 @@ repositories {
     maven("https://repo.nyon.dev/releases") {
         content {
             includeGroup("dev.nyon")
+        }
+    }
+
+    maven("https://raw.githubusercontent.com/settingdust/maven/main/repository/") {
+        name = "SettingDust's Maven"
+    }
+
+    maven("https://maven.lenni0451.net/snapshots/") {
+        content {
+            includeGroupAndSubgroups("net.lenni0451")
         }
     }
 
@@ -115,8 +125,6 @@ dependencies {
         }
     }
 }
-
-val containerTasks = mutableSetOf<TaskProvider<out Jar>>()
 
 cloche {
     metadata {
@@ -182,15 +190,25 @@ cloche {
         // mixins.from("src/common/1.21.1/main/resources/$id.1_21.mixins.json")
     }
 
+    val commonFasterModuleResolver = common("common:faster-module-resolver") {
+        dependsOn(commonMain)
+
+        dependencies {
+            compileOnly("org.spongepowered:mixin:0.8.7")
+        }
+    }
+
     run fabric@{
         val fabricCommon = common("fabric:common") {
-            dependsOn(commonGame, commonMain)
+            dependsOn(commonGame, commonMain, commonFasterModuleResolver)
 
             // mixins.from(file("src/fabric/common/main/resources/$id.fabric.mixins.json"))
         }
 
         val fabric1201 = fabric("fabric:1.20.1") {
-            dependsOn(commonMain, common1201, commonGame, commonGame1201)
+            dependsOn(commonMain, common1201, commonGame, commonGame1201, commonFasterModuleResolver)
+
+            sourceSet.the<SourceSetStaticLinkageInfo>().weakTreeLink(commonGame.sourceSet, commonMain.sourceSet)
 
             minecraftVersion = "1.20.1"
 
@@ -209,6 +227,8 @@ cloche {
 
             dependencies {
                 fabricApi("0.92.6")
+
+                implementation(catalog.preloadingTricks)
             }
 
             tasks.named<GenerateFabricModJson>(generateModsManifestTaskName) {
@@ -217,7 +237,7 @@ cloche {
         }
 
         val fabric121 = fabric("fabric:1.21") {
-            dependsOn(commonMain, common121, commonGame, commonGame121)
+            dependsOn(commonMain, common121, commonGame, commonGame121, commonFasterModuleResolver)
 
             sourceSet.the<SourceSetStaticLinkageInfo>().weakTreeLink(commonGame.sourceSet, commonMain.sourceSet)
 
@@ -237,6 +257,8 @@ cloche {
 
             dependencies {
                 fabricApi("0.116.6")
+
+                implementation(catalog.preloadingTricks)
             }
 
             tasks.named<GenerateFabricModJson>(generateModsManifestTaskName) {
@@ -298,8 +320,6 @@ cloche {
                     fromResolutionResults(include)
                 }
 
-                containerTasks += includesJar
-
                 build {
                     dependsOn(includesJar)
                 }
@@ -342,8 +362,37 @@ cloche {
     }
 
     run forge@{
-        val forge1201 = forge("forge:1.20.1") {
-            dependsOn(commonMain, common1201)
+        val forgeService = forge("forge:service") {
+            dependsOn(commonMain, common1201, commonFasterModuleResolver)
+
+            minecraftVersion = "1.20.1"
+            loaderVersion = "47.4.4"
+
+            repositories {
+                maven("https://repo.spongepowered.org/maven") {
+                    content {
+                        includeGroup("org.spongepowered")
+                    }
+                }
+            }
+
+            dependencies {
+                implementation("org.spongepowered:mixin:0.8.7")
+                compileOnly(catalog.mixinextras.common)
+                implementation(catalog.mixinextras.forge)
+
+                implementation(catalog.preloadingTricks)
+            }
+
+            tasks {
+                named(generateModsTomlTaskName) {
+                    enabled = false
+                }
+            }
+        }
+
+        val forgeGame = forge("forge:game") {
+            dependsOn(commonGame, commonGame1201)
 
             minecraftVersion = "1.20.1"
             loaderVersion = "47.4.4"
@@ -382,7 +431,19 @@ cloche {
                 compileOnly(catalog.mixinextras.common)
                 implementation(catalog.mixinextras.forge)
 
-//                modImplementation(catalog.klf)
+                modImplementation(catalog.klf.get1().get20().forge)
+
+                implementation(project(":")) {
+                    capabilities {
+                        requireFeature(forgeService.capabilitySuffix!!)
+                    }
+                }
+
+                implementation(project(":")) {
+                    capabilities {
+                        requireFeature(commonMain.capabilitySuffix)
+                    }
+                }
             }
 
             tasks {
@@ -393,11 +454,58 @@ cloche {
                         )
                     }
                 }
+
+                named(accessWidenTaskName) {
+                    dependsOn(forgeService.accessWidenTaskName)
+                }
+            }
+        }
+
+        forge("version:forge:1.20.1") {
+            minecraftVersion = "1.20.1"
+            loaderVersion = "47.4.4"
+
+            runs {
+                client {
+                    env("MOD_CLASSES", "")
+                }
+            }
+
+            dependencies {
+                implementation(project(":")) {
+                    capabilities {
+                        requireFeature(forgeService.capabilitySuffix!!)
+                    }
+                }
+                implementation(project(":")) {
+                    capabilities {
+                        requireFeature(forgeGame.capabilitySuffix!!)
+                    }
+                }
+            }
+
+            tasks {
+                named(jarTaskName) {
+                    enabled = false
+                }
+
+                named(remapJarTaskName) {
+                    enabled = false
+                }
+
+                named(includeJarTaskName) {
+                    enabled = false
+                }
+
+                named(accessWidenTaskName) {
+                    dependsOn(forgeService.accessWidenTaskName, forgeGame.accessWidenTaskName)
+                }
             }
         }
 
         run container@{
             val featureName = "containerForge"
+
             val include = configurations.register(lowerCamelCaseGradleName(featureName, "include")) {
                 isCanBeResolved = true
                 isTransitive = false
@@ -408,14 +516,32 @@ cloche {
                     attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, false)
                 }
             }
-            val targets = setOf(forge1201)
+
+            val embed = configurations.register(lowerCamelCaseGradleName(featureName, "embed")) {
+                isCanBeResolved = true
+                isTransitive = false
+
+                attributes {
+                    attribute(
+                        LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+                        objects.named(LibraryElements.CLASSES_AND_RESOURCES)
+                    )
+                    attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, false)
+                }
+            }
 
             dependencies {
-                for (target in targets) {
-                    include(project(":")) {
-                        capabilities {
-                            requireFeature(target.capabilitySuffix!!)
-                        }
+                include(project(":")) {
+                    capabilities {
+                        requireFeature(forgeGame.capabilitySuffix!!)
+                    }
+                }
+            }
+
+            project.dependencies {
+                embed(project(":")) {
+                    capabilities {
+                        requireFeature(forgeService.capabilitySuffix!!)
                     }
                 }
             }
@@ -426,6 +552,8 @@ cloche {
 
                     archiveClassifier = "forge"
                     destinationDirectory = intermediateOutputsDirectory
+
+                    from(embed)
                 }
 
                 val includesJar = register<JarJar>(lowerCamelCaseGradleName(featureName, "includeJar")) {
@@ -436,8 +564,6 @@ cloche {
                     input = jar.flatMap { it.archiveFile }
                     fromResolutionResults(include)
                 }
-
-                containerTasks += includesJar
 
                 build {
                     dependsOn(includesJar)
@@ -472,6 +598,7 @@ cloche {
             }
 
             dependencies {
+                modImplementation(catalog.klf.get1().get21().neoforge)
             }
 
             tasks {
@@ -528,8 +655,6 @@ cloche {
                     fromResolutionResults(include)
                 }
 
-                containerTasks += includesJar
-
                 build {
                     dependsOn(includesJar)
                 }
@@ -538,8 +663,6 @@ cloche {
     }
 
     targets.all {
-        dependsOn(commons.getValue(minecraftVersion.get()))
-
         runs {
             (client as LazyConfigurableInternal<MinecraftRunConfiguration>).onConfigured {
                 it.jvmArguments(
@@ -586,6 +709,18 @@ val MinecraftTarget.generateModsManifestTaskName: String
         else -> throw IllegalArgumentException("Unsupported target $this")
     }
 
+val MinecraftTarget.jarTaskName: String
+    get() = lowerCamelCaseGradleName(featureName, "jar")
+
+val MinecraftTarget.remapJarTaskName: String
+    get() = lowerCamelCaseGradleName(featureName, "remapJar")
+
+val MinecraftTarget.accessWidenTaskName: String
+    get() = lowerCamelCaseGradleName("accessWiden", featureName, "minecraft")
+
+val MinecraftTarget.decompileMinecraftTaskName: String
+    get() = lowerCamelCaseGradleName("decompile", featureName, "minecraft")
+
 tasks {
     withType<ProcessResources> {
         duplicatesStrategy = DuplicatesStrategy.WARN
@@ -602,15 +737,21 @@ tasks {
     val shadowContainersJar by registering(ShadowJar::class) {
         archiveClassifier = ""
 
-        for (task in containerTasks) {
-            from(task.map { zipTree(it.archiveFile) })
-            manifest.from(task.get().manifest)
-        }
+        val fabricJar = project.tasks.named<Jar>(lowerCamelCaseGradleName("containerFabric", "includeJar"))
+        from(fabricJar.map { zipTree(it.archiveFile) })
+        manifest.from(fabricJar.get().manifest)
 
-        manifest {
-            attributes(
-                "FMLModType" to "GAMELIBRARY"
-            )
+        val forgeJar = project.tasks.named<Jar>(lowerCamelCaseGradleName("containerForge", "includeJar"))
+        from(forgeJar.map { zipTree(it.archiveFile) })
+        manifest.from(forgeJar.get().manifest)
+
+        val neoforgeJar =
+            project.tasks.named<Jar>(lowerCamelCaseGradleName("containerNeoforge", "includeJar"))
+        from(neoforgeJar.map { zipTree(it.archiveFile) }) {
+            include("settingdust/$id/neoforge/**/*")
+            include("META-INF/services/*")
+            include("META-INF/jarjar/*")
+            include("META-INF/jars/*")
         }
 
         append("META-INF/accesstransformer.cfg")

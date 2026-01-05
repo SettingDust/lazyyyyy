@@ -1,12 +1,14 @@
+import maven
+
 dependencyResolutionManagement {
     pluginManagement {
         repositories {
             mavenCentral()
             gradlePluginPortal()
             maven("https://maven.msrandom.net/repository/cloche")
-            maven("https://raw.githubusercontent.com/SettingDust/cloche/refs/heads/maven-repo/")
-            maven("https://raw.githubusercontent.com/SettingDust/minecraft-codev/refs/heads/maven-repo/")
-            maven("https://raw.githubusercontent.com/SettingDust/jvm-multiplatform/refs/heads/maven-repo/")
+            maven("https://raw.githubusercontent.com/settingdust/maven/main/repository/") {
+                name = "SettingDust's Maven"
+            }
             mavenLocal()
         }
     }
@@ -157,7 +159,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
         )
     )
 
-    library("preloadingTricks", "maven.modrinth", "preloading-tricks").version("3.3.1")
+    library("preloadingTricks", "settingdust.preloading_tricks", "PreloadingTricks").version("3.4.5")
 
     maven(
         id = "klf",
@@ -167,11 +169,11 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
             "1.20" to "2.0",
             "1.21" to "3.1"
         ),
-        versionFormat = {mcVer, ver -> "2.10.6-k2.2.21-$ver"},
+        versionFormat = { _, ver -> "2.10.6-k2.2.21-$ver" },
         mapping = listOf(
             VariantMapping(
                 "1.20", mapOf(
-                    "neoforge" to VariantConfig(versionTransformer = VersionTransformers.versionPlusLoader)
+                    "forge" to VariantConfig(versionTransformer = VersionTransformers.versionPlusLoader)
                 )
             ),
             VariantMapping(
