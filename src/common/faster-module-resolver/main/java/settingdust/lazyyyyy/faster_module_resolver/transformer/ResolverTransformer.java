@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Base on <a href="https://github.com/openjdk/jdk/pull/15926/changes">Technici4n's PR</a>
+ */
 @Mixin(targets = "java.lang.module.Resolver")
 public class ResolverTransformer {
     @Shadow

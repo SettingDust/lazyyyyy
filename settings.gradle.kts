@@ -1,5 +1,3 @@
-import maven
-
 dependencyResolutionManagement {
     pluginManagement {
         repositories {
@@ -183,6 +181,8 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
             )
         )
     )
+
+    library("mixin-fabric", "net.fabricmc", "sponge-mixin").version("0.17.0+mixin.0.8.7")
 }
 
 plugins {

@@ -8,6 +8,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import earth.terrarium.cloche.INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE
 import earth.terrarium.cloche.REMAPPED_ATTRIBUTE
+import earth.terrarium.cloche.api.attributes.IncludeTransformationStateAttribute
 import earth.terrarium.cloche.api.attributes.MinecraftModLoader
 import earth.terrarium.cloche.api.attributes.TargetAttributes
 import earth.terrarium.cloche.api.metadata.CommonMetadata
@@ -38,9 +39,9 @@ plugins {
 
     id("com.palantir.git-version") version "4.2.0"
 
-    id("com.gradleup.shadow") version "9.2.2"
+    id("com.gradleup.shadow") version "9.3.0"
 
-    id("earth.terrarium.cloche") version "0.17.4-dust.2"
+    id("earth.terrarium.cloche") version "0.17.4-dust.5"
 }
 
 val archive_name: String by rootProject.properties
@@ -70,14 +71,14 @@ repositories {
         }
     }
 
-    maven("https://raw.githubusercontent.com/settingdust/maven/main/repository/") {
-        name = "SettingDust's Maven"
-    }
-
     maven("https://maven.lenni0451.net/snapshots/") {
         content {
             includeGroupAndSubgroups("net.lenni0451")
         }
+    }
+
+    maven("https://raw.githubusercontent.com/settingdust/maven/main/repository/") {
+        name = "SettingDust's Maven"
     }
 
     mavenCentral()
@@ -368,25 +369,37 @@ cloche {
             minecraftVersion = "1.20.1"
             loaderVersion = "47.4.4"
 
-            repositories {
-                maven("https://repo.spongepowered.org/maven") {
-                    content {
-                        includeGroup("org.spongepowered")
-                    }
-                }
-            }
-
             dependencies {
-                implementation("org.spongepowered:mixin:0.8.7")
+                implementation(catalog.mixin.fabric)
                 compileOnly(catalog.mixinextras.common)
                 implementation(catalog.mixinextras.forge)
 
                 implementation(catalog.preloadingTricks)
             }
 
+            val embedMixin by configurations.register(lowerCamelCaseGradleName(featureName, "embedMixin")) {
+                isTransitive = false
+
+                attributes
+                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
+                    .attribute(REMAPPED_ATTRIBUTE, false)
+                    .attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, true)
+                    .attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
+            }
+
+            project.dependencies {
+                embedMixin(catalog.mixin.fabric)
+            }
+
             tasks {
                 named(generateModsTomlTaskName) {
                     enabled = false
+                }
+
+                named<Jar>(jarTaskName) {
+                    from(embedMixin) {
+                        rename { "sponge-mixin.jar" }
+                    }
                 }
             }
         }
@@ -427,7 +440,7 @@ cloche {
             }
 
             dependencies {
-                implementation("org.spongepowered:mixin:0.8.7")
+                implementation(catalog.mixin.fabric)
                 compileOnly(catalog.mixinextras.common)
                 implementation(catalog.mixinextras.forge)
 
@@ -472,6 +485,7 @@ cloche {
             }
 
             dependencies {
+                legacyClasspath(catalog.mixin.fabric)
                 implementation(project(":")) {
                     capabilities {
                         requireFeature(forgeService.capabilitySuffix!!)
@@ -500,6 +514,14 @@ cloche {
                 named(accessWidenTaskName) {
                     dependsOn(forgeService.accessWidenTaskName, forgeGame.accessWidenTaskName)
                 }
+            }
+
+            configurations.named(sourceSet.runtimeClasspathConfigurationName) {
+                exclude("org.spongepowered", "mixin")
+            }
+
+            configurations.named(lowerCamelCaseGradleName(featureName, "minecraftLibraries")) {
+                exclude("org.spongepowered", "mixin")
             }
         }
 
