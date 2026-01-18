@@ -7,7 +7,7 @@ import settingdust.preloading_tricks.api.PreloadingEntrypoint
 
 class LazyyyyyFabricEntrypoint : PreloadingEntrypoint {
     init {
-        LazyyyyyEarlyConfig.registerDisableCondition(
+        LazyyyyyEarlyConfig.instance().registerDisableCondition(
             "faster_module_resolver",
             { true },  // always disabled on fabric
             "fabric has no usage of java module"

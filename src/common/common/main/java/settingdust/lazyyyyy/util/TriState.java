@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.config;
+package settingdust.lazyyyyy.util;
 
 /**
  * Tristate for configuration values.

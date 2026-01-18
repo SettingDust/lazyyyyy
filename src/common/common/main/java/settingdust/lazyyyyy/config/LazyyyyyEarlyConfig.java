@@ -1,109 +1,114 @@
 package settingdust.lazyyyyy.config;
 
 import com.google.common.base.Suppliers;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import settingdust.lazyyyyy.Lazyyyyy;
+import settingdust.lazyyyyy.api.config.FeatureConfig;
+import settingdust.lazyyyyy.api.config.FeatureDefinition;
 import settingdust.lazyyyyy.util.LoaderAdapter;
+import settingdust.lazyyyyy.util.TriState;
+import settingdust.lazyyyyy.util.config.ConfigIO;
+import settingdust.lazyyyyy.util.config.FeatureEvaluator;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-public class LazyyyyyEarlyConfig {
-    private static final Logger LOGGER = LogManager.getLogger("Lazyyyyy");
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH = LoaderAdapter.get().getConfigDirectory().resolve("lazyyyyy/early.json");
+/**
+ * Early configuration for lazyyyyy features.
+ * Singleton pattern with static feature definitions and instance state.
+ */
+public class LazyyyyyEarlyConfig implements FeatureConfig {
+    private static final Path CONFIG_PATH = LoaderAdapter.get().getConfigDirectory().resolve("lazyyyyy/early.properties");
+
+    // Static feature definitions
+    private static final List<FeatureDefinition> FEATURES = List.of(
+            FeatureDefinition.enabled("faster_mixin",
+                    "Optimizes mixin configuration loading for faster startup"),
+            FeatureDefinition.enabled("faster_module_resolver",
+                    "Accelerates Java module resolution (Java 17-21)",
+                    "Note: Automatically disabled on Fabric")
+    );
+    
+    private static final String[] HEADER = new String[]{
+            "Lazyyyyy Early Configuration",
+            "============================",
+            "",
+            "This file controls early-stage features that load before Minecraft."
+    };
 
     private static final Supplier<LazyyyyyEarlyConfig> INSTANCE = Suppliers.memoize(() -> {
         try {
             return load();
         } catch (IOException e) {
-            LOGGER.error("Failed to load config from {}", CONFIG_PATH, e);
+            Lazyyyyy.LOGGER.error("Failed to load config from {}", CONFIG_PATH, e);
             return createDefault();
         }
     });
 
-    // Default enabled state for features
-    private static final Map<String, Boolean> DEFAULT_ENABLED = Map.of(
-            "faster_mixin", true,
-            "faster_module_resolver", true
-    );
-    
-    // Feature toggle manager
-    private static final FeatureToggleManager<String> FEATURE_MANAGER = new FeatureToggleManager<>(DEFAULT_ENABLED, LOGGER);
+    // Instance state
+    private final Map<String, TriState> states;
+    private final Map<String, Boolean> defaults;
+    private final Map<String, FeatureEvaluator.DisableCondition> conditions = new HashMap<>();
 
-    private Map<String, TriState> features;
+    private LazyyyyyEarlyConfig(Map<String, TriState> states) {
+        this.states = states;
+        this.defaults = FeatureEvaluator.buildDefaults(FEATURES);
+    }
 
     public static LazyyyyyEarlyConfig instance() {
         return INSTANCE.get();
     }
 
-    /**
-     * Register a feature definition with disable condition and reason.
-     *
-     * @param featureName the feature name
-     * @param disableCondition condition that disables the feature (returns true when should be disabled)
-     * @param disableReason reason identifier for logging
-     */
-    public static void registerDisableCondition(String featureName, BooleanSupplier disableCondition, String disableReason) {
-        FEATURE_MANAGER.registerDisableCondition(featureName, disableCondition, disableReason);
+    @Override
+    public void registerDisableCondition(String featureName, BooleanSupplier condition, String reason) {
+        conditions.put(featureName, new FeatureEvaluator.DisableCondition(condition, reason));
     }
 
+    @Override
+    public boolean isFeatureEnabled(String featureName) {
+        return FeatureEvaluator.isEnabled(featureName, states, defaults, conditions);
+    }
+
+    @Override
+    public List<FeatureDefinition> getDefinitions() {
+        return FEATURES;
+    }
+
+    @Override
+    public Map<String, TriState> getStates() {
+        return states;
+    }
+
+    @Override
+    public Path getFilePath() {
+        return CONFIG_PATH;
+    }
+
+    @Override
+    public String[] getFileHeader() {
+        return HEADER;
+    }
+
+    // Load/Save logic using utility functions
     private static LazyyyyyEarlyConfig load() throws IOException {
-        LazyyyyyEarlyConfig config = Files.exists(CONFIG_PATH)
-                ? loadFromFile()
-                : createDefaultAndSave();
-        
-        // Apply states and log
-        config.features.forEach(FEATURE_MANAGER::setState);
-        FEATURE_MANAGER.logDisabledFeatures();
-        
-        return config;
-    }
-
-    private static LazyyyyyEarlyConfig loadFromFile() throws IOException {
-        String json = Files.readString(CONFIG_PATH);
-        LazyyyyyEarlyConfig config = GSON.fromJson(json, LazyyyyyEarlyConfig.class);
-        LOGGER.debug("Loaded config from {}", CONFIG_PATH);
-        return config != null ? config : createDefault();
-    }
-
-    private static LazyyyyyEarlyConfig createDefaultAndSave() throws IOException {
-        LOGGER.info("Config file not found at {}, creating default", CONFIG_PATH);
         LazyyyyyEarlyConfig config = createDefault();
-        config.save();
-        return config;
+        Map<String, TriState> states = ConfigIO.load(config);
+        
+        LazyyyyyEarlyConfig loaded = new LazyyyyyEarlyConfig(states);
+        FeatureEvaluator.logDisabledFeatures(loaded.states, loaded.defaults, loaded.conditions);
+        
+        return loaded;
     }
 
     private static LazyyyyyEarlyConfig createDefault() {
-        LazyyyyyEarlyConfig config = new LazyyyyyEarlyConfig();
-        
-        // Initialize feature manager
-        FEATURE_MANAGER.initializeDefaults();
-        config.features = FEATURE_MANAGER.getStates();
-        
-        return config;
-    }
-
-    private void save() throws IOException {
-        Files.createDirectories(CONFIG_PATH.getParent());
-        String json = GSON.toJson(this);
-        Files.writeString(CONFIG_PATH, json);
-        LOGGER.debug("Saved config to {}", CONFIG_PATH);
-    }
-
-    /**
-     * Check if a feature is enabled.
-     *
-     * @param featureName the feature name
-     * @return true if enabled, false otherwise
-     */
-    public boolean isFeatureEnabled(String featureName) {
-        return FEATURE_MANAGER.isEnabled(featureName);
+        Map<String, TriState> defaultStates = new HashMap<>();
+        for (FeatureDefinition def : FEATURES) {
+            defaultStates.put(def.name(), TriState.DEFAULT);
+        }
+        return new LazyyyyyEarlyConfig(defaultStates);
     }
 }
