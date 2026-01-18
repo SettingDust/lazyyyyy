@@ -108,7 +108,7 @@ fun VersionCatalogBuilder.dependency(id: String, group: String, block: MultiVers
 
     dep.configs.forEach { config ->
         val version = dep.versionFormat(config.mcVersion, config.modVersion)
-        val mcVersionName = "mc${config.mcVersion}"
+        val mcVersionName = "mc${config.mcVersion.replace("_", "")}"
         
         config.loaders.forEach { (loaderName, variant) ->
             val finalArtifact = variant.artifactFormatter.format(dep.artifact, loaderName, config.mcVersion)
@@ -126,6 +126,7 @@ fun VersionCatalogBuilder.dependency(id: String, group: String, block: MultiVers
     }
 }
 
+@Suppress("SpellCheckingInspection")
 fun VersionCatalogBuilder.modrinth(id: String, block: MultiVersionDepBuilder.() -> Unit) {
     dependency(id, "maven.modrinth", block)
 }
@@ -143,7 +144,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     }
 
     library("preloadingTricks", "settingdust.preloading_tricks", "PreloadingTricks")
-        .version("3.4.5.dirty")
+        .version("3.4.5")
 
     dependency("klf", "dev.nyon") {
         artifact = "KotlinLangForge"

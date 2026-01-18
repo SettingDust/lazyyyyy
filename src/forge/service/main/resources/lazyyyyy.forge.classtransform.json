@@ -1,0 +1,6 @@
+{
+  "package": "settingdust.lazyyyyy.forge.service.transformer",
+  "transformers": [
+    "ContainerHandleModLauncherEx$SecureJarResourceTransformer"
+  ]
+}

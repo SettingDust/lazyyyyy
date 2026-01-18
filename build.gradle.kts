@@ -41,7 +41,7 @@ plugins {
 
     id("com.gradleup.shadow") version "9.3.0"
 
-    id("earth.terrarium.cloche") version "0.17.4-dust.6"
+    id("earth.terrarium.cloche") version "0.17.6-dust.0"
 }
 
 val archive_name: String by rootProject.properties
@@ -486,7 +486,7 @@ cloche {
                 compileOnly(catalog.mixinextras.common)
                 implementation(catalog.mixinextras.forge)
 
-                modImplementation(catalog.klf.mc1_20.forge)
+                modImplementation(catalog.klf.mc120.forge)
 
                 implementation(project(":")) {
                     capabilities {
@@ -666,11 +666,11 @@ cloche {
             }
 
             dependencies {
-                modImplementation(catalog.klf.mc1_21.neoforge)
+                modImplementation(catalog.klf.mc121.neoforge)
             }
 
             tasks {
-                named<Jar>(lowerCamelCaseGradleName(featureName, "jar")) {
+                named<Jar>(jarTaskName) {
                     manifest {
                         attributes(
                             "ForgeVariant" to "NeoForge"
