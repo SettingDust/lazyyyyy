@@ -111,6 +111,8 @@ class MinecraftModLoaderCompatibilityRule : AttributeCompatibilityRule<Minecraft
 }
 
 dependencies {
+    implementation(project(":"))
+    implementation(project(":"))
     attributesSchema {
         attribute(TargetAttributes.MINECRAFT_VERSION) {
             compatibilityRules.add(MinecraftVersionCompatibilityRule::class)
@@ -194,6 +196,10 @@ cloche {
     val commonFasterModuleResolver = common("common:faster-module-resolver") {
         dependencies {
             compileOnly(catalog.mixin.fabric)
+        }
+
+        project.dependencies {
+            val implementation = lowerCamelCaseGradleName(name, JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
 
             implementation(project(":")) {
                 capabilities {
@@ -206,12 +212,6 @@ cloche {
     val commonFasterMixin = common("common:faster-mixin") {
         dependencies {
             compileOnly(catalog.mixin.fabric)
-
-            implementation(project(":")) {
-                capabilities {
-                    requireFeature(commonMain.capabilitySuffix)
-                }
-            }
         }
     }
 
@@ -358,7 +358,7 @@ cloche {
 
                 entrypoint("client") {
                     adapter = "kotlin"
-                    value = "$group.fabric.LazyyyyyFabric::clientInit"
+                    value = "$group.fabric.LazyyyyyFabricClient::init"
                 }
 
                 dependency {
