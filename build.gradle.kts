@@ -41,7 +41,7 @@ plugins {
 
     id("com.gradleup.shadow") version "9.3.0"
 
-    id("earth.terrarium.cloche") version "0.17.4-dust.5"
+    id("earth.terrarium.cloche") version "0.17.4-dust.6"
 }
 
 val archive_name: String by rootProject.properties
@@ -192,22 +192,38 @@ cloche {
     }
 
     val commonFasterModuleResolver = common("common:faster-module-resolver") {
-        dependsOn(commonMain)
-
         dependencies {
-            compileOnly("org.spongepowered:mixin:0.8.7")
+            compileOnly(catalog.mixin.fabric)
+
+            implementation(project(":")) {
+                capabilities {
+                    requireFeature(commonMain.capabilitySuffix)
+                }
+            }
+        }
+    }
+
+    val commonFasterMixin = common("common:faster-mixin") {
+        dependencies {
+            compileOnly(catalog.mixin.fabric)
+
+            implementation(project(":")) {
+                capabilities {
+                    requireFeature(commonMain.capabilitySuffix)
+                }
+            }
         }
     }
 
     run fabric@{
         val fabricCommon = common("fabric:common") {
-            dependsOn(commonGame, commonMain, commonFasterModuleResolver)
+            dependsOn(commonGame, commonMain, commonFasterModuleResolver, commonFasterMixin)
 
             // mixins.from(file("src/fabric/common/main/resources/$id.fabric.mixins.json"))
         }
 
         val fabric1201 = fabric("fabric:1.20.1") {
-            dependsOn(commonMain, common1201, commonGame, commonGame1201, commonFasterModuleResolver)
+            dependsOn(commonMain, common1201, commonGame, commonGame1201, commonFasterModuleResolver, commonFasterMixin)
 
             sourceSet.the<SourceSetStaticLinkageInfo>().weakTreeLink(commonGame.sourceSet, commonMain.sourceSet)
 
@@ -238,7 +254,7 @@ cloche {
         }
 
         val fabric121 = fabric("fabric:1.21") {
-            dependsOn(commonMain, common121, commonGame, commonGame121, commonFasterModuleResolver)
+            dependsOn(commonMain, common121, commonGame, commonGame121, commonFasterModuleResolver, commonFasterMixin)
 
             sourceSet.the<SourceSetStaticLinkageInfo>().weakTreeLink(commonGame.sourceSet, commonMain.sourceSet)
 
@@ -375,6 +391,12 @@ cloche {
                 implementation(catalog.mixinextras.forge)
 
                 implementation(catalog.preloadingTricks)
+
+                implementation(project(":")) {
+                    capabilities {
+                        requireFeature(commonFasterMixin.capabilitySuffix)
+                    }
+                }
             }
 
             val embedMixin by configurations.register(lowerCamelCaseGradleName(featureName, "embedMixin")) {
@@ -387,8 +409,24 @@ cloche {
                     .attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
             }
 
+            val embedBoot by configurations.register(lowerCamelCaseGradleName(featureName, "embedBoot")) {
+                isTransitive = false
+
+                attributes
+                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
+                    .attribute(REMAPPED_ATTRIBUTE, false)
+                    .attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, true)
+                    .attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
+            }
+
             project.dependencies {
                 embedMixin(catalog.mixin.fabric)
+
+                embedBoot(project(":")) {
+                    capabilities {
+                        requireFeature(commonFasterMixin.capabilitySuffix)
+                    }
+                }
             }
 
             tasks {
@@ -399,6 +437,10 @@ cloche {
                 named<Jar>(jarTaskName) {
                     from(embedMixin) {
                         rename { "sponge-mixin.jar" }
+                    }
+
+                    from(embedBoot) {
+                        into("boot")
                     }
                 }
             }
@@ -444,7 +486,7 @@ cloche {
                 compileOnly(catalog.mixinextras.common)
                 implementation(catalog.mixinextras.forge)
 
-                modImplementation(catalog.klf.get1().get20().forge)
+                modImplementation(catalog.klf.mc1_20.forge)
 
                 implementation(project(":")) {
                     capabilities {
@@ -486,15 +528,19 @@ cloche {
 
             dependencies {
                 legacyClasspath(catalog.mixin.fabric)
-                implementation(project(":")) {
+                runtimeOnly(project(":")) {
                     capabilities {
                         requireFeature(forgeService.capabilitySuffix!!)
                     }
+
+                    exclude("settingdust.lazyyyyy")
                 }
-                implementation(project(":")) {
+                runtimeOnly(project(":")) {
                     capabilities {
                         requireFeature(forgeGame.capabilitySuffix!!)
                     }
+
+                    exclude("settingdust.lazyyyyy")
                 }
             }
 
@@ -620,7 +666,7 @@ cloche {
             }
 
             dependencies {
-                modImplementation(catalog.klf.get1().get21().neoforge)
+                modImplementation(catalog.klf.mc1_21.neoforge)
             }
 
             tasks {
