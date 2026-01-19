@@ -3,6 +3,7 @@ package settingdust.lazyyyyy.forge.service;
 import cpw.mods.modlauncher.api.IModuleLayerManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import settingdust.lazyyyyy.config.LazyyyyyEarlyConfig;
 import settingdust.lazyyyyy.faster_mixin.FasterMixinEntrypoint;
 import settingdust.preloading_tricks.api.PreloadingEntrypoint;
 import settingdust.preloading_tricks.forgelike.module_injector.accessor.ModuleAccessor;
@@ -23,7 +24,10 @@ public class LazyyyyyForgeEntrypoint implements PreloadingEntrypoint {
 
     private final Path rootPath;
 
-    public LazyyyyyForgeEntrypoint() {
+    public LazyyyyyForgeEntrypoint() throws IOException {
+        // Load configuration
+        LazyyyyyEarlyConfig.instance().load();
+
         try {
             var codeSource = getClass().getProtectionDomain().getCodeSource();
             rootPath = Path.of(codeSource.getLocation().toURI());

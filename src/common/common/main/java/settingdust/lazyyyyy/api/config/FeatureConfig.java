@@ -1,6 +1,7 @@
 package settingdust.lazyyyyy.api.config;
 
 import settingdust.lazyyyyy.util.TriState;
+import settingdust.lazyyyyy.util.config.FeatureEvaluator;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -21,6 +22,16 @@ public interface FeatureConfig {
      * Get current feature states.
      */
     Map<String, TriState> getStates();
+    
+    /**
+     * Get default enabled states.
+     */
+    Map<String, Boolean> getDefaults();
+    
+    /**
+     * Get disable conditions.
+     */
+    Map<String, FeatureEvaluator.DisableCondition> getConditions();
     
     /**
      * Get configuration file path.

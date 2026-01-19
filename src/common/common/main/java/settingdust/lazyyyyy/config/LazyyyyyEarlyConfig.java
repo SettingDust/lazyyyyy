@@ -29,8 +29,7 @@ public class LazyyyyyEarlyConfig implements FeatureConfig {
             FeatureDefinition.enabled("faster_mixin",
                     "Optimizes mixin configuration loading for faster startup"),
             FeatureDefinition.enabled("faster_module_resolver",
-                    "Accelerates Java module resolution (Java 17-21)",
-                    "Note: Automatically disabled on Fabric")
+                    "Accelerates Java module resolution (Java 17-21)")
     );
     
     private static final String[] HEADER = new String[]{
@@ -40,27 +39,38 @@ public class LazyyyyyEarlyConfig implements FeatureConfig {
             "This file controls early-stage features that load before Minecraft."
     };
 
-    private static final Supplier<LazyyyyyEarlyConfig> INSTANCE = Suppliers.memoize(() -> {
-        try {
-            return load();
-        } catch (IOException e) {
-            Lazyyyyy.LOGGER.error("Failed to load config from {}", CONFIG_PATH, e);
-            return createDefault();
-        }
-    });
+    private static final Supplier<LazyyyyyEarlyConfig> INSTANCE = Suppliers.memoize(LazyyyyyEarlyConfig::new);
 
     // Instance state
-    private final Map<String, TriState> states;
+    private final Map<String, TriState> states = new HashMap<>();
     private final Map<String, Boolean> defaults;
     private final Map<String, FeatureEvaluator.DisableCondition> conditions = new HashMap<>();
 
-    private LazyyyyyEarlyConfig(Map<String, TriState> states) {
-        this.states = states;
+    private LazyyyyyEarlyConfig() {
         this.defaults = FeatureEvaluator.buildDefaults(FEATURES);
+        // Initialize with default states
+        for (FeatureDefinition def : FEATURES) {
+            states.put(def.name(), TriState.DEFAULT);
+        }
     }
 
     public static LazyyyyyEarlyConfig instance() {
         return INSTANCE.get();
+    }
+
+    /**
+     * Load configuration states from file.
+     * Must be called explicitly to load user configuration.
+     */
+    public void load() {
+        try {
+            Map<String, TriState> loadedStates = ConfigIO.load(this);
+            states.clear();
+            states.putAll(loadedStates);
+            FeatureEvaluator.logDisabledFeatures(states, defaults, conditions);
+        } catch (IOException e) {
+            Lazyyyyy.LOGGER.error("Failed to load config from {}", CONFIG_PATH, e);
+        }
     }
 
     @Override
@@ -84,6 +94,16 @@ public class LazyyyyyEarlyConfig implements FeatureConfig {
     }
 
     @Override
+    public Map<String, Boolean> getDefaults() {
+        return defaults;
+    }
+
+    @Override
+    public Map<String, FeatureEvaluator.DisableCondition> getConditions() {
+        return conditions;
+    }
+
+    @Override
     public Path getFilePath() {
         return CONFIG_PATH;
     }
@@ -91,24 +111,5 @@ public class LazyyyyyEarlyConfig implements FeatureConfig {
     @Override
     public String[] getFileHeader() {
         return HEADER;
-    }
-
-    // Load/Save logic using utility functions
-    private static LazyyyyyEarlyConfig load() throws IOException {
-        LazyyyyyEarlyConfig config = createDefault();
-        Map<String, TriState> states = ConfigIO.load(config);
-        
-        LazyyyyyEarlyConfig loaded = new LazyyyyyEarlyConfig(states);
-        FeatureEvaluator.logDisabledFeatures(loaded.states, loaded.defaults, loaded.conditions);
-        
-        return loaded;
-    }
-
-    private static LazyyyyyEarlyConfig createDefault() {
-        Map<String, TriState> defaultStates = new HashMap<>();
-        for (FeatureDefinition def : FEATURES) {
-            defaultStates.put(def.name(), TriState.DEFAULT);
-        }
-        return new LazyyyyyEarlyConfig(defaultStates);
     }
 }

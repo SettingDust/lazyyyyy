@@ -85,13 +85,33 @@ public final class ConfigIO {
             if (!first) writer.write("\n");
             first = false;
             
+            // Write descriptions
             for (String desc : def.descriptions()) {
                 writer.write("# " + desc + "\n");
             }
             
+            // Always show what DEFAULT means for this feature
+            String defaultInfo = getDefaultStateInfo(def.name(), config);
+            writer.write("# " + defaultInfo + "\n");
+            
             String value = triStateToString(states.getOrDefault(def.name(), TriState.DEFAULT));
             writer.write(def.name() + "=" + value + "\n");
         }
+    }
+    
+    private static String getDefaultStateInfo(String featureName, FeatureConfig config) {
+        boolean defaultEnabled = config.getDefaults().getOrDefault(featureName, false);
+        var condition = config.getConditions().get(featureName);
+        
+        if (!defaultEnabled) {
+            return "DEFAULT - disabled by default";
+        }
+        
+        if (condition != null && condition.condition().getAsBoolean()) {
+            return "DEFAULT - disabled by " + condition.reason();
+        }
+        
+        return "DEFAULT - enabled";
     }
     
     private static Map<String, TriState> createDefaultStates(FeatureConfig config) {
