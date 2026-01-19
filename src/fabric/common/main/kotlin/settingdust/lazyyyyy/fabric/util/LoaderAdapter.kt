@@ -21,4 +21,6 @@ class LoaderAdapter : LoaderAdapter {
     }
 
     override fun getModsDirectory() = _modsDirectory
+
+    override fun hasEarlyErrors() = false
 }
