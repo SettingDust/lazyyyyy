@@ -165,6 +165,8 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     }
 
     library("betterLog4jConfig", "maven.modrinth", "better-log4j-config").version("1.2.0-fabric")
+
+    library("hash4j", "com.dynatrace.hash4j", "hash4j").version("0.29.0")
 }
 
 plugins {

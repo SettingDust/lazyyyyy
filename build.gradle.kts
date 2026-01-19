@@ -247,6 +247,10 @@ cloche {
 
                 implementation(catalog.preloadingTricks)
                 implementation(catalog.betterLog4jConfig)
+                catalog.hash4j.let {
+                    implementation(it)
+                    include(it)
+                }
             }
 
             tasks.named<GenerateFabricModJson>(generateModsManifestTaskName) {
@@ -278,6 +282,10 @@ cloche {
 
                 implementation(catalog.preloadingTricks)
                 implementation(catalog.betterLog4jConfig)
+                catalog.hash4j.let {
+                    implementation(it)
+                    include(it)
+                }
             }
 
             tasks.named<GenerateFabricModJson>(generateModsManifestTaskName) {
@@ -399,6 +407,11 @@ cloche {
                         requireFeature(commonFasterMixin.capabilitySuffix)
                     }
                 }
+
+                catalog.hash4j.let {
+                    implementation(it)
+                    include(it)
+                }
             }
 
             val embedMixin by configurations.register(lowerCamelCaseGradleName(featureName, "embedMixin")) {
@@ -501,6 +514,8 @@ cloche {
                         requireFeature(commonMain.capabilitySuffix)
                     }
                 }
+
+                implementation(catalog.hash4j)
             }
 
             tasks {
