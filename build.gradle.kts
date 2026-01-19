@@ -217,7 +217,7 @@ cloche {
 
     run fabric@{
         val fabricCommon = common("fabric:common") {
-            dependsOn(commonGame, commonMain, commonFasterModuleResolver, commonFasterMixin)
+            dependsOn(commonMain, commonGame, commonFasterModuleResolver, commonFasterMixin)
 
             // mixins.from(file("src/fabric/common/main/resources/$id.fabric.mixins.json"))
         }
@@ -246,6 +246,7 @@ cloche {
                 fabricApi("0.92.6")
 
                 implementation(catalog.preloadingTricks)
+                implementation(catalog.betterLog4jConfig)
             }
 
             tasks.named<GenerateFabricModJson>(generateModsManifestTaskName) {
@@ -276,6 +277,7 @@ cloche {
                 fabricApi("0.116.6")
 
                 implementation(catalog.preloadingTricks)
+                implementation(catalog.betterLog4jConfig)
             }
 
             tasks.named<GenerateFabricModJson>(generateModsManifestTaskName) {

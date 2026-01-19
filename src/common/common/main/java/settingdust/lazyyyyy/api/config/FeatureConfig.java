@@ -50,7 +50,9 @@ public interface FeatureConfig {
      * @param condition condition that disables the feature (returns true when should be disabled)
      * @param reason reason identifier for logging
      */
-    void registerDisableCondition(String featureName, BooleanSupplier condition, String reason);
+    default void registerDisableCondition(String featureName, BooleanSupplier condition, String reason) {
+        getConditions().put(featureName, new FeatureEvaluator.DisableCondition(condition, reason));
+    }
     
     /**
      * Check if a feature is enabled.
@@ -58,5 +60,7 @@ public interface FeatureConfig {
      * @param featureName the feature name
      * @return true if enabled, false otherwise
      */
-    boolean isFeatureEnabled(String featureName);
+    default boolean isFeatureEnabled(String featureName) {
+        return FeatureEvaluator.isEnabled(featureName, getStates(), getDefaults(), getConditions());
+    }
 }

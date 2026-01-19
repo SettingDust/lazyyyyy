@@ -10,16 +10,11 @@ public class FasterModuleResolverEntrypoint implements PreloadingEntrypoint {
     private static final Logger LOGGER = LogManager.getLogger("Lazyyyyy");
 
     public FasterModuleResolverEntrypoint() {
-        if (!LazyyyyyEarlyConfig.instance().isFeatureEnabled("faster_module_resolver")) {
+        if (!LazyyyyyEarlyConfig.instance().isFeatureEnabled(LazyyyyyEarlyConfig.FASTER_MODULE_RESOLVER)) {
             return;
         }
 
-        if (Runtime.version().feature() > 21) {
-            LOGGER.info("FasterModuleResolver disabled: Java version {} not supported (requires Java 17-21)", Runtime.version().feature());
-            return;
-        }
-
-        LOGGER.info("Applying FasterModuleResolver");
+        LOGGER.info("Applying " + LazyyyyyEarlyConfig.FASTER_MODULE_RESOLVER);
 
         ClassTransformBootstrap.INSTANCE.addConfig("lazyyyyy.faster_module_resolver.classtransform.json");
     }

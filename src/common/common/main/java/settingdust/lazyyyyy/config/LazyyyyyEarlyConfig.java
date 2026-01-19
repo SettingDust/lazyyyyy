@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 /**
@@ -22,16 +21,24 @@ import java.util.function.Supplier;
  * Singleton pattern with static feature definitions and instance state.
  */
 public class LazyyyyyEarlyConfig implements FeatureConfig {
-    private static final Path CONFIG_PATH = LoaderAdapter.get().getConfigDirectory().resolve("lazyyyyy/early.properties");
+    private static final Path CONFIG_PATH = LoaderAdapter.get()
+            .getConfigDirectory()
+            .resolve("lazyyyyy/early.properties");
+
+    // Feature names
+    public static final String FASTER_MIXIN = "faster_mixin";
+    public static final String FASTER_MODULE_RESOLVER = "faster_module_resolver";
 
     // Static feature definitions
     private static final List<FeatureDefinition> FEATURES = List.of(
-            FeatureDefinition.enabled("faster_mixin",
+            FeatureDefinition.enabled(
+                    FASTER_MIXIN,
                     "Optimizes mixin configuration loading for faster startup"),
-            FeatureDefinition.enabled("faster_module_resolver",
+            FeatureDefinition.enabled(
+                    FASTER_MODULE_RESOLVER,
                     "Accelerates Java module resolution (Java 17-21)")
     );
-    
+
     private static final String[] HEADER = new String[]{
             "Lazyyyyy Early Configuration",
             "============================",
@@ -52,6 +59,11 @@ public class LazyyyyyEarlyConfig implements FeatureConfig {
         for (FeatureDefinition def : FEATURES) {
             states.put(def.name(), TriState.DEFAULT);
         }
+        registerDisableCondition(
+                FASTER_MODULE_RESOLVER,
+                () -> Runtime.version().feature() > 21,
+                "Java 21 or later is fixed"
+        );
     }
 
     public static LazyyyyyEarlyConfig instance() {
@@ -73,15 +85,6 @@ public class LazyyyyyEarlyConfig implements FeatureConfig {
         }
     }
 
-    @Override
-    public void registerDisableCondition(String featureName, BooleanSupplier condition, String reason) {
-        conditions.put(featureName, new FeatureEvaluator.DisableCondition(condition, reason));
-    }
-
-    @Override
-    public boolean isFeatureEnabled(String featureName) {
-        return FeatureEvaluator.isEnabled(featureName, states, defaults, conditions);
-    }
 
     @Override
     public List<FeatureDefinition> getDefinitions() {

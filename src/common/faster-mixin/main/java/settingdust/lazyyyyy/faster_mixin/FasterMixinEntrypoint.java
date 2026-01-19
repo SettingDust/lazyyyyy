@@ -9,14 +9,15 @@ public class FasterMixinEntrypoint {
     private static final Logger LOGGER = LogManager.getLogger("Lazyyyyy");
 
     public static void init(ClassLoader loader) {
-        var configClazz = RStream.of(Classes.byName("settingdust.lazyyyyy.config.LazyyyyyEarlyConfig", loader));
-        var configMethods = configClazz.methods();
-        if (!configMethods.by("isFeatureEnabled")
-                .<Boolean>invokeInstance(configMethods.by("instance").invoke(), "faster_mixin")) {
+        var featureConfigClass = RStream.of(Classes.byName("settingdust.lazyyyyy.api.config.FeatureConfig", loader));
+        var earlyConfigClass = RStream.of(Classes.byName("settingdust.lazyyyyy.config.LazyyyyyEarlyConfig", loader));
+        if (!featureConfigClass.methods()
+                .by("isFeatureEnabled")
+                .<Boolean>invokeInstance(earlyConfigClass.methods().by("instance").invoke(), "faster_mixin")) {
             return;
         }
 
-        LOGGER.info("Applying FasterMixin");
+        LOGGER.info("Applying faster_mixin");
 
         var clazz = RStream.of(Classes.byName(
                 "settingdust.preloading_tricks.util.class_transform.ClassTransformBootstrap",

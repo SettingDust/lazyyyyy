@@ -14,7 +14,7 @@ dependencyResolutionManagement {
 
 fun interface ArtifactFormatter {
     fun format(artifact: String, loader: String, mcVersion: String): String
-    
+
     companion object {
         val simple = ArtifactFormatter { artifact, _, _ -> artifact }
         val dashLoader = ArtifactFormatter { artifact, loader, _ -> "$artifact-$loader" }
@@ -24,7 +24,7 @@ fun interface ArtifactFormatter {
 
 fun interface VersionFormatter {
     fun format(version: String, loader: String): String
-    
+
     companion object {
         val simple = VersionFormatter { version, _ -> version }
         val dashLoader = VersionFormatter { version, loader -> "$version-$loader" }
@@ -36,23 +36,23 @@ fun interface VersionFormatter {
 class LoaderVariantBuilder {
     var artifactFormatter: ArtifactFormatter = ArtifactFormatter.simple
     var versionFormatter: VersionFormatter = VersionFormatter.simple
-    
+
     fun artifact(formatter: ArtifactFormatter) {
         artifactFormatter = formatter
     }
-    
+
     fun artifact(block: (artifact: String, loader: String, mcVersion: String) -> String) {
         artifactFormatter = ArtifactFormatter(block)
     }
-    
+
     fun version(formatter: VersionFormatter) {
         versionFormatter = formatter
     }
-    
+
     fun version(block: (version: String, loader: String) -> String) {
         versionFormatter = VersionFormatter(block)
     }
-    
+
     internal fun build() = LoaderVariant(artifactFormatter, versionFormatter)
 }
 
@@ -64,11 +64,11 @@ data class LoaderVariant(
 class McVersionBuilder(private val mcVersion: String) {
     private val loaders = mutableMapOf<String, LoaderVariant>()
     var modVersion: String = ""
-    
+
     fun loader(name: String, block: LoaderVariantBuilder.() -> Unit = {}) {
         loaders[name] = LoaderVariantBuilder().apply(block).build()
     }
-    
+
     internal fun build() = McVersionConfig(mcVersion, modVersion, loaders)
 }
 
@@ -81,13 +81,13 @@ data class McVersionConfig(
 class MultiVersionDepBuilder(val id: String, val group: String) {
     var artifact: String = id
     var versionFormat: (String, String) -> String = { _, v -> v }
-    
+
     private val configs = mutableListOf<McVersionConfig>()
-    
+
     fun version(mcVersion: String, block: McVersionBuilder.() -> Unit) {
         configs.add(McVersionBuilder(mcVersion).apply(block).build())
     }
-    
+
     internal fun build() = MultiVersionDep(id, group, artifact, configs, versionFormat)
 }
 
@@ -101,7 +101,7 @@ data class MultiVersionDep(
 
 fun VersionCatalogBuilder.dependency(id: String, group: String, block: MultiVersionDepBuilder.() -> Unit) {
     val dep = MultiVersionDepBuilder(id, group).apply(block).build()
-    
+
     val allLoaders = dep.configs.flatMap { it.loaders.keys }.toSet()
     val isSingleLoader = allLoaders.size == 1
     val isSingleMcVersion = dep.configs.size == 1
@@ -109,18 +109,18 @@ fun VersionCatalogBuilder.dependency(id: String, group: String, block: MultiVers
     dep.configs.forEach { config ->
         val version = dep.versionFormat(config.mcVersion, config.modVersion)
         val mcVersionName = "mc${config.mcVersion.replace("_", "")}"
-        
+
         config.loaders.forEach { (loaderName, variant) ->
             val finalArtifact = variant.artifactFormatter.format(dep.artifact, loaderName, config.mcVersion)
             val finalVersion = variant.versionFormatter.format(version, loaderName)
-            
+
             val catalogId = when {
                 isSingleMcVersion && isSingleLoader -> dep.id
                 isSingleMcVersion -> "${dep.id}-$loaderName"
                 isSingleLoader -> "${dep.id}-$mcVersionName"
                 else -> "${dep.id}-$mcVersionName-$loaderName"
             }
-            
+
             library(catalogId, dep.group, finalArtifact).version(finalVersion)
         }
     }
@@ -132,9 +132,12 @@ fun VersionCatalogBuilder.modrinth(id: String, block: MultiVersionDepBuilder.() 
 }
 
 dependencyResolutionManagement.versionCatalogs.create("catalog") {
+    library("mixin-fabric", "net.fabricmc", "sponge-mixin")
+        .version("0.17.0+mixin.0.8.7")
+
     dependency("mixinextras", "io.github.llamalad7") {
         artifact = "mixinextras"
-        
+
         version("*") {
             modVersion = "0.5.0"
             loader("forge") { artifact(ArtifactFormatter.dashLoader) }
@@ -149,20 +152,19 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     dependency("klf", "dev.nyon") {
         artifact = "KotlinLangForge"
         versionFormat = { _, ver -> "2.10.6-k2.2.21-$ver" }
-        
+
         version("1_20") {
             modVersion = "2.0"
             loader("forge") { version(VersionFormatter.plusLoader) }
         }
-        
+
         version("1_21") {
             modVersion = "3.1"
             loader("neoforge") { version(VersionFormatter.plusLoader) }
         }
     }
 
-    library("mixin-fabric", "net.fabricmc", "sponge-mixin")
-        .version("0.17.0+mixin.0.8.7")
+    library("betterLog4jConfig", "maven.modrinth", "better-log4j-config").version("1.2.0-fabric")
 }
 
 plugins {
