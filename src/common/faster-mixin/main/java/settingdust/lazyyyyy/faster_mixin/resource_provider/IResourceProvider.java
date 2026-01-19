@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.faster_mixin;
+package settingdust.lazyyyyy.faster_mixin.resource_provider;
 
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.logging.ILogger;

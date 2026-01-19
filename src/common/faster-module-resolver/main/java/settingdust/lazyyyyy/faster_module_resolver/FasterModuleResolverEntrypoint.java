@@ -16,6 +16,8 @@ public class FasterModuleResolverEntrypoint implements PreloadingEntrypoint {
 
         LOGGER.info("Applying " + LazyyyyyEarlyConfig.FASTER_MODULE_RESOLVER);
 
-        ClassTransformBootstrap.INSTANCE.addConfig("lazyyyyy.faster_module_resolver.classtransform.json");
+        ClassTransformBootstrap.INSTANCE.addConfig(
+                "lazyyyyy.faster_module_resolver.classtransform.json",
+                FasterModuleResolverEntrypoint.class.getClassLoader());
     }
 }

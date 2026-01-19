@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.faster_mixin;
+package settingdust.lazyyyyy.faster_mixin.resource_provider;
 
 import com.google.common.io.Closeables;
 import com.google.gson.JsonParseException;

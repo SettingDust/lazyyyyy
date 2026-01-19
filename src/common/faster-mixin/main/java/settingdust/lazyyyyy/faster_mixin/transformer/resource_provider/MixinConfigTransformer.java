@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.faster_mixin.transformer;
+package settingdust.lazyyyyy.faster_mixin.transformer.resource_provider;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Mixin;
@@ -8,14 +8,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.refmap.ReferenceMapper;
 import org.spongepowered.asm.service.IMixinService;
-import settingdust.lazyyyyy.faster_mixin.IResourceProvider;
-import settingdust.lazyyyyy.faster_mixin.ReferenceMapperCreator;
+import settingdust.lazyyyyy.faster_mixin.resource_provider.IResourceProvider;
+import settingdust.lazyyyyy.faster_mixin.resource_provider.ReferenceMapperCreator;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 @Mixin(targets = "org.spongepowered.asm.mixin.transformer.MixinConfig")
-public class MixinConfigTransformer {
+public abstract class MixinConfigTransformer {
     @Shadow
     private transient IMixinConfigSource source;
 

@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.faster_mixin.transformer;
+package settingdust.lazyyyyy.faster_mixin.transformer.cache;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Mixin;
