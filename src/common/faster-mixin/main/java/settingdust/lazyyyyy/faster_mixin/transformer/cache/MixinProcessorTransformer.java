@@ -46,7 +46,11 @@ public abstract class MixinProcessorTransformer implements MixinProcessorAccesso
         this.sessionId = sessionId;
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+    @Inject(
+            method = "<init>",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lorg/spongepowered/asm/logging/Level;DEBUG:Lorg/spongepowered/asm/logging/Level;"))
     private void lazyyyyy$loadSessionIdFromCache(CallbackInfo ci) {
         String cachedSessionId = MixinCacheManager.loadGlobalSessionId();
         if (cachedSessionId != null) {

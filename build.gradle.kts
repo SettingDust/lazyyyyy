@@ -24,7 +24,6 @@ import net.msrandom.minecraftcodev.fabric.MinecraftCodevFabricPlugin
 import net.msrandom.minecraftcodev.fabric.task.JarInJar
 import net.msrandom.minecraftcodev.forge.task.JarJar
 import net.msrandom.minecraftcodev.runs.MinecraftRunConfiguration
-import net.msrandom.virtualsourcesets.SourceSetStaticLinkageInfo
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.jvm.tasks.Jar
@@ -41,7 +40,7 @@ plugins {
 
     id("com.gradleup.shadow") version "9.3.0"
 
-    id("earth.terrarium.cloche") version "0.17.6-dust.0"
+    id("earth.terrarium.cloche") version "0.17.7-dust.0"
 }
 
 val archive_name: String by rootProject.properties
@@ -111,8 +110,6 @@ class MinecraftModLoaderCompatibilityRule : AttributeCompatibilityRule<Minecraft
 }
 
 dependencies {
-    implementation(project(":"))
-    implementation(project(":"))
     attributesSchema {
         attribute(TargetAttributes.MINECRAFT_VERSION) {
             compatibilityRules.add(MinecraftVersionCompatibilityRule::class)
@@ -212,24 +209,40 @@ cloche {
     val commonFasterMixin = common("common:faster-mixin") {
         dependencies {
             compileOnly(catalog.mixin.fabric)
+            compileOnly(catalog.hash4j)
         }
     }
 
     run fabric@{
-        val fabricCommon = common("fabric:common") {
-            dependsOn(commonMain, commonGame, commonFasterModuleResolver, commonFasterMixin)
+        val fabricCommonFasterMixin = common("fabric:common:faster-mixin") {
+            dependsOn(commonFasterMixin)
+        }
 
-            // mixins.from(file("src/fabric/common/main/resources/$id.fabric.mixins.json"))
+        val fabricCommon = common("fabric:common") {
+            dependsOn(commonMain, commonGame, commonFasterModuleResolver)
+
+            project.dependencies {
+                val implementation = lowerCamelCaseGradleName(name, JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
+
+                implementation(project(":")) {
+                    capabilities {
+                        requireFeature(fabricCommonFasterMixin.capabilitySuffix)
+                    }
+                }
+
+                implementation(project(":")) {
+                    capabilities {
+                        requireFeature(commonFasterMixin.capabilitySuffix)
+                    }
+                }
+            }
         }
 
         val fabric1201 = fabric("fabric:1.20.1") {
-            dependsOn(commonMain, common1201, commonGame, commonGame1201, commonFasterModuleResolver, commonFasterMixin)
-
-            sourceSet.the<SourceSetStaticLinkageInfo>().weakTreeLink(commonGame.sourceSet, commonMain.sourceSet)
+            dependsOn(common1201, commonGame1201, commonFasterModuleResolver, fabricCommon)
+            stubSources(fabricCommonFasterMixin)
 
             minecraftVersion = "1.20.1"
-
-            runs { client() }
 
             metadata {
                 dependency {
@@ -247,25 +260,21 @@ cloche {
 
                 implementation(catalog.preloadingTricks)
                 implementation(catalog.betterLog4jConfig)
-                catalog.hash4j.let {
-                    implementation(it)
-                    include(it)
-                }
-            }
+                localImplementation(catalog.hash4j)
 
-            tasks.named<GenerateFabricModJson>(generateModsManifestTaskName) {
-                modId = "${id}_1_20"
+                implementation(project(":")) {
+                    capabilities {
+                        requireFeature(fabricCommonFasterMixin.capabilitySuffix)
+                    }
+                }
             }
         }
 
         val fabric121 = fabric("fabric:1.21") {
-            dependsOn(commonMain, common121, commonGame, commonGame121, commonFasterModuleResolver, commonFasterMixin)
-
-            sourceSet.the<SourceSetStaticLinkageInfo>().weakTreeLink(commonGame.sourceSet, commonMain.sourceSet)
+            dependsOn(common121, commonGame121, commonFasterModuleResolver, fabricCommon)
+            stubSources(fabricCommonFasterMixin)
 
             minecraftVersion = "1.21.1"
-
-            runs { client() }
 
             metadata {
                 dependency {
@@ -282,14 +291,91 @@ cloche {
 
                 implementation(catalog.preloadingTricks)
                 implementation(catalog.betterLog4jConfig)
-                catalog.hash4j.let {
-                    implementation(it)
-                    include(it)
+                localImplementation(catalog.hash4j)
+
+                implementation(project(":")) {
+                    capabilities {
+                        requireFeature(fabricCommonFasterMixin.capabilitySuffix)
+                    }
                 }
             }
+        }
 
-            tasks.named<GenerateFabricModJson>(generateModsManifestTaskName) {
-                modId = "${id}_1_21"
+        fabric("version:fabric:1.20.1") {
+            minecraftVersion = "1.20.1"
+
+            runs { client() }
+
+            dependencies {
+                fabricApi("0.92.6")
+
+                runtimeOnly(skipIncludeTransformation(project(":"))) {
+                    capabilities {
+                        requireFeature("fabric")
+                    }
+
+                    exclude("settingdust.lazyyyyy")
+                }
+
+                runtimeOnly(catalog.preloadingTricks)
+                runtimeOnly(catalog.betterLog4jConfig)
+            }
+
+            tasks {
+                named(generateModsManifestTaskName) {
+                    enabled = false
+                }
+
+                named(jarTaskName) {
+                    enabled = false
+                }
+
+                named(remapJarTaskName) {
+                    enabled = false
+                }
+
+                named(includeJarTaskName) {
+                    enabled = false
+                }
+            }
+        }
+
+        fabric("version:fabric:1.21") {
+            minecraftVersion = "1.21.1"
+
+            runs { client() }
+
+            dependencies {
+                fabricApi("0.116.6")
+
+                runtimeOnly(skipIncludeTransformation(project(":"))) {
+                    capabilities {
+                        requireFeature("fabric")
+                    }
+
+                    exclude("settingdust.lazyyyyy")
+                }
+
+                runtimeOnly(catalog.preloadingTricks)
+                runtimeOnly(catalog.betterLog4jConfig)
+            }
+
+            tasks {
+                named(generateModsManifestTaskName) {
+                    enabled = false
+                }
+
+                named(jarTaskName) {
+                    enabled = false
+                }
+
+                named(remapJarTaskName) {
+                    enabled = false
+                }
+
+                named(includeJarTaskName) {
+                    enabled = false
+                }
             }
         }
 
@@ -299,6 +385,7 @@ cloche {
                 .map { it.dir("metadata").dir(featureName) }
             val include = configurations.register(lowerCamelCaseGradleName(featureName, "include")) {
                 isCanBeResolved = true
+                isCanBeConsumed
                 isTransitive = false
 
                 attributes {
@@ -309,6 +396,16 @@ cloche {
             }
             val targets = setOf(fabric1201, fabric121)
 
+            val embedBoot by configurations.register(lowerCamelCaseGradleName(featureName, "embedBoot")) {
+                isTransitive = false
+
+                attributes
+                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
+                    .attribute(REMAPPED_ATTRIBUTE, false)
+                    .attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, true)
+                    .attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
+            }
+
             dependencies {
                 for (target in targets) {
                     include(project(":")) {
@@ -317,12 +414,19 @@ cloche {
                         }
                     }
                 }
+
+                embedBoot(project(":")) {
+                    capabilities {
+                        requireFeature(fabricCommonFasterMixin.capabilitySuffix)
+                    }
+                }
+                embedBoot(catalog.hash4j)
             }
 
             tasks {
                 val generateModJson =
                     register<GenerateFabricModJson>(lowerCamelCaseGradleName(featureName, "generateModJson")) {
-                        modId = id
+                        modId = "${id}_container"
                         metadata = objects.newInstance(FabricMetadata::class.java, fabric1201).apply {
                             license.value(cloche.metadata.license)
                             dependencies.value(cloche.metadata.dependencies)
@@ -337,6 +441,10 @@ cloche {
                     destinationDirectory = intermediateOutputsDirectory
                     dependsOn(generateModJson)
                     from(metadataDirectory)
+
+                    from(embedBoot) {
+                        into("libs/boot")
+                    }
                 }
 
                 val includesJar = register<JarInJar>(lowerCamelCaseGradleName(featureName, "includeJar")) {
@@ -350,15 +458,27 @@ cloche {
                 build {
                     dependsOn(includesJar)
                 }
+
+                configurations.register(lowerCamelCaseGradleName(featureName, "runtimeElements")) {
+                    isCanBeResolved = false
+                    isCanBeConsumed = true
+                    attributes {
+                        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+                        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+                        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+                        attribute(TargetAttributes.MOD_LOADER, MinecraftModLoader.fabric)
+                        attribute(REMAPPED_ATTRIBUTE, true)
+                    }
+                    outgoing.artifact(includesJar)
+                    outgoing.capability("$group:${project.name}-fabric:$version")
+                }
             }
         }
 
         targets.withType<FabricTarget> {
-            loaderVersion = "0.18.1"
+            loaderVersion = "0.18.4"
 
             includedClient()
-
-            dependsOn(fabricCommon)
 
             metadata {
                 entrypoint("main") {
@@ -408,10 +528,7 @@ cloche {
                     }
                 }
 
-                catalog.hash4j.let {
-                    implementation(it)
-                    include(it)
-                }
+                implementation(catalog.hash4j)
             }
 
             val embedMixin by configurations.register(lowerCamelCaseGradleName(featureName, "embedMixin")) {
@@ -442,6 +559,7 @@ cloche {
                         requireFeature(commonFasterMixin.capabilitySuffix)
                     }
                 }
+                embedBoot(catalog.hash4j)
             }
 
             tasks {

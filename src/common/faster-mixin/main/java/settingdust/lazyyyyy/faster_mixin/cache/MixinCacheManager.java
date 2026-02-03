@@ -6,30 +6,29 @@ import com.google.common.hash.Hashing;
 import com.google.common.hash.HashingInputStream;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
+import org.spongepowered.asm.logging.ILogger;
 import org.spongepowered.asm.mixin.MixinEnvironment;
+import org.spongepowered.asm.service.MixinService;
 import org.spongepowered.asm.transformers.MixinClassWriter;
+import settingdust.lazyyyyy.faster_mixin.util.LazyyyyyEarlyConfigInvoker;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class MixinCacheManager {
-    private static final Logger LOGGER = LogManager.getLogger("Lazyyyyy/MixinCache");
-    private static final Path CACHE_PATH = Paths.get(".lazyyyyy", "mixin-cache");
+    private static final ILogger LOGGER = MixinService.getService().getLogger("Lazyyyyy/MixinCache");
+    private static final Path CACHE_PATH = Paths.get(".cache", "lazyyyyy", "mixin");
     private static final Path GLOBAL_SESSION_PATH = CACHE_PATH.resolve("session");
     private static final Path PATH_HASH_CACHE_PATH = CACHE_PATH.resolve("path-hash.json.gz");
     private static final Gson GSON = new Gson();
@@ -45,7 +44,9 @@ public class MixinCacheManager {
         if (Files.exists(PATH_HASH_CACHE_PATH)) {
             try (var is = new GZIPInputStream(Files.newInputStream(PATH_HASH_CACHE_PATH));
                  var reader = new InputStreamReader(is)) {
-                return GSON.fromJson(reader, new TypeToken<Map<String, PathHashEntry>>() {}.getType());
+                return GSON.fromJson(
+                        reader, new TypeToken<Map<String, PathHashEntry>>() {
+                        }.getType());
             } catch (IOException e) {
                 LOGGER.warn("Failed to load path hash cache", e);
             }
@@ -88,7 +89,14 @@ public class MixinCacheManager {
         }
     }
 
-    public static boolean applyMixinsCached(Object processor, MixinEnvironment environment, String name, ClassNode targetClassNode) {
+    public static boolean applyMixinsCached(
+            Object processor,
+            MixinEnvironment environment,
+            String name,
+            ClassNode targetClassNode) {
+        if (!LazyyyyyEarlyConfigInvoker.isFeatureEnabled("faster_mixin.cache")) {
+            return ((MixinProcessorAccessor) processor).lazyyyyy$applyMixins(environment, name, targetClassNode);
+        }
         List<IHashProvider> relevantProviders = new ArrayList<>();
         for (var config : ((MixinProcessorAccessor) processor).lazyyyyy$getConfigs()) {
             MixinConfigAccessor accessor = (MixinConfigAccessor) config;
@@ -106,23 +114,38 @@ public class MixinCacheManager {
 
         try {
             Hasher hasher = Hashing.murmur3_128().newHasher();
-            for (var provider : relevantProviders) {
-                hasher.putBytes(provider.lazyyyyy$getHash());
-            }
+            relevantProviders.parallelStream()
+                    .map(provider -> {
+                        try {
+                            var hash = provider.lazyyyyy$getHash();
+                            if (hash == null) {
+                                LOGGER.warn("Failed to load hash for {} target {}", provider, name);
+                            }
+                            return hash;
+                        } catch (IOException e) {
+                            LOGGER.warn("Failed to get hash for {}", provider, e);
+                            throw new UncheckedIOException(e);
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .forEach(hasher::putBytes);
+
             // Include original class hash to avoid collisions and handle updates
             hasher.putBytes(getClassBytes(targetClassNode));
+
             byte[] combinedHash = hasher.hash().asBytes();
 
             if (loadFromCache(name, targetClassNode, combinedHash)) {
                 return true;
             }
 
-            boolean transformed = ((MixinProcessorAccessor) processor).lazyyyyy$applyMixins(environment, name, targetClassNode);
-            if (transformed) {
-                saveToCache(name, targetClassNode, combinedHash);
-            }
+            boolean transformed = ((MixinProcessorAccessor) processor).lazyyyyy$applyMixins(
+                    environment,
+                    name,
+                    targetClassNode);
+            saveToCache(name, targetClassNode, combinedHash);
             return transformed;
-        } catch (IOException e) {
+        } catch (UncheckedIOException e) {
             return ((MixinProcessorAccessor) processor).lazyyyyy$applyMixins(environment, name, targetClassNode);
         }
     }

@@ -1,0 +1,7 @@
+{
+  "package": "settingdust.lazyyyyy.fabric.transformer",
+  "transformers": [
+    "better_log4j_config.earlier_init.BetterLog4jConfigTransformer",
+    "faster_mixin.FabricMixinBootstrapTransformer"
+  ]
+}

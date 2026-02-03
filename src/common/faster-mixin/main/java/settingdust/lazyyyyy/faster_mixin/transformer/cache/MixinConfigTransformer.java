@@ -6,6 +6,6 @@ import settingdust.lazyyyyy.faster_mixin.cache.MixinConfigAccessor;
 
 @Mixin(targets = "org.spongepowered.asm.mixin.transformer.MixinConfig")
 public abstract class MixinConfigTransformer implements MixinConfigAccessor {
-    @Shadow(remap = false)
+    @Shadow
     public abstract boolean hasMixinsFor(String className);
 }

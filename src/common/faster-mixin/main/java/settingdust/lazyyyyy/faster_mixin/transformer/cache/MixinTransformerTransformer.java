@@ -11,12 +11,12 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(targets = "org.spongepowered.asm.mixin.transformer.MixinTransformer")
 public abstract class MixinTransformerTransformer {
     @CASM("transformClass(Lorg/spongepowered/asm/mixin/MixinEnvironment;Ljava/lang/String;Lorg/objectweb/asm/tree/ClassNode;)Z")
-    public static void lazyyyyy$cachedTransformClassNode(MethodNode method) {
+    private static void lazyyyyy$cachedTransformClassNode(MethodNode method) {
         lazyyyyy$redirectApplyMixins(method);
     }
 
     @CASM("transformClass(Lorg/spongepowered/asm/mixin/MixinEnvironment;Ljava/lang/String;[B)[B")
-    public static void lazyyyyy$cachedTransformClassBytes(MethodNode method) {
+    private static void lazyyyyy$cachedTransformClassBytes(MethodNode method) {
         lazyyyyy$redirectApplyMixins(method);
     }
 

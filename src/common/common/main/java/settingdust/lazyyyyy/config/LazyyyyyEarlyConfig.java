@@ -27,6 +27,7 @@ public class LazyyyyyEarlyConfig implements FeatureConfig {
 
     // Feature names
     public static final String FASTER_MIXIN = "faster_mixin";
+    public static final String FASTER_MIXIN_CACHE = "faster_mixin.cache";
     public static final String FASTER_MODULE_RESOLVER = "faster_module_resolver";
 
     // Static feature definitions
@@ -34,6 +35,9 @@ public class LazyyyyyEarlyConfig implements FeatureConfig {
             FeatureDefinition.enabled(
                     FASTER_MIXIN,
                     "Optimizes mixin configuration loading for faster startup"),
+            FeatureDefinition.enabled(
+                    FASTER_MIXIN_CACHE,
+                    "Caches transformed mixin classes for faster subsequent startups"),
             FeatureDefinition.enabled(
                     FASTER_MODULE_RESOLVER,
                     "Accelerates Java module resolution (Java 17-21)")

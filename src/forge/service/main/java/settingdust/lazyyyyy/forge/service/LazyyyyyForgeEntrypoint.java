@@ -1,5 +1,6 @@
 package settingdust.lazyyyyy.forge.service;
 
+import com.google.common.collect.Lists;
 import cpw.mods.modlauncher.api.IModuleLayerManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,7 +33,7 @@ public class LazyyyyyForgeEntrypoint implements PreloadingEntrypoint {
             var codeSource = getClass().getProtectionDomain().getCodeSource();
             rootPath = Path.of(codeSource.getLocation().toURI());
             injectBoot();
-            FasterMixinEntrypoint.init(getClass().getClassLoader());
+            FasterMixinEntrypoint.init(getClass().getClassLoader(), LOGGER::info);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -41,11 +42,7 @@ public class LazyyyyyForgeEntrypoint implements PreloadingEntrypoint {
     private void injectBoot() {
         try {
             var bootClassLoader = ModuleLayerHandlerAccessor.getModuleClassLoader(IModuleLayerManager.Layer.BOOT);
-            var bootJars = Files.list(rootPath.resolve("boot"))
-                    .filter(it -> it.getFileName().toString().endsWith(".jar"))
-                    .toList();
-            LOGGER.info("Injected {} jars into BOOT layer", bootJars.size());
-            LOGGER.debug("Injected jars: {}", bootJars);
+            var bootJars = Lists.newArrayList(Files.newDirectoryStream(rootPath.resolve("boot"), "*.jar"));
             var configuration = ModuleConfigurationCreator.createConfigurationFromPaths(
                     bootJars,
                     ModuleClassLoaderAccessor.getConfiguration(bootClassLoader)
@@ -56,6 +53,9 @@ public class LazyyyyyForgeEntrypoint implements PreloadingEntrypoint {
                     bootClassLoader,
                     bootLayer
             );
+
+            LOGGER.info("Injected {} jars into BOOT layer", bootJars.size());
+            LOGGER.debug("Injected jars: {}", bootJars);
 
             var bootNameToModule = ModuleLayerAccessor.getNameToModule(bootLayer);
             var serviceModules = LauncherAccessor.getModuleLayer(IModuleLayerManager.Layer.SERVICE).modules();

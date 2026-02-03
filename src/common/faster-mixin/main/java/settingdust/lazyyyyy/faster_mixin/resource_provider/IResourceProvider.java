@@ -27,5 +27,5 @@ public interface IResourceProvider {
         return service.getResourceAsStream(resource);
     }
 
-    InputStream lazyyyyy$getResourceAsStream(String resource) throws IOException;
+    @Nullable InputStream lazyyyyy$getResourceAsStream(String resource) throws IOException;
 }
