@@ -531,50 +531,9 @@ cloche {
                 implementation(catalog.hash4j)
             }
 
-            val embedMixin by configurations.register(lowerCamelCaseGradleName(featureName, "embedMixin")) {
-                isTransitive = false
-
-                attributes
-                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
-                    .attribute(REMAPPED_ATTRIBUTE, false)
-                    .attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, true)
-                    .attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
-            }
-
-            val embedBoot by configurations.register(lowerCamelCaseGradleName(featureName, "embedBoot")) {
-                isTransitive = false
-
-                attributes
-                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
-                    .attribute(REMAPPED_ATTRIBUTE, false)
-                    .attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, true)
-                    .attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
-            }
-
-            project.dependencies {
-                embedMixin(catalog.mixin.fabric)
-
-                embedBoot(project(":")) {
-                    capabilities {
-                        requireFeature(commonFasterMixin.capabilitySuffix)
-                    }
-                }
-                embedBoot(catalog.hash4j)
-            }
-
             tasks {
                 named(generateModsTomlTaskName) {
                     enabled = false
-                }
-
-                named<Jar>(jarTaskName) {
-                    from(embedMixin) {
-                        rename { "sponge-mixin.jar" }
-                    }
-
-                    from(embedBoot) {
-                        into("boot")
-                    }
                 }
             }
         }
@@ -663,20 +622,13 @@ cloche {
 
             dependencies {
                 legacyClasspath(catalog.mixin.fabric)
-                runtimeOnly(project(":")) {
+                runtimeOnly(skipIncludeTransformation(project(":"))) {
                     capabilities {
-                        requireFeature(forgeService.capabilitySuffix!!)
+                        requireFeature("forge")
                     }
-
-                    exclude("settingdust.lazyyyyy")
                 }
-                runtimeOnly(project(":")) {
-                    capabilities {
-                        requireFeature(forgeGame.capabilitySuffix!!)
-                    }
 
-                    exclude("settingdust.lazyyyyy")
-                }
+                runtimeOnly(catalog.preloadingTricks)
             }
 
             tasks {
@@ -733,20 +685,47 @@ cloche {
                 }
             }
 
-            dependencies {
+            val embedMixin by configurations.register(lowerCamelCaseGradleName(featureName, "embedMixin")) {
+                isTransitive = false
+
+                attributes
+                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
+                    .attribute(REMAPPED_ATTRIBUTE, false)
+                    .attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, true)
+                    .attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
+            }
+
+            val embedBoot by configurations.register(lowerCamelCaseGradleName(featureName, "embedBoot")) {
+                isTransitive = false
+
+                attributes
+                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
+                    .attribute(REMAPPED_ATTRIBUTE, false)
+                    .attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, true)
+                    .attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
+            }
+
+            project.dependencies {
                 include(project(":")) {
                     capabilities {
                         requireFeature(forgeGame.capabilitySuffix!!)
                     }
                 }
-            }
 
-            project.dependencies {
                 embed(project(":")) {
                     capabilities {
                         requireFeature(forgeService.capabilitySuffix!!)
                     }
                 }
+
+                embedMixin(catalog.mixin.fabric)
+
+                embedBoot(project(":")) {
+                    capabilities {
+                        requireFeature(commonFasterMixin.capabilitySuffix)
+                    }
+                }
+                embedBoot(catalog.hash4j)
             }
 
             tasks {
@@ -757,6 +736,14 @@ cloche {
                     destinationDirectory = intermediateOutputsDirectory
 
                     from(embed)
+
+                    from(embedMixin) {
+                        rename { "sponge-mixin.jar" }
+                    }
+
+                    from(embedBoot) {
+                        into("boot")
+                    }
                 }
 
                 val includesJar = register<JarJar>(lowerCamelCaseGradleName(featureName, "includeJar")) {
@@ -771,12 +758,82 @@ cloche {
                 build {
                     dependsOn(includesJar)
                 }
+
+                configurations.register(lowerCamelCaseGradleName(featureName, "runtimeElements")) {
+                    isCanBeResolved = false
+                    isCanBeConsumed = true
+                    attributes {
+                        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+                        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+                        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+                        attribute(TargetAttributes.MOD_LOADER, MinecraftModLoader.forge)
+                        attribute(REMAPPED_ATTRIBUTE, true)
+                    }
+                    outgoing.artifact(includesJar)
+                    outgoing.capability("$group:${project.name}-forge:$version")
+                }
             }
         }
     }
 
     run neoforge@{
-        val neoforge121 = neoforge("neoforge:1.21") {
+        val neoforgeService = neoforge("neoforge:service") {
+            dependsOn(commonMain, common121, commonFasterModuleResolver)
+
+            minecraftVersion = "1.21.1"
+            loaderVersion = "21.1.192"
+
+            dependencies {
+                implementation(catalog.mixin.fabric)
+                compileOnly(catalog.mixinextras.common)
+                implementation(catalog.mixinextras.forge)
+
+                implementation(catalog.preloadingTricks)
+
+                implementation(project(":")) {
+                    capabilities {
+                        requireFeature(commonFasterMixin.capabilitySuffix)
+                    }
+                }
+
+                implementation(catalog.hash4j)
+            }
+
+            val embedBoot by configurations.register(lowerCamelCaseGradleName(featureName, "embedBoot")) {
+                isTransitive = false
+
+                attributes
+                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
+                    .attribute(REMAPPED_ATTRIBUTE, false)
+                    .attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, true)
+                    .attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
+            }
+
+            project.dependencies {
+                embedBoot(project(":")) {
+                    capabilities {
+                        requireFeature(commonFasterMixin.capabilitySuffix)
+                    }
+                }
+                embedBoot(catalog.hash4j)
+            }
+
+            tasks {
+                named(generateModsTomlTaskName) {
+                    enabled = false
+                }
+
+                named<Jar>(jarTaskName) {
+                    from(embedBoot) {
+                        into("boot")
+                    }
+                }
+            }
+        }
+
+        val neoforgeGame = neoforge("neoforge:game") {
+            dependsOn(commonGame, commonGame121)
+
             minecraftVersion = "1.21.1"
             loaderVersion = "21.1.192"
 
@@ -800,17 +857,85 @@ cloche {
                 }
             }
 
+            repositories {
+                maven("https://repo.spongepowered.org/maven") {
+                    content {
+                        includeGroup("org.spongepowered")
+                    }
+                }
+            }
+
             dependencies {
-                modImplementation(catalog.klf.mc121.neoforge)
+                implementation(catalog.mixin.fabric)
+                compileOnly(catalog.mixinextras.common)
+                implementation(catalog.mixinextras.forge)
+
+                modImplementation(catalog.klf.mc120.forge)
+
+                implementation(project(":")) {
+                    capabilities {
+                        requireFeature(neoforgeService.capabilitySuffix!!)
+                    }
+                }
+
+                implementation(project(":")) {
+                    capabilities {
+                        requireFeature(commonMain.capabilitySuffix)
+                    }
+                }
+
+                implementation(catalog.hash4j)
             }
 
             tasks {
-                named<Jar>(jarTaskName) {
+                named<Jar>(lowerCamelCaseGradleName(featureName, "jar")) {
                     manifest {
                         attributes(
                             "ForgeVariant" to "NeoForge"
                         )
                     }
+                }
+
+                named(accessWidenTaskName) {
+                    dependsOn(neoforgeService.accessWidenTaskName)
+                }
+            }
+        }
+
+        neoforge("version:neoforge:1.21.1") {
+            minecraftVersion = "1.21.1"
+            loaderVersion = "21.1.192"
+
+            runs {
+                client {
+                    env("MOD_CLASSES", "")
+                }
+            }
+
+            dependencies {
+                legacyClasspath(catalog.mixin.fabric)
+                runtimeOnly(project(":")) {
+                    capabilities {
+                        requireFeature("neoforge")
+                    }
+                }
+            }
+
+            tasks {
+                named(jarTaskName) {
+                    enabled = false
+                }
+
+                named(remapJarTaskName) {
+                    enabled = false
+                }
+
+                named(includeJarTaskName) {
+                    enabled = false
+                }
+
+                named(accessWidenTaskName) {
+                    dependsOn(neoforgeService.accessWidenTaskName, neoforgeGame.accessWidenTaskName)
                 }
             }
         }
@@ -827,18 +952,32 @@ cloche {
                     attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, false)
                 }
             }
-            val targets = setOf(neoforge121)
 
-            dependencies {
-                for (target in targets) {
-                    include(project(":")) {
-                        capabilities {
-                            requireFeature(target.capabilitySuffix!!)
-                        }
+            val embed = configurations.register(lowerCamelCaseGradleName(featureName, "embed")) {
+                isCanBeResolved = true
+                isTransitive = false
+
+                attributes {
+                    attribute(
+                        LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+                        objects.named(LibraryElements.CLASSES_AND_RESOURCES)
+                    )
+                    attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, false)
+                }
+            }
+
+            project.dependencies {
+                include(project(":")) {
+                    capabilities {
+                        requireFeature(neoforgeGame.capabilitySuffix!!)
                     }
                 }
 
-                include(catalog.preloadingTricks)
+                embed(project(":")) {
+                    capabilities {
+                        requireFeature(neoforgeService.capabilitySuffix!!)
+                    }
+                }
             }
 
             tasks {
@@ -847,6 +986,8 @@ cloche {
 
                     archiveClassifier = "neoforge"
                     destinationDirectory = intermediateOutputsDirectory
+
+                    from(embed)
                 }
 
                 val includesJar = register<JarJar>(lowerCamelCaseGradleName(featureName, "includeJar")) {
@@ -860,6 +1001,20 @@ cloche {
 
                 build {
                     dependsOn(includesJar)
+                }
+
+                configurations.register(lowerCamelCaseGradleName(featureName, "runtimeElements")) {
+                    isCanBeResolved = false
+                    isCanBeConsumed = true
+                    attributes {
+                        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+                        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+                        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+                        attribute(TargetAttributes.MOD_LOADER, MinecraftModLoader.neoforge)
+                        attribute(REMAPPED_ATTRIBUTE, true)
+                    }
+                    outgoing.artifact(includesJar)
+                    outgoing.capability("$group:${project.name}-neoforge:$version")
                 }
             }
         }
