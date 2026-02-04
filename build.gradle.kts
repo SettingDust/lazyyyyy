@@ -447,7 +447,7 @@ cloche {
                     from(metadataDirectory)
 
                     from(embedBoot) {
-                        into("libs/boot")
+                        into("boot")
                     }
                 }
 

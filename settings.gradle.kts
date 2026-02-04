@@ -147,7 +147,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     }
 
     library("preloadingTricks", "settingdust.preloading_tricks", "PreloadingTricks")
-        .version("3.5.5.dirty")
+        .version("3.5.6")
 
     dependency("klf", "dev.nyon") {
         artifact = "KotlinLangForge"

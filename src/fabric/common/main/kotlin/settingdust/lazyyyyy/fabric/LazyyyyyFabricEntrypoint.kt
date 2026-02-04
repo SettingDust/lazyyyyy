@@ -45,7 +45,7 @@ class LazyyyyyFabricEntrypoint : PreloadingEntrypoint {
 
         val mod = FabricLoader.getInstance().getModContainer("${Lazyyyyy.ID}_container").orElseThrow()
         val bootJars = mod
-            .findPath("libs/boot").orElseThrow()
+            .findPath("boot").orElseThrow()
             .listDirectoryEntries("*.jar")
         for (path in bootJars) {
             UcpClassLoaderInjector.inject(path, ClassLoader.getSystemClassLoader())
