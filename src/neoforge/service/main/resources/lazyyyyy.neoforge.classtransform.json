@@ -1,0 +1,7 @@
+{
+  "package": "settingdust.lazyyyyy.neoforge.service.transformer",
+  "transformers": [
+    "ContainerHandleModLauncherEx$SecureJarResourceTransformer",
+    "cache.ContainerHandleModLauncherEx$SecureJarResourceHashTransformer"
+  ]
+}

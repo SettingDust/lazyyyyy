@@ -636,6 +636,10 @@ cloche {
             }
 
             tasks {
+                named(generateModsManifestTaskName) {
+                    enabled = false
+                }
+
                 named(jarTaskName) {
                     enabled = false
                 }
@@ -788,7 +792,6 @@ cloche {
             loaderVersion = "21.1.192"
 
             dependencies {
-                implementation(catalog.mixin.fabric)
                 compileOnly(catalog.mixinextras.common)
                 implementation(catalog.mixinextras.forge)
 
@@ -803,34 +806,9 @@ cloche {
                 implementation(catalog.hash4j)
             }
 
-            val embedBoot by configurations.register(lowerCamelCaseGradleName(featureName, "embedBoot")) {
-                isTransitive = false
-
-                attributes
-                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
-                    .attribute(REMAPPED_ATTRIBUTE, false)
-                    .attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, true)
-                    .attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
-            }
-
-            project.dependencies {
-                embedBoot(project(":")) {
-                    capabilities {
-                        requireFeature(fasterMixin.capabilitySuffix)
-                    }
-                }
-                embedBoot(catalog.hash4j)
-            }
-
             tasks {
                 named(generateModsTomlTaskName) {
                     enabled = false
-                }
-
-                named<Jar>(jarTaskName) {
-                    from(embedBoot) {
-                        into("boot")
-                    }
                 }
             }
         }
@@ -870,7 +848,6 @@ cloche {
             }
 
             dependencies {
-                implementation(catalog.mixin.fabric)
                 compileOnly(catalog.mixinextras.common)
                 implementation(catalog.mixinextras.forge)
 
@@ -917,15 +894,22 @@ cloche {
             }
 
             dependencies {
-                legacyClasspath(catalog.mixin.fabric)
-                runtimeOnly(project(":")) {
+                legacyClasspath(skipIncludeTransformation(project(":"))) {
                     capabilities {
                         requireFeature("neoforge")
                     }
                 }
+
+                legacyClasspath(catalog.preloadingTricks) {
+                    isTransitive = false
+                }
             }
 
             tasks {
+                named(generateModsManifestTaskName) {
+                    enabled = false
+                }
+
                 named(jarTaskName) {
                     enabled = false
                 }
@@ -946,6 +930,16 @@ cloche {
 
         run container@{
             val featureName = "containerNeoforge"
+
+            val embedBoot by configurations.register(lowerCamelCaseGradleName(featureName, "embedBoot")) {
+                isTransitive = false
+
+                attributes
+                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
+                    .attribute(REMAPPED_ATTRIBUTE, false)
+                    .attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, true)
+                    .attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
+            }
             val include = configurations.register(lowerCamelCaseGradleName(featureName, "include")) {
                 isCanBeResolved = true
                 isTransitive = false
@@ -971,6 +965,13 @@ cloche {
             }
 
             project.dependencies {
+                embedBoot(project(":")) {
+                    capabilities {
+                        requireFeature(fasterMixin.capabilitySuffix)
+                    }
+                }
+                embedBoot(catalog.hash4j)
+
                 include(project(":")) {
                     capabilities {
                         requireFeature(neoforgeGame.capabilitySuffix!!)
@@ -992,6 +993,9 @@ cloche {
                     destinationDirectory = intermediateOutputsDirectory
 
                     from(embed)
+                    from(embedBoot) {
+                        into("boot")
+                    }
                 }
 
                 val includesJar = register<JarJar>(lowerCamelCaseGradleName(featureName, "includeJar")) {

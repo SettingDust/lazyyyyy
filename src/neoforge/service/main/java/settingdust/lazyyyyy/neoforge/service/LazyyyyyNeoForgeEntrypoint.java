@@ -1,6 +1,5 @@
-package settingdust.lazyyyyy.forge.service;
+package settingdust.lazyyyyy.neoforge.service;
 
-import com.google.common.collect.Lists;
 import cpw.mods.modlauncher.api.IModuleLayerManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,12 +21,12 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class LazyyyyyForgeEntrypoint implements PreloadingEntrypoint {
+public class LazyyyyyNeoForgeEntrypoint implements PreloadingEntrypoint {
     private static final Logger LOGGER = LogManager.getLogger("Lazyyyyy");
 
     private final Path rootPath;
 
-    public LazyyyyyForgeEntrypoint() {
+    public LazyyyyyNeoForgeEntrypoint() {
         // Load configuration
         LazyyyyyEarlyConfig.instance().load();
 
@@ -40,15 +39,17 @@ public class LazyyyyyForgeEntrypoint implements PreloadingEntrypoint {
             throw new RuntimeException(e);
         }
 
-        ModLauncherPreloadingCallbacks.COLLECT_ADDITIONAL_DEPENDENCY_SOURCES.register(manager -> {
-            manager.add(rootPath, Lazyyyyy.ID + "_service");
-        });
+        ModLauncherPreloadingCallbacks.COLLECT_ADDITIONAL_DEPENDENCY_SOURCES
+                .register(manager ->
+                        manager.add(rootPath, Lazyyyyy.ID + "_service"));
     }
 
     private void injectBoot() {
         try {
             var bootClassLoader = ModuleLayerHandlerAccessor.getModuleClassLoader(IModuleLayerManager.Layer.BOOT);
-            var bootJars = Lists.newArrayList(Files.newDirectoryStream(rootPath.resolve("boot"), "*.jar"));
+            var bootJars = Files.list(rootPath.resolve("boot"))
+                    .filter(it -> it.getFileName().toString().endsWith(".jar"))
+                    .toList();
             var configuration = ModuleConfigurationCreator.createConfigurationFromPaths(
                     bootJars,
                     ModuleClassLoaderAccessor.getConfiguration(bootClassLoader)

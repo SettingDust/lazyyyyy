@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.forge.service.transformer;
+package settingdust.lazyyyyy.neoforge.service.transformer;
 
 import cpw.mods.jarhandling.SecureJar;
 import org.spongepowered.asm.mixin.Mixin;
