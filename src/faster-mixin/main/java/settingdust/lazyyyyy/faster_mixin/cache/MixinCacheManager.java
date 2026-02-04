@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -140,10 +141,8 @@ public class MixinCacheManager {
                 return true;
             }
 
-            boolean transformed = ((MixinProcessorAccessor) processor).lazyyyyy$applyMixins(
-                    environment,
-                    name,
-                    targetClassNode);
+            boolean transformed = ((MixinProcessorAccessor) processor)
+                    .lazyyyyy$applyMixins(environment, name, targetClassNode);
             saveToCache(name, targetClassNode, combinedHash);
             return transformed;
         } catch (UncheckedIOException e) {
@@ -152,7 +151,7 @@ public class MixinCacheManager {
     }
 
     public static byte[] getFileHash(Path path) throws IOException {
-        String key = path.toAbsolutePath().toString();
+        String key = path.toAbsolutePath().normalize().toString();
         long lastModified = Files.getLastModifiedTime(path).toMillis();
 
         PathHashEntry entry = pathHashCache.get(key);
@@ -177,7 +176,7 @@ public class MixinCacheManager {
 
     public static boolean loadFromCache(String className, ClassNode classNode, byte[] hash) {
         var hashString = HashCode.fromBytes(hash).toString();
-        var classPath = CACHE_PATH.resolve(hashString).resolve(className + ".class");
+        var classPath = CACHE_PATH.resolve(hashString).resolve(className.replace('.', '/') + ".class");
 
         if (Files.exists(classPath)) {
             try {
@@ -195,17 +194,19 @@ public class MixinCacheManager {
     }
 
     public static void saveToCache(String className, ClassNode classNode, byte[] hash) {
-        var hashString = HashCode.fromBytes(hash).toString();
-        var cachePath = CACHE_PATH.resolve(hashString);
-        var classPath = cachePath.resolve(className + ".class");
+        CompletableFuture.runAsync(() -> {
+            var hashString = HashCode.fromBytes(hash).toString();
+            var cachePath = CACHE_PATH.resolve(hashString);
+            var classPath = cachePath.resolve(className + ".class");
 
-        try {
-            Files.createDirectories(cachePath);
-            Files.write(classPath, getClassBytes(classNode));
-            LOGGER.debug("Saved cached class '{}' to hash {}", className, hashString);
-        } catch (IOException e) {
-            LOGGER.warn("Failed to save cache for {} in {}", className, hashString, e);
-        }
+            try {
+                Files.createDirectories(cachePath);
+                Files.write(classPath, getClassBytes(classNode));
+                LOGGER.debug("Saved cached class '{}' to hash {}", className, hashString);
+            } catch (IOException e) {
+                LOGGER.warn("Failed to save cache for {} in {}", className, hashString, e);
+            }
+        });
     }
 
     private static void cleanClassNode(ClassNode classNode) {
