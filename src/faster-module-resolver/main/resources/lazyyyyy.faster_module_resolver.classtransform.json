@@ -1,0 +1,6 @@
+{
+  "package": "settingdust.lazyyyyy.faster_module_resolver.transformer",
+  "transformers": [
+    "ResolverTransformer"
+  ]
+}

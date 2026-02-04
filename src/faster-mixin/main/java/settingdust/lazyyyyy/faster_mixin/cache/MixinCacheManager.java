@@ -128,6 +128,7 @@ public class MixinCacheManager {
                         }
                     })
                     .filter(Objects::nonNull)
+                    .sequential()
                     .forEach(hasher::putBytes);
 
             // Include original class hash to avoid collisions and handle updates
