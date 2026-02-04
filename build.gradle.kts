@@ -169,7 +169,7 @@ cloche {
         // mixins.from("src/common/1.21.1/main/resources/$id.1_21.mixins.json")
     }
 
-    val commonGame = common("common:game") {
+    val game = common("game") {
         project.dependencies {
             val implementation = lowerCamelCaseGradleName(name, JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
 
@@ -181,16 +181,16 @@ cloche {
         }
     }
 
-    val commonGame1201 = common("common:game:1.20.1") {
-        dependsOn(commonGame)
+    val game1201 = common("game:1.20.1") {
+        dependsOn(game)
         // mixins.from("src/common/1.20.1/main/resources/$id.1_20.mixins.json")
     }
-    val commonGame121 = common("common:game:1.21.1") {
-        dependsOn(commonGame)
+    val game121 = common("game:1.21.1") {
+        dependsOn(game)
         // mixins.from("src/common/1.21.1/main/resources/$id.1_21.mixins.json")
     }
 
-    val commonFasterModuleResolver = common("common:faster-module-resolver") {
+    val fasterModuleResolver = common("faster-module-resolver") {
         dependencies {
             compileOnly(catalog.mixin.fabric)
         }
@@ -206,41 +206,45 @@ cloche {
         }
     }
 
-    val commonFasterMixin = common("common:faster-mixin") {
+    val fasterMixin = common("faster-mixin") {
         dependencies {
             compileOnly(catalog.mixin.fabric)
             compileOnly(catalog.hash4j)
         }
     }
 
+    val modlauncher = common("modlauncher") {
+
+    }
+
     run fabric@{
-        val fabricCommonFasterMixin = common("fabric:common:faster-mixin") {
-            dependsOn(commonFasterMixin)
+        val fabricFasterMixin = common("fabric:faster-mixin") {
+            dependsOn(fasterMixin)
         }
 
         val fabricCommon = common("fabric:common") {
-            dependsOn(commonMain, commonGame, commonFasterModuleResolver)
+            dependsOn(commonMain, game, fasterModuleResolver)
 
             project.dependencies {
                 val implementation = lowerCamelCaseGradleName(name, JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
 
                 implementation(project(":")) {
                     capabilities {
-                        requireFeature(fabricCommonFasterMixin.capabilitySuffix)
+                        requireFeature(fabricFasterMixin.capabilitySuffix)
                     }
                 }
 
                 implementation(project(":")) {
                     capabilities {
-                        requireFeature(commonFasterMixin.capabilitySuffix)
+                        requireFeature(fasterMixin.capabilitySuffix)
                     }
                 }
             }
         }
 
         val fabric1201 = fabric("fabric:1.20.1") {
-            dependsOn(common1201, commonGame1201, commonFasterModuleResolver, fabricCommon)
-            stubSources(fabricCommonFasterMixin)
+            dependsOn(common1201, game1201, fasterModuleResolver, fabricCommon)
+            stubSources(fabricFasterMixin)
 
             minecraftVersion = "1.20.1"
 
@@ -264,15 +268,15 @@ cloche {
 
                 implementation(project(":")) {
                     capabilities {
-                        requireFeature(fabricCommonFasterMixin.capabilitySuffix)
+                        requireFeature(fabricFasterMixin.capabilitySuffix)
                     }
                 }
             }
         }
 
         val fabric121 = fabric("fabric:1.21") {
-            dependsOn(common121, commonGame121, commonFasterModuleResolver, fabricCommon)
-            stubSources(fabricCommonFasterMixin)
+            dependsOn(common121, game121, fasterModuleResolver, fabricCommon)
+            stubSources(fabricFasterMixin)
 
             minecraftVersion = "1.21.1"
 
@@ -295,7 +299,7 @@ cloche {
 
                 implementation(project(":")) {
                     capabilities {
-                        requireFeature(fabricCommonFasterMixin.capabilitySuffix)
+                        requireFeature(fabricFasterMixin.capabilitySuffix)
                     }
                 }
             }
@@ -417,7 +421,7 @@ cloche {
 
                 embedBoot(project(":")) {
                     capabilities {
-                        requireFeature(fabricCommonFasterMixin.capabilitySuffix)
+                        requireFeature(fabricFasterMixin.capabilitySuffix)
                     }
                 }
                 embedBoot(catalog.hash4j)
@@ -510,7 +514,7 @@ cloche {
 
     run forge@{
         val forgeService = forge("forge:service") {
-            dependsOn(commonMain, common1201, commonFasterModuleResolver)
+            dependsOn(commonMain, common1201, fasterModuleResolver, modlauncher)
 
             minecraftVersion = "1.20.1"
             loaderVersion = "47.4.4"
@@ -524,7 +528,7 @@ cloche {
 
                 implementation(project(":")) {
                     capabilities {
-                        requireFeature(commonFasterMixin.capabilitySuffix)
+                        requireFeature(fasterMixin.capabilitySuffix)
                     }
                 }
 
@@ -539,7 +543,7 @@ cloche {
         }
 
         val forgeGame = forge("forge:game") {
-            dependsOn(commonGame, commonGame1201)
+            dependsOn(game, game1201)
 
             minecraftVersion = "1.20.1"
             loaderVersion = "47.4.4"
@@ -722,7 +726,7 @@ cloche {
 
                 embedBoot(project(":")) {
                     capabilities {
-                        requireFeature(commonFasterMixin.capabilitySuffix)
+                        requireFeature(fasterMixin.capabilitySuffix)
                     }
                 }
                 embedBoot(catalog.hash4j)
@@ -778,7 +782,7 @@ cloche {
 
     run neoforge@{
         val neoforgeService = neoforge("neoforge:service") {
-            dependsOn(commonMain, common121, commonFasterModuleResolver)
+            dependsOn(commonMain, common121, fasterModuleResolver, modlauncher)
 
             minecraftVersion = "1.21.1"
             loaderVersion = "21.1.192"
@@ -792,7 +796,7 @@ cloche {
 
                 implementation(project(":")) {
                     capabilities {
-                        requireFeature(commonFasterMixin.capabilitySuffix)
+                        requireFeature(fasterMixin.capabilitySuffix)
                     }
                 }
 
@@ -812,7 +816,7 @@ cloche {
             project.dependencies {
                 embedBoot(project(":")) {
                     capabilities {
-                        requireFeature(commonFasterMixin.capabilitySuffix)
+                        requireFeature(fasterMixin.capabilitySuffix)
                     }
                 }
                 embedBoot(catalog.hash4j)
@@ -832,7 +836,7 @@ cloche {
         }
 
         val neoforgeGame = neoforge("neoforge:game") {
-            dependsOn(commonGame, commonGame121)
+            dependsOn(game, game121)
 
             minecraftVersion = "1.21.1"
             loaderVersion = "21.1.192"

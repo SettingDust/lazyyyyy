@@ -25,7 +25,7 @@ public class LazyyyyyForgeEntrypoint implements PreloadingEntrypoint {
 
     private final Path rootPath;
 
-    public LazyyyyyForgeEntrypoint() throws IOException {
+    public LazyyyyyForgeEntrypoint() {
         // Load configuration
         LazyyyyyEarlyConfig.instance().load();
 
