@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.fabric.faster_mixin;
+package settingdust.lazyyyyy.faster_mixin.fabric;
 
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;

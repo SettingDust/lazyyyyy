@@ -1,6 +1,5 @@
 package settingdust.lazyyyyy.forge.service;
 
-import com.google.common.collect.Lists;
 import cpw.mods.modlauncher.api.IModuleLayerManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,7 +47,9 @@ public class LazyyyyyForgeEntrypoint implements PreloadingEntrypoint {
     private void injectBoot() {
         try {
             var bootClassLoader = ModuleLayerHandlerAccessor.getModuleClassLoader(IModuleLayerManager.Layer.BOOT);
-            var bootJars = Lists.newArrayList(Files.newDirectoryStream(rootPath.resolve("boot"), "*.jar"));
+            var bootJars = Files.list(rootPath.resolve("boot"))
+                    .filter(it -> it.getFileName().toString().endsWith(".jar"))
+                    .toList();
             var configuration = ModuleConfigurationCreator.createConfigurationFromPaths(
                     bootJars,
                     ModuleClassLoaderAccessor.getConfiguration(bootClassLoader)
