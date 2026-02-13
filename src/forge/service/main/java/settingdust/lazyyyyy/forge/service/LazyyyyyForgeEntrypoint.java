@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import settingdust.lazyyyyy.Lazyyyyy;
 import settingdust.lazyyyyy.config.LazyyyyyEarlyConfig;
 import settingdust.lazyyyyy.faster_mixin.FasterMixinEntrypoint;
+import settingdust.lazyyyyy.util.UcpClassLoaderInjector;
 import settingdust.preloading_tricks.api.PreloadingEntrypoint;
 import settingdust.preloading_tricks.api.modlauncher.ModLauncherPreloadingCallbacks;
 import settingdust.preloading_tricks.forgelike.module_injector.accessor.ModuleAccessor;
@@ -15,6 +16,7 @@ import settingdust.preloading_tricks.modlauncher.module_injector.ModuleInjector;
 import settingdust.preloading_tricks.modlauncher.module_injector.accessor.LauncherAccessor;
 import settingdust.preloading_tricks.modlauncher.module_injector.accessor.ModuleClassLoaderAccessor;
 import settingdust.preloading_tricks.modlauncher.module_injector.accessor.ModuleLayerHandlerAccessor;
+import settingdust.preloading_tricks.util.class_transform.ClassTransformBootstrap;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -39,9 +41,15 @@ public class LazyyyyyForgeEntrypoint implements PreloadingEntrypoint {
             throw new RuntimeException(e);
         }
 
+        ClassTransformBootstrap.INSTANCE.addConfig("lazyyyyy.forge.classtransform.json", getClass().getClassLoader());
+
         ModLauncherPreloadingCallbacks.COLLECT_ADDITIONAL_DEPENDENCY_SOURCES.register(manager -> {
             manager.add(rootPath, Lazyyyyy.ID + "_service");
         });
+
+        UcpClassLoaderInjector.removeFromClassLoader(
+                ClassLoader.getSystemClassLoader(),
+                it -> it.getFile().equals("mixin-0.8.5.jar"));
     }
 
     private void injectBoot() {

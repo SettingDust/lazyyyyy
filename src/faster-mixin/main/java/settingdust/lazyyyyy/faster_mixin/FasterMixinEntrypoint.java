@@ -18,8 +18,13 @@ public class FasterMixinEntrypoint {
         var clazz = RStream.of(Classes.byName(
                 "settingdust.preloading_tricks.util.class_transform.ClassTransformBootstrap",
                 loader));
-        clazz.methods()
-                .by("addConfig", String.class)
-                .invokeInstance(clazz.fields().by("INSTANCE").get(), "lazyyyyy.faster_mixin.classtransform.json");
+        var addConfig = clazz.methods().by("addConfig", String.class);
+        addConfig.invokeInstance(clazz.fields().by("INSTANCE").get(), "lazyyyyy.faster_mixin.classtransform.json");
+
+        if (LazyyyyyEarlyConfigInvoker.isFeatureEnabled("faster_mixin.cache")) {
+            addConfig.invokeInstance(
+                    clazz.fields().by("INSTANCE").get(),
+                    "lazyyyyy.faster_mixin.cache.classtransform.json");
+        }
     }
 }

@@ -1,12 +1,9 @@
 {
   "package": "settingdust.lazyyyyy.faster_mixin.transformer",
   "transformers": [
+    "MixinInfoTransformer",
+    "ClassInfoTransformer",
     "resource_provider.ContainerHandleModLauncher$ResourceTransformer",
-    "resource_provider.MixinConfigTransformer",
-    "cache.MixinConfigTransformer",
-    "cache.MixinProcessorTransformer",
-    "cache.MixinTransformerTransformer",
-    "cache.InnerClassGeneratorTransformer",
-    "cache.ContainerHandleModLauncher$ResourceTransformer"
+    "resource_provider.MixinConfigTransformer"
   ]
 }

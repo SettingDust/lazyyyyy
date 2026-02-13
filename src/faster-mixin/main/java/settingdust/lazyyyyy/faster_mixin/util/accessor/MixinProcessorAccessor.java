@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy.faster_mixin.cache;
+package settingdust.lazyyyyy.faster_mixin.util.accessor;
 
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.MixinEnvironment;

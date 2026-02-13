@@ -11,6 +11,7 @@ import settingdust.lazyyyyy.fabric.config.FabricEarlyConfig
 import settingdust.lazyyyyy.fabric.transformer.better_log4j_config.earlier_init.BetterLog4jConfigTransformer
 import settingdust.lazyyyyy.faster_mixin.FasterMixinEntrypoint
 import settingdust.lazyyyyy.faster_module_resolver.FasterModuleResolverEntrypoint
+import settingdust.lazyyyyy.util.UcpClassLoaderInjector
 import settingdust.preloading_tricks.api.PreloadingEntrypoint
 import settingdust.preloading_tricks.util.class_transform.ClassTransformBootstrap
 import kotlin.io.path.listDirectoryEntries

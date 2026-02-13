@@ -15,12 +15,14 @@ public interface IResourceProvider {
     static InputStream getResourceAsStream(
             String resource,
             @Nullable IMixinConfigSource source,
-            IMixinService service) throws IOException {
+            IMixinService service) {
         if (source instanceof IResourceProvider provider) {
-            var result = provider.lazyyyyy$getResourceAsStream(resource);
-            if (result != null) return result;
-            LOGGER.warn("Resource {} not found in source {}. Fallback to slower method", resource, source);
-            return service.getResourceAsStream(resource);
+            try {
+                return provider.lazyyyyy$getResourceAsStream(resource);
+            } catch (IOException e) {
+                LOGGER.warn("Resource {} not found in source {}. Fallback to slower method", resource, source);
+                return service.getResourceAsStream(resource);
+            }
         } else {
             LOGGER.debug("Resource {} source {} is not IResourceProvider", resource, source);
         }

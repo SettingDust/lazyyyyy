@@ -207,7 +207,9 @@ cloche {
     }
 
     val fasterMixin = common("faster-mixin") {
-        dependencies {
+        project.dependencies {
+            val compileOnly = lowerCamelCaseGradleName(name, JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME)
+
             compileOnly(catalog.mixin.fabric)
             compileOnly(catalog.hash4j)
         }
@@ -618,6 +620,8 @@ cloche {
                 }
 
                 runtimeOnly(catalog.preloadingTricks)
+
+                modRuntimeOnly(catalog.klf.mc120.forge)
             }
 
             tasks {

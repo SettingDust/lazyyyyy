@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import settingdust.lazyyyyy.faster_mixin.cache.MixinCacheManager;
-import settingdust.lazyyyyy.faster_mixin.cache.MixinProcessorAccessor;
+import settingdust.lazyyyyy.faster_mixin.util.accessor.MixinProcessorAccessor;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public abstract class MixinProcessorTransformer implements MixinProcessorAccesso
     private String sessionId;
 
     @Shadow
-    public abstract boolean applyMixins(MixinEnvironment environment, String name, ClassNode targetClassNode);
+    abstract boolean applyMixins(MixinEnvironment environment, String name, ClassNode targetClassNode);
 
     @Override
     @Unique
