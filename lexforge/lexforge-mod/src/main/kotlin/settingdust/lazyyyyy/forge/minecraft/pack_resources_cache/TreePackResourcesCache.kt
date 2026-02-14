@@ -1,71 +1,62 @@
 package settingdust.lazyyyyy.forge.minecraft.pack_resources_cache
 
 import com.ferreusveritas.dynamictrees.api.resource.TreeResourcePack
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import net.minecraft.server.packs.PackType
 import settingdust.lazyyyyy.Lazyyyyy
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingStrategy
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.GenericPackResourcesCache
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCache
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesLayout
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.consumeFile
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.consumeResourceDirectory
 import settingdust.lazyyyyy.util.collect
 import settingdust.lazyyyyy.util.concurrent
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.time.measureTime
 
 class TreePackResourcesCache(pack: TreeResourcePack, treePackTypeRoots: List<Path>) :
-    PackResourcesCache(pack, treePackTypeRoots) {
+    GenericPackResourcesCache(pack, treePackTypeRoots, TreePackLayout) {
     constructor(root: Path, pack: TreeResourcePack) : this(pack, listOf(root))
+}
 
-    private val allNamespaces = CompletableDeferred<MutableSet<String>>()
-
-    init {
-        scope.launch { loadCache() }
-    }
-
-    private suspend fun CoroutineScope.consumePackType(
-        directory: Path,
-        namespaces: MutableSet<String>
-    ) {
-        val strategy = CachingStrategy.PackRoot(directory, directory)
+object TreePackLayout : PackResourcesLayout {
+    override suspend fun cachePack(cache: PackResourcesCache): Map<PackType, Set<String>> = coroutineScope {
+        val namespaces = ConcurrentHashMap.newKeySet<String>()
         val directoryToFiles = ConcurrentHashMap<String, MutableMap<Path, String>>()
-        directory.listDirectoryEntries().asFlow().concurrent().collect { path ->
-            if (path.isDirectory()) {
-                namespaces += path.name
-                consumeResourceDirectory(path, directoryToFiles, strategy)
-            } else {
-                consumeFile(this, path, strategy)
+        val time = measureTime {
+            cache.roots.asFlow().concurrent().collect { root ->
+                consumePackType(cache, this, root, namespaces, directoryToFiles)
             }
         }
         for ((path, files) in directoryToFiles) {
-            this@TreePackResourcesCache.directoryToFiles[path]!!.complete(files)
+            cache.directoryToFiles[path]!!.complete(files)
         }
+        Lazyyyyy.logger.debug("Cache tree pack ${cache.pack.packId()} in $time")
+        PackType.entries.associateWith { namespaces as Set<String> }
     }
 
-    private suspend fun CoroutineScope.loadCache() =
-        withContext(CoroutineName("Dynamic Trees pack cache #${pack.packId()}")) {
-            val time = measureTime {
-                val namespaces = ConcurrentHashMap.newKeySet<String>()
-                roots.asFlow().concurrent().collect { consumePackType(it, namespaces) }
-                allNamespaces.complete(namespaces)
-                allCompleted.complete()
+    private suspend fun consumePackType(
+        cache: PackResourcesCache,
+        scope: CoroutineScope,
+        directory: Path,
+        namespaces: MutableSet<String>,
+        directoryToFiles: MutableMap<String, MutableMap<Path, String>>
+    ) {
+        val strategy = CachingStrategy.PackRoot(directory, directory)
+        directory.listDirectoryEntries().asFlow().concurrent().collect { path ->
+            if (path.isDirectory()) {
+                namespaces += path.name
+                cache.consumeResourceDirectory(path, directoryToFiles, strategy)
+            } else {
+                cache.consumeFile(scope, path, strategy)
             }
-            Lazyyyyy.logger.debug("Cache tree pack ${pack.packId()} in $time")
         }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getNamespaces(type: PackType?) =
-        if (allNamespaces.isCompleted) allNamespaces.getCompleted()
-        else runBlocking { allNamespaces.await() }
+    }
 }

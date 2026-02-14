@@ -15,6 +15,7 @@ import net.minecraft.server.packs.PackResources
 import net.minecraft.server.packs.PackType
 import settingdust.lazyyyyy.Lazyyyyy
 import settingdust.lazyyyyy.PlatformService
+import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingStrategy
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.CachingStrategy.PackRoot
 import settingdust.lazyyyyy.minecraft.pack_resources_cache.PackResourcesCacheManager.toValidFileName
 import settingdust.lazyyyyy.util.collect
@@ -26,68 +27,24 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.time.measureTime
 
-class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackResourcesCache(pack, roots) {
+class GenericPackResourcesCache(
+    pack: PackResources,
+    roots: List<Path>,
+    private val layout: PackResourcesLayout = DefaultPackResourcesLayout()
+) : PackResourcesCache(pack, roots) {
     constructor(root: Path, pack: PackResources) : this(pack, listOf(root))
 
     var namespaces: MutableMap<PackType, CompletableDeferred<Set<String>>> = ConcurrentHashMap()
 
-    init { loadCache() }
-
-    private suspend fun consumeRoot(
-        root: Path,
-        namespaces: ConcurrentHashMap<PackType, MutableSet<String>>
-    ) = coroutineScope  {
-        val strategy = PackRoot(root, null)
-        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#root/$root] caching") }
-        root.listDirectoryEntries().asFlow().concurrent().collect { path ->
-            val relativePath = root.relativize(path)
-            if (path.isDirectory()) {
-                val firstPath = relativePath.firstOrNull()
-                val packType = packTypeByDirectory[firstPath?.name] ?: return@collect
-                consumePackType(packType, path, PackRoot(root, path), namespaces)
-            } else {
-                consumeFile(this, path, strategy)
-            }
-        }
-        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#root/$root] cached") }
+    init {
+        loadCache()
     }
 
-    private suspend fun CoroutineScope.consumePackType(
-        type: PackType,
-        directory: Path,
-        strategy: CachingStrategy,
-        namespaces: MutableMap<PackType, MutableSet<String>>
-    ) {
-        namespaces.computeIfAbsent(type) { ConcurrentHashMap.newKeySet() }
-        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type] caching") }
-        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/entries] caching") }
-        val directoryToFiles = ConcurrentHashMap<String, MutableMap<Path, String>>()
-        directory.listDirectoryEntries().asFlow().concurrent().collect { path ->
-            if (path.isDirectory()) {
-                namespaces[type]!! += path.name
-                consumeResourceDirectory(path, directoryToFiles, strategy)
-            } else {
-                consumeFile(this, path, strategy)
-            }
-        }
-        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/directoryToFiles] caching") }
-        for ((path, files) in directoryToFiles) {
-            this@GenericPackResourcesCache.directoryToFiles[path]!!.complete(files)
-        }
-        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/directoryToFiles] cached") }
-
-        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type/entries] cached") }
-        Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}#packType/$type] cached") }
-    }
-
-    private suspend fun cachePack() = coroutineScope  {
-        val namespaces = ConcurrentHashMap<PackType, MutableSet<String>>()
-
+    private suspend fun cachePack() = coroutineScope {
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}] caching") }
-        roots.asFlow().concurrent().collect { root -> consumeRoot(root, namespaces) }
-
-        for ((type, deferred) in this@GenericPackResourcesCache.namespaces) {
-            deferred.complete(namespaces[type] ?: emptySet())
+        val namespacesSnapshot = layout.cachePack(this@GenericPackResourcesCache)
+        for ((type, deferred) in namespaces) {
+            deferred.complete(namespacesSnapshot[type] ?: emptySet())
         }
         allCompleted.complete()
         Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${pack.packId()}] cached") }
@@ -219,5 +176,66 @@ class GenericPackResourcesCache(pack: PackResources, roots: List<Path>) : PackRe
         if (deferred.isCompleted) return deferred.getCompleted()
         if (allCompleted.isCompleted) return emptySet()
         return runBlocking { deferred.await() }
+    }
+
+    private class DefaultPackResourcesLayout : PackResourcesLayout {
+        override suspend fun cachePack(cache: PackResourcesCache): Map<PackType, Set<String>> = coroutineScope {
+            val namespaces = ConcurrentHashMap<PackType, MutableSet<String>>()
+            Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${cache.pack.packId()}] caching") }
+            cache.roots.asFlow().concurrent().collect { root ->
+                consumeRoot(cache, this, root, namespaces)
+            }
+            Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${cache.pack.packId()}] cached") }
+            namespaces.mapValues { it.value }
+        }
+
+        private suspend fun consumeRoot(
+            cache: PackResourcesCache,
+            scope: CoroutineScope,
+            root: Path,
+            namespaces: ConcurrentHashMap<PackType, MutableSet<String>>
+        ) = scope.coroutineScope {
+            val strategy = PackRoot(root, null)
+            Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${cache.pack.packId()}#root/$root] caching") }
+            root.listDirectoryEntries().asFlow().concurrent().collect { path ->
+                val relativePath = root.relativize(path)
+                if (path.isDirectory()) {
+                    val firstPath = relativePath.firstOrNull()
+                    val packType = PackResourcesCache.packTypeByDirectory[firstPath?.name] ?: return@collect
+                    consumePackType(cache, this, packType, path, PackRoot(root, path), namespaces)
+                } else {
+                    cache.consumeFile(this, path, strategy)
+                }
+            }
+            Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${cache.pack.packId()}#root/$root] cached") }
+        }
+
+        private suspend fun CoroutineScope.consumePackType(
+            cache: PackResourcesCache,
+            type: PackType,
+            directory: Path,
+            strategy: CachingStrategy,
+            namespaces: MutableMap<PackType, MutableSet<String>>
+        ) {
+            namespaces.computeIfAbsent(type) { ConcurrentHashMap.newKeySet() }
+            Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${cache.pack.packId()}#packType/$type] caching") }
+            Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${cache.pack.packId()}#packType/$type/entries] caching") }
+            val directoryToFiles = ConcurrentHashMap<String, MutableMap<Path, String>>()
+            directory.listDirectoryEntries().asFlow().concurrent().collect { path ->
+                if (path.isDirectory()) {
+                    namespaces[type]!! += path.name
+                    cache.consumeResourceDirectory(path, directoryToFiles, strategy)
+                } else {
+                    cache.consumeFile(this, path, strategy)
+                }
+            }
+            Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${cache.pack.packId()}#packType/$type/directoryToFiles] caching") }
+            for ((path, files) in directoryToFiles) {
+                cache.directoryToFiles[path]!!.complete(files)
+            }
+            Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${cache.pack.packId()}#packType/$type/directoryToFiles] cached") }
+            Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${cache.pack.packId()}#packType/$type/entries] cached") }
+            Lazyyyyy.DebugLogging.packCache.whenDebug { info("[${cache.pack.packId()}#packType/$type] cached") }
+        }
     }
 }

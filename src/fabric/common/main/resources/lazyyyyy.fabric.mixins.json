@@ -5,6 +5,8 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "lazyyyyy.fabric.refmap.json",
   "mixins": [
+    "game.pack_resources_cache.PathPackResourcesMixin",
+    "settingdust.lazyyyyy.mixin.game.pack_resources_cache.FilePackResourcesMixin"
   ],
   "client": [
   ]

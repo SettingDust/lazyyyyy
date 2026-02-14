@@ -170,6 +170,9 @@ cloche {
     }
 
     val game = common("game") {
+        mixins.from(files("src/game/main/resources/$id.game.mixins.json"))
+        accessWideners.from(file("src/game/main/resources/$id.game.accessWidener"))
+
         project.dependencies {
             val implementation = lowerCamelCaseGradleName(name, JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
 
@@ -178,16 +181,42 @@ cloche {
                     requireFeature(commonMain.capabilitySuffix)
                 }
             }
+
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
         }
     }
 
     val game1201 = common("game:1.20.1") {
         dependsOn(game)
-        // mixins.from("src/common/1.20.1/main/resources/$id.1_20.mixins.json")
+        mixins.from(files("src/game/1.20.1/main/resources/$id.game.1.20.1.mixins.json"))
+
+        project.dependencies {
+            val implementation = lowerCamelCaseGradleName(name, JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
+
+            implementation(project(":")) {
+                capabilities {
+                    requireFeature(commonMain.capabilitySuffix)
+                }
+            }
+
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+        }
     }
     val game121 = common("game:1.21.1") {
         dependsOn(game)
-        // mixins.from("src/common/1.21.1/main/resources/$id.1_21.mixins.json")
+        mixins.from(files("src/game/1.21.1/main/resources/$id.game.1.21.1.mixins.json"))
+
+        project.dependencies {
+            val implementation = lowerCamelCaseGradleName(name, JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
+
+            implementation(project(":")) {
+                capabilities {
+                    requireFeature(commonMain.capabilitySuffix)
+                }
+            }
+
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+        }
     }
 
     val fasterModuleResolver = common("faster-module-resolver") {
@@ -530,7 +559,7 @@ cloche {
         }
 
         val forgeGame = forge("forge:game") {
-            dependsOn(game, game1201)
+            dependsOn(game1201)
 
             minecraftVersion = "1.20.1"
             loaderVersion = "47.4.4"
@@ -803,7 +832,7 @@ cloche {
         }
 
         val neoforgeGame = neoforge("neoforge:game") {
-            dependsOn(game, game121)
+            dependsOn(game121)
 
             minecraftVersion = "1.21.1"
             loaderVersion = "21.1.192"
@@ -840,7 +869,7 @@ cloche {
                 compileOnly(catalog.mixinextras.common)
                 implementation(catalog.mixinextras.forge)
 
-                modImplementation(catalog.klf.mc120.forge)
+                modImplementation(catalog.klf.mc121.neoforge)
 
                 implementation(project(":")) {
                     capabilities {

@@ -1,6 +1,6 @@
-package settingdust.lazyyyyy
+package settingdust.lazyyyyy.game
 
-import org.apache.logging.log4j.Logger
+import org.apache.logging.log4j.LogManager
 import settingdust.lazyyyyy.api.config.FeatureConfig
 import settingdust.lazyyyyy.api.config.FeatureDefinition
 import settingdust.lazyyyyy.util.TriState
@@ -14,20 +14,38 @@ import kotlin.io.path.Path
  * Configuration manager for Lazyyyyy mixin features.
  * Implements FeatureConfig interface with properties-based persistence.
  */
-class LazyyyyyMixinConfig(private val logger: Logger) : FeatureConfig {
+object LazyyyyyMixinConfig : FeatureConfig {
+    const val FEATURE_PACK_RESOURCES_CACHE = "pack_resources_cache"
+    const val FEATURE_PACK_RESOURCES_CACHE_PERSISTENCE = "pack_resources_cache.persistence"
+
+    private val logger = LogManager.getLogger()
+
     private val configPath = Path("./config/lazyyyyy.mixins.properties")
-    
+
     private val features = mutableListOf<FeatureDefinition>()
     private val states = mutableMapOf<String, TriState>()
     private val defaults = mutableMapOf<String, Boolean>()
     private val conditions = mutableMapOf<String, FeatureEvaluator.DisableCondition>()
-    
+
     private val header = arrayOf(
         "Lazyyyyy Mixin Configuration",
         "============================",
         "",
         "This file controls mixin features that enhance Minecraft performance and compatibility."
     )
+
+    init {
+        registerFeature(
+            FEATURE_PACK_RESOURCES_CACHE,
+            true,
+            "Enable pack resources cache."
+        )
+        registerFeature(
+            FEATURE_PACK_RESOURCES_CACHE_PERSISTENCE,
+            true,
+            "Enable pack resources cache persistence."
+        )
+    }
 
     /**
      * Register a feature definition.
@@ -72,12 +90,12 @@ class LazyyyyyMixinConfig(private val logger: Logger) : FeatureConfig {
         } catch (e: IOException) {
             logger.error("Failed to load config from {}", configPath, e)
         }
-        
+
         // Build and cache config map
         config = states.mapValues { (name, state) ->
             FeatureEvaluator.isEnabled(name, states, defaults, conditions)
         }
-        
+
         return config
     }
 
@@ -122,8 +140,4 @@ class LazyyyyyMixinConfig(private val logger: Logger) : FeatureConfig {
     override fun getFilePath(): Path = configPath
 
     override fun getFileHeader(): Array<String> = header
-
-    companion object {
-        // Feature name constants will be added here
-    }
 }

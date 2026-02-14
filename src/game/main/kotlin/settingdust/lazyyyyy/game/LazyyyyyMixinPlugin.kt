@@ -1,4 +1,4 @@
-package settingdust.lazyyyyy
+package settingdust.lazyyyyy.game
 
 import org.apache.logging.log4j.LogManager
 import org.objectweb.asm.tree.ClassNode
@@ -10,18 +10,14 @@ class LazyyyyyMixinPlugin : IMixinConfigPlugin {
     companion object {
         private val PLATFORM_PREFIXES = setOf("fabric", "forge", "neoforge")
     }
-    
+
     lateinit var mixinPackage: String
         private set
 
     val logger = LogManager.getLogger()
 
-    private val mixinConfig = LazyyyyyMixinConfig(logger)
-
     init {
-        // Features will be registered later
-        // Load config
-        mixinConfig.load()
+        LazyyyyyMixinConfig.load()
     }
 
     override fun onLoad(mixinPackage: String) {
@@ -34,7 +30,7 @@ class LazyyyyyMixinPlugin : IMixinConfigPlugin {
         if (LoaderAdapter.get().hasEarlyErrors()) return false
 
         if (!mixinClassName.startsWith(mixinPackage)) return true
-        
+
         var relativeName = mixinClassName.removePrefix("${mixinPackage}.")
         // Remove platform prefixes
         for (prefix in PLATFORM_PREFIXES) {
@@ -43,8 +39,8 @@ class LazyyyyyMixinPlugin : IMixinConfigPlugin {
                 break
             }
         }
-        
-        return mixinConfig.shouldApplyFeature(relativeName)
+
+        return LazyyyyyMixinConfig.shouldApplyFeature(relativeName)
     }
 
     override fun acceptTargets(myTargets: Set<String>, otherTargets: Set<String>) {}
