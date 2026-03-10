@@ -10,6 +10,7 @@ import earth.terrarium.cloche.INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE
 import earth.terrarium.cloche.REMAPPED_ATTRIBUTE
 import earth.terrarium.cloche.api.attributes.IncludeTransformationStateAttribute
 import earth.terrarium.cloche.api.attributes.MinecraftModLoader
+import earth.terrarium.cloche.api.attributes.RemapNamespaceAttribute
 import earth.terrarium.cloche.api.attributes.TargetAttributes
 import earth.terrarium.cloche.api.metadata.CommonMetadata
 import earth.terrarium.cloche.api.metadata.FabricMetadata
@@ -40,7 +41,7 @@ plugins {
 
     id("com.gradleup.shadow") version "9.3.0"
 
-    id("earth.terrarium.cloche") version "0.17.7-dust.1"
+    id("earth.terrarium.cloche") version "0.17.7-dust.2"
 }
 
 val archive_name: String by rootProject.properties
@@ -202,6 +203,7 @@ cloche {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
         }
     }
+
     val game121 = common("game:1.21.1") {
         dependsOn(game)
         mixins.from(files("src/game/1.21.1/main/resources/$id.game.1.21.1.mixins.json"))
@@ -265,6 +267,10 @@ cloche {
 
             minecraftVersion = "1.20.1"
 
+            mappings {
+                mcpSearge()
+            }
+
             metadata {
                 dependency {
                     modId = "minecraft"
@@ -279,6 +285,8 @@ cloche {
             dependencies {
                 fabricApi("0.92.6")
 
+                remapClasspath(forgeMinecraft("1.20.1-47.4.4"))
+
                 implementation(catalog.preloadingTricks)
                 implementation(catalog.betterLog4jConfig)
                 localImplementation(catalog.hash4j)
@@ -288,6 +296,10 @@ cloche {
                         requireFeature(fasterMixin.capabilitySuffix)
                     }
                 }
+
+                modImplementation(catalog.dynamictrees.mc120.forge) {
+                    attributes { attribute(RemapNamespaceAttribute.ATTRIBUTE, RemapNamespaceAttribute.SEARGE) }
+                }
             }
         }
 
@@ -295,6 +307,10 @@ cloche {
             dependsOn(common121, game121, fasterModuleResolver, fabricCommon)
 
             minecraftVersion = "1.21.1"
+
+            mappings {
+                neoforgeSearge("20240808.144430")
+            }
 
             metadata {
                 dependency {
@@ -317,6 +333,10 @@ cloche {
                     capabilities {
                         requireFeature(fasterMixin.capabilitySuffix)
                     }
+                }
+
+                modImplementation(catalog.dynamictrees.mc121.neoforge) {
+                    attributes { attribute(RemapNamespaceAttribute.ATTRIBUTE, RemapNamespaceAttribute.SEARGE) }
                 }
             }
         }
@@ -613,6 +633,8 @@ cloche {
                 }
 
                 implementation(catalog.hash4j)
+
+                modImplementation(catalog.dynamictrees.mc120.forge)
             }
 
             tasks {
@@ -822,6 +844,8 @@ cloche {
                 }
 
                 implementation(catalog.hash4j)
+
+                implementation(catalog.dynamictrees.mc121.neoforge)
             }
 
             tasks {
