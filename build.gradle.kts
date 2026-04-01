@@ -77,6 +77,19 @@ repositories {
         }
     }
 
+    maven("https://maven.su5ed.dev/releases") {
+        content {
+            includeGroupAndSubgroups("dev.su5ed.sinytra")
+            includeGroupAndSubgroups("org.sinytra")
+        }
+    }
+
+    maven("https://maven.sinytra.org/") {
+        content {
+            includeGroupAndSubgroups("org.sinytra")
+        }
+    }
+
     maven("https://raw.githubusercontent.com/settingdust/maven/main/repository/") {
         name = "SettingDust's Maven"
     }
@@ -623,6 +636,8 @@ cloche {
                 implementation(catalog.hash4j)
 
                 modImplementation(catalog.dynamictrees.mc120.forge)
+
+                modImplementation(catalog.forgifiedFabricApi.mc120)
             }
 
             tasks {
@@ -898,6 +913,8 @@ cloche {
                 implementation(catalog.hash4j)
 
                 implementation(catalog.dynamictrees.mc121.neoforge)
+
+                modImplementation(catalog.forgifiedFabricApi.mc121)
             }
 
             tasks {

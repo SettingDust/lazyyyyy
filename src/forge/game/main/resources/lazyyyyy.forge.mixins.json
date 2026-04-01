@@ -11,6 +11,7 @@
   "mixins": [
     "pack_resources_cache.ForgePathPackResourcesMixin",
     "pack_resources_cache.dynamic_trees.FlatTreeResourcePackMixin",
+    "pack_resources_cache.sinytra_connector.ModNioResourcePackMixin",
     "redundant_list_resources.DelegatingPackResourcesMixin"
   ],
   "client": [
