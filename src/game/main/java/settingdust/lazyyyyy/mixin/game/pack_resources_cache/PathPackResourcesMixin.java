@@ -27,13 +27,13 @@ import java.util.Set;
 @Mixin(PathPackResources.class)
 public class PathPackResourcesMixin implements PackCacheHolder, PackCacheHashProvider {
     @Unique
-    private PackCache lazyyyyy$cache;
+    protected PackCache lazyyyyy$cache;
     @Unique
     private Path lazyyyyy$rootPath;
 
     @Dynamic
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void lazyyyyy$init(String string, Path path, boolean bl, final CallbackInfo ci) {
+    protected void lazyyyyy$init(String string, Path path, boolean bl, final CallbackInfo ci) {
         lazyyyyy$rootPath = path;
         lazyyyyy$cache = new PackCache(path, (PackResources) this);
     }

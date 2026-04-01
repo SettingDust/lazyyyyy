@@ -1,17 +1,7 @@
-package settingdust.lazyyyyy.forge.game.pack_resources_cache
+package settingdust.lazyyyyy.game.pack_resources_cache
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.minecraft.server.packs.PackType
-import settingdust.lazyyyyy.game.pack_resources_cache.PackCacheCore
-import settingdust.lazyyyyy.game.pack_resources_cache.PackCacheLayout
-import settingdust.lazyyyyy.game.pack_resources_cache.PackCacheLayoutResult
-import settingdust.lazyyyyy.game.pack_resources_cache.PackCachePathStrategy
-import settingdust.lazyyyyy.game.pack_resources_cache.indexFile
-import settingdust.lazyyyyy.game.pack_resources_cache.indexResourceDirectory
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.isDirectory

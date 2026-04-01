@@ -178,6 +178,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
         version("1.21") {
             modVersion = "1.7.0"
             loader("neoforge") { version { _, version, _ -> version } }
+            loader("fabric") { version { _, version, _ -> "$version-BETA1" } }
         }
     }
 }

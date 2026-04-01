@@ -9,6 +9,6 @@
   },
   "mixins": [
     "pack_resources_cache.FilePackResourcesMixin",
-    "pack_resources_cache.SharedZipFileAccessAccessor"
+    "pack_resources_cache.dynamic_trees.TreePackResourcesMixin"
   ]
 }

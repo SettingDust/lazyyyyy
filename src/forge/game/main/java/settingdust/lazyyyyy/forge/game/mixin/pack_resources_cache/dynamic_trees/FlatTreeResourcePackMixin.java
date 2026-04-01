@@ -12,8 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import settingdust.lazyyyyy.forge.game.mixin.pack_resources_cache.ForgePathPackResourcesMixin;
-import settingdust.lazyyyyy.forge.game.pack_resources_cache.TreePackCacheLayout;
 import settingdust.lazyyyyy.game.pack_resources_cache.PackCache;
+import settingdust.lazyyyyy.game.pack_resources_cache.TreePackCacheLayout;
 
 import java.io.InputStream;
 import java.nio.file.Path;
