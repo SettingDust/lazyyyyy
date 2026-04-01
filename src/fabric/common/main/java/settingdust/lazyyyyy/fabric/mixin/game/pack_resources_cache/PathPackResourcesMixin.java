@@ -1,71 +1,48 @@
-package settingdust.lazyyyyy.mixin.game.pack_resources_cache;
+package settingdust.lazyyyyy.fabric.mixin.game.pack_resources_cache;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import net.minecraft.DetectedVersion;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.VanillaPackResources;
+import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import settingdust.lazyyyyy.game.LazyyyyyMixinConfig;
 import settingdust.lazyyyyy.game.pack_resources_cache.PackCache;
-import settingdust.lazyyyyy.game.pack_resources_cache.PackCacheHashProvider;
 import settingdust.lazyyyyy.game.pack_resources_cache.PackCacheHolder;
 
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-@Mixin(VanillaPackResources.class)
-public class VanillaPackResourcesMixin implements PackCacheHolder, PackCacheHashProvider {
-    @Shadow
-    @Final
-    private List<Path> rootPaths;
-    @Shadow
-    @Final
-    private Map<PackType, List<Path>> pathsForType;
-
+@Mixin(PathPackResources.class)
+public class PathPackResourcesMixin implements PackCacheHolder {
     @Unique
     private PackCache lazyyyyy$cache;
-    @Unique
-    private static final byte[] lazyyyyy$hash =
-        ByteBuffer.allocate(4).putInt(DetectedVersion.BUILT_IN.getDataVersion().getVersion()).array();
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void lazyyyyy$init(final CallbackInfo ci) {
-        lazyyyyy$initCache();
-    }
-
-    @Unique
-    private void lazyyyyy$initCache() {
-        List<Path> roots = new ArrayList<>(this.rootPaths);
-        for (List<Path> paths : this.pathsForType.values()) {
-            for (Path path : paths) {
-                Path parent = path.getParent();
-                if (parent != null && !roots.contains(parent)) {
-                    roots.add(parent);
-                }
-            }
-        }
-        lazyyyyy$cache = new PackCache((PackResources) this, roots);
+    private void lazyyyyy$init(String string, Path path, boolean bl, final CallbackInfo ci) {
+        lazyyyyy$cache = new PackCache(path, (PackResources) this);
     }
 
     @Inject(method = "close", remap = false, at = @At("TAIL"))
     private void lazyyyyy$close(final CallbackInfo ci) {
         lazyyyyy$cache.close();
+    }
+
+    @WrapMethod(method = "getNamespaces")
+    private Set<String> lazyyyyy$getNamespaces(
+        final PackType packType,
+        final Operation<Set<String>> original
+    ) {
+        return lazyyyyy$cache.getNamespaces(packType);
     }
 
     @WrapMethod(method = "getRootResource")
@@ -97,21 +74,8 @@ public class VanillaPackResourcesMixin implements PackCacheHolder, PackCacheHash
         lazyyyyy$cache.listResources(packType, namespace, prefix, resourceOutput);
     }
 
-    @WrapMethod(method = "getNamespaces")
-    private Set<String> lazyyyyy$getNamespaces(
-        final PackType packType,
-        final Operation<Set<String>> original
-    ) {
-        return lazyyyyy$cache.getNamespaces(packType);
-    }
-
     @Override
     public @NotNull PackCache getLazyyyyy$cache() {
         return lazyyyyy$cache;
-    }
-
-    @Override
-    public byte[] lazyyyyy$getHash() {
-        return lazyyyyy$hash;
     }
 }

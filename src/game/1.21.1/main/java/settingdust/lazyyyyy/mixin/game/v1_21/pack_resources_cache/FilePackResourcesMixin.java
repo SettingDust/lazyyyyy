@@ -1,9 +1,14 @@
 package settingdust.lazyyyyy.mixin.game.v1_21.pack_resources_cache;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.server.packs.FilePackResources;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -11,6 +16,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import settingdust.lazyyyyy.game.pack_resources_cache.PackCache;
 import settingdust.lazyyyyy.game.pack_resources_cache.PackCacheHashProvider;
 import settingdust.lazyyyyy.game.pack_resources_cache.PackCacheHolder;
@@ -18,6 +24,7 @@ import settingdust.lazyyyyy.game.util.pack_resources_cache.HashManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -25,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 @Mixin(FilePackResources.class)
 public abstract class FilePackResourcesMixin implements PackCacheHolder, PackCacheHashProvider {
@@ -58,12 +66,41 @@ public abstract class FilePackResourcesMixin implements PackCacheHolder, PackCac
 
     @Inject(method = "close", remap = false, at = @At("TAIL"))
     private void lazyyyyy$close(final CallbackInfo ci) {
+        lazyyyyy$cache.close();
         if (lazyyyyy$fs != null) {
             try {
                 lazyyyyy$fs.close();
             } catch (IOException ignored) {
             }
         }
+    }
+
+    @WrapMethod(method = "getNamespaces")
+    private Set<String> lazyyyyy$getNamespaces(
+        final PackType packType,
+        final Operation<Set<String>> original
+    ) {
+        return lazyyyyy$cache.getNamespaces(packType);
+    }
+
+    @WrapMethod(method = "getResource(Ljava/lang/String;)Lnet/minecraft/server/packs/resources/IoSupplier;")
+    @Nullable
+    private IoSupplier<InputStream> lazyyyyy$getResource(
+        final String string,
+        final Operation<IoSupplier<InputStream>> original
+    ) {
+        return lazyyyyy$cache.getResource(string);
+    }
+
+    @WrapMethod(method = "listResources")
+    private void lazyyyyy$listResources(
+        final PackType packType,
+        final String namespace,
+        final String prefix,
+        final PackResources.ResourceOutput resourceOutput,
+        final Operation<Void> original
+    ) {
+        lazyyyyy$cache.listResources(packType, namespace, prefix, resourceOutput);
     }
 
     @Override
