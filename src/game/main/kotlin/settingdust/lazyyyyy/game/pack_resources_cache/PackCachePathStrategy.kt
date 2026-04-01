@@ -10,10 +10,13 @@ interface PackCachePathStrategy {
     fun getRelativePathString(path: Path) = PackCacheCore.Companion.JOINER.join(path)
 
     class PackRoot(override val root: Path, val packTypeRoot: Path?) : PackCachePathStrategy {
-        override fun getNamespaceRoot(path: Path): Path? = try {
-            path.subpath(0, packTypeRoot!!.nameCount + 1).let { packTypeRoot.root?.resolve(it) ?: it }
-        } catch (_: IllegalArgumentException) {
-            null
+        override fun getNamespaceRoot(path: Path): Path? {
+            val ptr = packTypeRoot ?: return null
+            return try {
+                path.subpath(0, ptr.nameCount + 1).let { ptr.root?.resolve(it) ?: it }
+            } catch (_: IllegalArgumentException) {
+                null
+            }
         }
     }
 

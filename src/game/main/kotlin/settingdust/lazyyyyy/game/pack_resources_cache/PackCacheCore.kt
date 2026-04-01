@@ -10,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -29,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.iterator
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
-import kotlin.time.Duration.Companion.nanoseconds
 
 abstract class PackCacheCore(val pack: PackResources, roots: List<Path>) : Closeable {
     companion object {
@@ -100,8 +98,8 @@ abstract class PackCacheCore(val pack: PackResources, roots: List<Path>) : Close
 
     override fun close() {
         val job = scope.coroutineContext[Job] ?: return
-        if (job.isCancelled) job.cancel(CancellationException("Pack closed"))
-        if (job.isCompleted) runBlocking { job.join() }
+        if (!job.isCompleted) job.cancel(CancellationException("Pack closed"))
+        runBlocking { job.join() }
     }
 
     private fun getOrWaitResource(path: String): Path? {
@@ -123,24 +121,12 @@ abstract class PackCacheCore(val pack: PackResources, roots: List<Path>) : Close
         if (deferred != null) {
             return if (deferred.isCompleted) deferred.getCompleted()
             else runBlocking(scope.coroutineContext) { deferred.await() }
-        } else if (allCompleted.isCompleted) {
-            return getter()?.getCompleted()
-        } else {
-            var result = getter()
-            if (result != null) {
-                return if (result.isCompleted) result.getCompleted()
-                else runBlocking(scope.coroutineContext) { result.await() }
-            }
-            runBlocking(scope.coroutineContext) {
-                while (result == null) {
-                    delay(300.nanoseconds)
-                    result = getter()
-                    if (allCompleted.isCompleted) break
-                }
-            }
-            return if (result == null) null
-            else runBlocking(scope.coroutineContext) { result.await() }
         }
+        if (allCompleted.isCompleted) {
+            return getter()?.getCompleted()
+        }
+        runBlocking(scope.coroutineContext) { allCompleted.join() }
+        return getter()?.getCompleted()
     }
 }
 
