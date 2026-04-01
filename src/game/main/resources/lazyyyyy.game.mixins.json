@@ -8,7 +8,6 @@
     "minVersion": "0.5.3"
   },
   "mixins": [
-    "pack_resources_cache.FilePackResourcesMixin",
     "pack_resources_cache.PathPackResourcesMixin",
     "pack_resources_cache.VanillaPackResourcesMixin"
   ]

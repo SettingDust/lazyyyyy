@@ -17,6 +17,7 @@ import earth.terrarium.cloche.api.metadata.FabricMetadata
 import earth.terrarium.cloche.api.target.FabricTarget
 import earth.terrarium.cloche.api.target.ForgeLikeTarget
 import earth.terrarium.cloche.api.target.MinecraftTarget
+import earth.terrarium.cloche.api.target.forgeMinecraft
 import earth.terrarium.cloche.target.LazyConfigurableInternal
 import earth.terrarium.cloche.tasks.GenerateFabricModJson
 import groovy.lang.Closure
@@ -41,7 +42,7 @@ plugins {
 
     id("com.gradleup.shadow") version "9.3.0"
 
-    id("earth.terrarium.cloche") version "0.17.7-dust.2"
+    id("earth.terrarium.cloche") version "0.18.10-dust.3"
 }
 
 val archive_name: String by rootProject.properties
@@ -283,9 +284,9 @@ cloche {
             }
 
             dependencies {
-                fabricApi("0.92.6")
+                fabricApi("0.92.7")
 
-                remapClasspath(forgeMinecraft("1.20.1-47.4.4"))
+                remapClasspath(forgeMinecraft("1.20.1", "47.4.4"))
 
                 implementation(catalog.preloadingTricks)
                 implementation(catalog.betterLog4jConfig)
@@ -605,18 +606,12 @@ cloche {
                 }
             }
 
-            repositories {
-                maven("https://repo.spongepowered.org/maven") {
-                    content {
-                        includeGroup("org.spongepowered")
-                    }
-                }
-            }
-
             dependencies {
                 implementation(catalog.mixin.fabric)
                 compileOnly(catalog.mixinextras.common)
                 implementation(catalog.mixinextras.forge)
+
+                implementation(catalog.preloadingTricks)
 
                 modImplementation(catalog.klf.mc120.forge)
 
@@ -892,6 +887,8 @@ cloche {
             dependencies {
                 compileOnly(catalog.mixinextras.common)
                 implementation(catalog.mixinextras.forge)
+
+                implementation(catalog.preloadingTricks)
 
                 modImplementation(catalog.klf.mc121.neoforge)
 

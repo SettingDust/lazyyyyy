@@ -1,18 +1,21 @@
 {
-    "required": true,
-    "minVersion": "0.8",
-    "package": "settingdust.lazyyyyy.forge.game.mixin",
-    "compatibilityLevel": "JAVA_17",
-    "refmap": "lazyyyyy.forge.refmap.json",
-    "plugin": "settingdust.lazyyyyy.game.LazyyyyyMixinPlugin",
-    "mixinextras": {
-        "minVersion": "0.5.0"
-    },
-    "mixins": [
-    ],
-    "client": [
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+  "required": true,
+  "minVersion": "0.8",
+  "package": "settingdust.lazyyyyy.forge.game.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "lazyyyyy.forge.refmap.json",
+  "plugin": "settingdust.lazyyyyy.game.LazyyyyyMixinPlugin",
+  "mixinextras": {
+    "minVersion": "0.5.0"
+  },
+  "mixins": [
+    "pack_resources_cache.ForgePathPackResourcesMixin",
+    "pack_resources_cache.dynamic_trees.FlatTreeResourcePackMixin",
+    "redundant_list_resources.DelegatingPackResourcesMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

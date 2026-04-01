@@ -3,6 +3,7 @@ package settingdust.lazyyyyy.forge.game.mixin.redundant_list_resources;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraftforge.resource.DelegatingPackResources;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,10 +27,10 @@ public class DelegatingPackResourcesMixin {
     @Redirect(
         method = "listResources",
         at = @At(
-            value = "FIELD",
-            remap = false,
-            target = "Lnet/minecraftforge/resource/DelegatingPackResources;delegates:Ljava/util/List;"
-        )
+                value = "FIELD",
+                remap = false,
+                target = "Lnet/minecraftforge/resource/DelegatingPackResources;delegates:Ljava/util/List;",
+                opcode = Opcodes.GETFIELD)
     )
     private List<PackResources> lazyyyyyy$avoidRedundantListResources(
         DelegatingPackResources instance,

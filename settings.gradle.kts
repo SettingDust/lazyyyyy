@@ -168,6 +168,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
 
     library("hash4j", "com.dynatrace.hash4j", "hash4j").version("0.29.0")
 
+    // https://modrinth.com/mod/dynamictrees/versions
     modrinth("dynamictrees") {
         version("1.20") {
             modVersion = "1.4.10"
@@ -175,7 +176,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
         }
 
         version("1.21") {
-            modVersion = "1.6.0"
+            modVersion = "1.7.0"
             loader("neoforge") { version { _, version, _ -> version } }
         }
     }

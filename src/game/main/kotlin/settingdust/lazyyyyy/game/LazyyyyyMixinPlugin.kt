@@ -9,6 +9,9 @@ import settingdust.lazyyyyy.util.LoaderAdapter
 class LazyyyyyMixinPlugin : IMixinConfigPlugin {
     companion object {
         private val PLATFORM_PREFIXES = setOf("fabric", "forge", "neoforge")
+        private val MOD_REQUIRED_MIXINS = mapOf(
+            "dynamic_trees" to "dynamictrees"
+        )
     }
 
     lateinit var mixinPackage: String
@@ -37,6 +40,16 @@ class LazyyyyyMixinPlugin : IMixinConfigPlugin {
             if (relativeName.startsWith("$prefix.")) {
                 relativeName = relativeName.removePrefix("$prefix.")
                 break
+            }
+        }
+
+        // Check if mixin requires a specific mod to be loaded
+        for ((pathSegment, modId) in MOD_REQUIRED_MIXINS) {
+            if (relativeName.contains(pathSegment)) {
+                if (!LoaderAdapter.get().isModLoaded(modId)) {
+                    logger.debug("Skipping mixin '$mixinClassName': mod '$modId' is not loaded")
+                    return false
+                }
             }
         }
 
