@@ -8,7 +8,6 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraftforge.resource.PathPackResources;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,13 +32,8 @@ public class ForgePathPackResourcesMixin implements PackCacheHolder, PackCacheHa
 
     @Inject(method = "<init>", at = @At("RETURN"))
     protected void lazyyyyy$init(String packId, boolean isBuiltin, Path source, final CallbackInfo ci) {
-        lazyyyyy$filePath = lazyyyyy$resolveFileSystemPath(source);
+        lazyyyyy$filePath = FileSystemPathUtilKt.getFileSystemPath(source);
         lazyyyyy$cache = new PackCache(source, (PackResources) this);
-    }
-
-    @Unique
-    private @Nullable Path lazyyyyy$resolveFileSystemPath(Path path) {
-        return FileSystemPathUtilKt.getFileSystemPath(path);
     }
 
     @Inject(method = "close", remap = false, at = @At("TAIL"))
