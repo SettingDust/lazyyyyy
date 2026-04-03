@@ -9,7 +9,6 @@
   },
   "mixins": [
     "pack_resources_cache.PathPackResourcesMixin",
-    "pack_resources_cache.VanillaPackResourcesMixin",
-    "v1_20.pack_resources_cache.fabric.ModNioResourcePackMixin"
+    "pack_resources_cache.VanillaPackResourcesMixin"
   ]
 }
