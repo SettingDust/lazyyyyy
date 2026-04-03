@@ -29,7 +29,6 @@ import net.msrandom.minecraftcodev.forge.task.JarJar
 import net.msrandom.minecraftcodev.runs.MinecraftRunConfiguration
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.attributes.AttributeContainer
 import org.gradle.jvm.tasks.Jar
 import java.nio.charset.StandardCharsets
 
@@ -260,6 +259,13 @@ class ContainerScope(
         }
 
         fun includeTarget(target: MinecraftTarget) {
+            includeJarTask.configure {
+                dependsOn(target.includeJarTaskName)
+            }
+            includeDevJarTask.configure {
+                dependsOn(target.jarTaskName)
+            }
+
             include(target(target)) {
                 withIncludeAttributes()
             }
@@ -742,8 +748,6 @@ cloche {
             }
 
         container(loader = MinecraftModLoader.fabric) {
-            val targets = setOf(fabric1201, fabric121)
-
             embed("boot", configureConfiguration = {
                 applyTransformedJarAttributes()
             }) {
@@ -751,13 +755,8 @@ cloche {
             }
 
             dependencies {
-                for (target in targets) {
-                    include(project(":")) {
-                        capabilities {
-                            requireFeature(target.capabilitySuffix!!)
-                        }
-                    }
-                }
+                includeTarget(fabric1201)
+                includeTarget(fabric121)
 
                 embed("boot", project(":")) {
                     capabilities {
@@ -990,11 +989,7 @@ cloche {
             }
 
             dependencies {
-                include(project(":")) {
-                    capabilities {
-                        requireFeature(forgeGame.capabilitySuffix!!)
-                    }
-                }
+                includeTarget(forgeGame)
 
                 embed(project(":")) {
                     capabilities {

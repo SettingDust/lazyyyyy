@@ -2,13 +2,13 @@ package settingdust.lazyyyyy.game.pack_resources_cache
 
 import com.google.gson.Gson
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.minecraft.server.packs.PackType
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
-import kotlin.collections.iterator
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.outputStream
@@ -49,6 +49,7 @@ object PackCacheStorage {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun buildSnapshot(
         cache: PackCacheCore,
         namespacesSnapshot: Map<PackType, Set<String>>

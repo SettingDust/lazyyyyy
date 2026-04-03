@@ -21,6 +21,7 @@ class PackCache(
         startLoad()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun startLoad() {
         for (type in PackType.entries) {
             namespaces.computeIfAbsent(type) { CompletableDeferred() }
