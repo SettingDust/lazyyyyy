@@ -1,3 +1,5 @@
+// #region Plugin Management
+
 dependencyResolutionManagement {
     pluginManagement {
         repositories {
@@ -12,6 +14,10 @@ dependencyResolutionManagement {
     }
 }
 
+// #endregion
+
+// #region Multi-Version Dependency DSL
+
 fun interface ArtifactFormatter {
     fun format(artifact: String, loader: String, mcVersion: String): String
 
@@ -23,13 +29,13 @@ fun interface ArtifactFormatter {
 }
 
 fun interface VersionFormatter {
-    fun format(mcVer: String, version: String, loader: String): String
+    fun format(version: String, loader: String): String
 
     companion object {
-        val simple = VersionFormatter { _, version, _ -> version }
-        val dashLoader = VersionFormatter { _, version, loader -> "$version-$loader" }
-        val plusLoader = VersionFormatter { _, version, loader -> "$version+$loader" }
-        val loaderUnderscore = VersionFormatter { _, version, loader -> "${loader}_$version" }
+        val simple = VersionFormatter { version, _ -> version }
+        val dashLoader = VersionFormatter { version, loader -> "$version-$loader" }
+        val plusLoader = VersionFormatter { version, loader -> "$version+$loader" }
+        val loaderUnderscore = VersionFormatter { version, loader -> "${loader}_$version" }
     }
 }
 
@@ -49,7 +55,7 @@ class LoaderVariantBuilder {
         versionFormatter = formatter
     }
 
-    fun version(block: (mcVer: String, version: String, loader: String) -> String) {
+    fun version(block: (version: String, loader: String) -> String) {
         versionFormatter = VersionFormatter(block)
     }
 
@@ -80,7 +86,7 @@ data class McVersionConfig(
 
 class MultiVersionDepBuilder(val id: String, val group: String) {
     var artifact: String = id
-    var versionFormat: (mcVer: String, ver: String) -> String = { _, v -> v }
+    var versionFormat: (String, String) -> String = { _, v -> v }
 
     private val configs = mutableListOf<McVersionConfig>()
 
@@ -108,11 +114,11 @@ fun VersionCatalogBuilder.dependency(id: String, group: String, block: MultiVers
 
     dep.configs.forEach { config ->
         val version = dep.versionFormat(config.mcVersion, config.modVersion)
-        val mcVersionName = "mc${config.mcVersion.replace(".", "")}"
+        val mcVersionName = "mc${config.mcVersion.replace("_", "")}"
 
         config.loaders.forEach { (loaderName, variant) ->
             val finalArtifact = variant.artifactFormatter.format(dep.artifact, loaderName, config.mcVersion)
-            val finalVersion = variant.versionFormatter.format(config.mcVersion, version, loaderName)
+            val finalVersion = variant.versionFormatter.format(version, loaderName)
 
             val catalogId = when {
                 isSingleMcVersion && isSingleLoader -> dep.id
@@ -131,6 +137,10 @@ fun VersionCatalogBuilder.modrinth(id: String, block: MultiVersionDepBuilder.() 
     dependency(id, "maven.modrinth", block)
 }
 
+// #endregion
+
+// #region Version Catalog
+
 dependencyResolutionManagement.versionCatalogs.create("catalog") {
     library("mixin-fabric", "net.fabricmc", "sponge-mixin")
         .version("0.17.0+mixin.0.8.7")
@@ -147,80 +157,34 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     }
 
     library("preloadingTricks", "settingdust.preloading_tricks", "PreloadingTricks")
-        .version("3.5.6")
+        .version("3.4.6")
+
 
     dependency("klf", "dev.nyon") {
         artifact = "KotlinLangForge"
         versionFormat = { _, ver -> "2.10.6-k2.2.21-$ver" }
 
-        version("1.20") {
+        version("20") {
             modVersion = "2.0"
             loader("forge") { version(VersionFormatter.plusLoader) }
         }
 
-        version("1.21") {
+        version("21") {
             modVersion = "3.1"
             loader("neoforge") { version(VersionFormatter.plusLoader) }
         }
     }
 
-    library("betterLog4jConfig", "maven.modrinth", "better-log4j-config").version("1.2.0-fabric")
-
-    library("hash4j", "com.dynatrace.hash4j", "hash4j").version("0.29.0")
-
-    // https://modrinth.com/mod/dynamictrees/versions
-    modrinth("dynamictrees") {
-        version("1.20") {
-            modVersion = "1.4.10"
-            loader("forge") { version { mcVer, version, _ -> "$mcVer.1-$version" } }
-        }
-
-        version("1.21") {
-            modVersion = "1.7.0"
-            loader("neoforge") { version { _, version, _ -> version } }
-            loader("fabric") { version { _, version, _ -> "$version-BETA1" } }
-        }
-    }
-
-    dependency("connector-mc120", "org.sinytra") {
-        artifact = "Connector"
-
-        version("1.20") {
-            modVersion = "1.0.0-beta.48+1.20.1"
-            loader("forge")
-        }
-    }
-
-    dependency("connector-mc121", "org.sinytra") {
-        artifact = "connector"
-
-        version("1.21") {
-            modVersion = "2.0.0-beta.14+1.21.1"
-            loader("neoforge")
-        }
-    }
-
-    dependency("forgifiedFabricApi-mc120", "dev.su5ed.sinytra.fabric-api") {
-        artifact = "fabric-api"
-
-        version("1.20") {
-            modVersion = "0.92.6+1.11.14+1.20.1"
-            loader("forge")
-        }
-    }
-
-    dependency("forgifiedFabricApi-mc121", "org.sinytra.forgified-fabric-api") {
-        artifact = "forgified-fabric-api"
-
-        version("1.21") {
-            modVersion = "0.116.7+2.2.4+1.21.1"
-            loader("neoforge")
-        }
-    }
 }
+
+// #endregion
+
+// #region Project Settings
 
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 rootProject.name = "Lazyyyyy"
+
+// #endregion

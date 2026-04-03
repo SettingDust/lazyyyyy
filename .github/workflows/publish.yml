@@ -26,11 +26,7 @@ jobs:
 
       - name: Get CHANGELOG
         id: changelog
-        uses: requarks/changelog-action@v1
-        with:
-          writeToFile: false
-          token: ${{ github.token }}
-          tag: ${{ github.ref_name }}
+        uses: mikepenz/release-changelog-builder-action@v6
 
       - name: Git Status
         run: |
@@ -48,7 +44,7 @@ jobs:
 
           # Only include this section if you wish to publish
           # your assets on CurseForge.
-          curseforge-id: 000000
+          curseforge-id: 1142812
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
           files: |
@@ -78,11 +74,9 @@ jobs:
             21
 
       - name: Update CHANGELOG
-        id: changelog
-        uses: requarks/changelog-action@v1
+        uses: mikepenz/release-changelog-builder-action@v6
         with:
-          token: ${{ github.token }}
-          tag: ${{ github.ref_name }}
+          outputFile: CHANGELOG.MD
 
       - name: Commit CHANGELOG.md
         uses: stefanzweifel/git-auto-commit-action@v7

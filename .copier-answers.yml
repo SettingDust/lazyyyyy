@@ -1,10 +1,12 @@
 # Changes here will be overwritten by Copier
-_commit: 0.1.8-24-g3392e31
+_commit: 0.1.8-42-gcc933c5
 _src_path: https://github.com/SettingDust/cloche-template
 author: SettingDust
 description: Optimizations for many points
 group: settingdust.lazyyyyy
+has_service: true
 id: lazyyyyy
+language: kotlin
 license: Apache License 2.0
 name: Lazyyyyy
 slug: lazyyyyy
