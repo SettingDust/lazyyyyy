@@ -18,6 +18,7 @@ import earth.terrarium.cloche.api.metadata.FabricMetadata
 import earth.terrarium.cloche.api.target.FabricTarget
 import earth.terrarium.cloche.api.target.ForgeLikeTarget
 import earth.terrarium.cloche.api.target.MinecraftTarget
+import earth.terrarium.cloche.api.target.compilation.ClocheDependencyHandler
 import earth.terrarium.cloche.target.LazyConfigurableInternal
 import earth.terrarium.cloche.tasks.GenerateFabricModJson
 import earth.terrarium.cloche.util.target
@@ -130,6 +131,7 @@ class ContainerScope(
     val loader: MinecraftModLoader,
 ) {
     val featureName: String = loader.containerFeatureName()
+    val capabilitySuffix: String = loader.toString().lowercase()
 
     val intermediateOutputsDirectory = project.layout.buildDirectory.dir("libs/intermediates")
 
@@ -185,7 +187,7 @@ class ContainerScope(
             dependsOn(includeJarTask, includeDevJarTask)
         }
 
-        val containerCapability = "${project.group}:${project.name}-${loader.toString().lowercase()}:${project.version}"
+        val containerCapability = "${project.group}:${project.name}-$capabilitySuffix:${project.version}"
 
         project.configurations.register(lowerCamelCaseGradleName(featureName, "runtimeElements")) {
             isCanBeResolved = false
@@ -398,9 +400,19 @@ class ContainerScope(
 fun ClocheExtension.container(
     loader: MinecraftModLoader,
     block: ContainerScope.() -> Unit,
-) {
-    ContainerScope(project, loader).apply(block)
-}
+): ContainerScope = ContainerScope(project, loader).apply(block)
+
+fun ClocheDependencyHandler.container(container: ContainerScope): Dependency =
+    project.dependencies.project(":").apply {
+        capabilities {
+            requireFeature(container.capabilitySuffix)
+        }
+
+        attributes {
+            attribute(REMAPPED_ATTRIBUTE, true)
+            attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
+        }
+    }
 
 // endregion
 
@@ -711,123 +723,11 @@ cloche {
 
     // endregion
 
-    // region Version Targets
-
-    // region Fabric Version Targets
-
-    fabric("version:fabric:20.1") {
-        minecraftVersion = "1.20.1"
-
-        runs { client() }
-
-        dependencies {
-            fabricApi("0.92.6")
-
-            runtimeOnly(project(":")) {
-                capabilities {
-                    requireFeature(fabric201.capabilitySuffix!!)
-                }
-            }
-        }
-
-        tasks {
-            named(generateModsManifestTaskName) { enabled = false }
-            named(jarTaskName) { enabled = false }
-            named(remapJarTaskName) { enabled = false }
-            named(includeJarTaskName) { enabled = false }
-        }
-    }
-
-    fabric("version:fabric:21.1") {
-        minecraftVersion = "1.21.1"
-
-        runs { client() }
-
-        dependencies {
-            fabricApi("0.116.6")
-
-            runtimeOnly(project(":")) {
-                capabilities {
-                    requireFeature(fabric211.capabilitySuffix!!)
-                }
-            }
-        }
-
-        tasks {
-            named(generateModsManifestTaskName) { enabled = false }
-            named(jarTaskName) { enabled = false }
-            named(remapJarTaskName) { enabled = false }
-            named(includeJarTaskName) { enabled = false }
-        }
-    }
-
-    // endregion
-
-    // region Forge Version Targets
-
-    forge("version:forge:20.1") {
-        minecraftVersion = "1.20.1"
-        loaderVersion = "47.4.4"
-
-        runs {
-            client {
-                env("MOD_CLASSES", "")
-            }
-        }
-
-        dependencies {
-            implementation(project(":")) {
-                capabilities {
-                    requireFeature(forgeGame.capabilitySuffix!!)
-                }
-            }
-        }
-
-        tasks {
-            named(generateModsManifestTaskName) { enabled = false }
-            named(jarTaskName) { enabled = false }
-            named(remapJarTaskName) { enabled = false }
-            named(includeJarTaskName) { enabled = false }
-        }
-    }
-
-    // endregion
-
-    // region NeoForge Version Targets
-
-    neoforge("version:neoforge:21.1") {
-        minecraftVersion = "1.21.1"
-        loaderVersion = "21.1.192"
-
-        runs {
-            client {
-                env("MOD_CLASSES", "")
-            }
-        }
-
-        dependencies {
-            implementation(project(":")) {
-                capabilities {
-                    requireFeature(neoforgeGame.capabilitySuffix!!)
-                }
-            }
-        }
-
-        tasks {
-            named(generateModsManifestTaskName) { enabled = false }
-            named(jarTaskName) { enabled = false }
-            named(remapJarTaskName) { enabled = false }
-            named(includeJarTaskName) { enabled = false }
-        }
-    }
-
-    // endregion
-
     // region Containers
 
     // region Fabric Container
 
-    container(loader = MinecraftModLoader.fabric) {
+    val fabricContainer = container(loader = MinecraftModLoader.fabric) {
         val metadataDirectory = project.layout.buildDirectory.dir("generated")
             .map { it.dir("metadata").dir(featureName) }
         val generateModJson =
@@ -856,20 +756,17 @@ cloche {
 
     // region Forge Container
 
-    container(loader = MinecraftModLoader.forge) {
-
+    val forgeContainer = container(loader = MinecraftModLoader.forge) {
         embed()
 
         dependencies {
             includeTarget(forgeGame)
-
 
             embed(project(":")) {
                 capabilities {
                     requireFeature(forgeService.capabilitySuffix!!)
                 }
             }
-
         }
     }
 
@@ -877,8 +774,7 @@ cloche {
 
     // region NeoForge Container
 
-    container(loader = MinecraftModLoader.neoforge) {
-
+    val neoforgeContainer = container(loader = MinecraftModLoader.neoforge) {
         embed()
 
         dependencies {
@@ -886,15 +782,111 @@ cloche {
 
             include(catalog.preloadingTricks)
 
-
             embed(project(":")) {
                 capabilities {
                     requireFeature(neoforgeService.capabilitySuffix!!)
                 }
             }
-
         }
     }
+
+    // endregion
+
+    // endregion
+
+    // region Version Targets
+
+    // region Fabric Version Targets
+
+    fabric("version:fabric:20.1") {
+        minecraftVersion = "1.20.1"
+
+        runs { client() }
+
+        dependencies {
+            fabricApi("0.92.6")
+            runtimeOnly(container(fabricContainer))
+        }
+
+        tasks {
+            named(generateModsManifestTaskName) { enabled = false }
+            named(jarTaskName) { enabled = false }
+            named(remapJarTaskName) { enabled = false }
+            named(includeJarTaskName) { enabled = false }
+        }
+    }
+
+    fabric("version:fabric:21.1") {
+        minecraftVersion = "1.21.1"
+
+        runs { client() }
+
+        dependencies {
+            fabricApi("0.116.6")
+            runtimeOnly(container(fabricContainer))
+        }
+
+        tasks {
+            named(generateModsManifestTaskName) { enabled = false }
+            named(jarTaskName) { enabled = false }
+            named(remapJarTaskName) { enabled = false }
+            named(includeJarTaskName) { enabled = false }
+        }
+    }
+
+    // endregion
+
+    // region Forge Version Targets
+
+    forge("version:forge:20.1") {
+        minecraftVersion = "1.20.1"
+        loaderVersion = "47.4.4"
+
+        runs {
+            client {
+                env("MOD_CLASSES", "")
+            }
+        }
+
+        dependencies {
+            runtimeOnly(container(forgeContainer))
+        }
+
+        tasks {
+            named(generateModsManifestTaskName) { enabled = false }
+            named(jarTaskName) { enabled = false }
+            named(remapJarTaskName) { enabled = false }
+            named(includeJarTaskName) { enabled = false }
+        }
+    }
+
+    // endregion
+
+    // region NeoForge Version Targets
+
+    neoforge("version:neoforge:21.1") {
+        minecraftVersion = "1.21.1"
+        loaderVersion = "21.1.192"
+
+        runs {
+            client {
+                env("MOD_CLASSES", "")
+            }
+        }
+
+        dependencies {
+            runtimeOnly(container(neoforgeContainer))
+        }
+
+        tasks {
+            named(generateModsManifestTaskName) { enabled = false }
+            named(jarTaskName) { enabled = false }
+            named(remapJarTaskName) { enabled = false }
+            named(includeJarTaskName) { enabled = false }
+        }
+    }
+
+    // endregion
 
     // endregion
 
