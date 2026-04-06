@@ -29,13 +29,13 @@ fun interface ArtifactFormatter {
 }
 
 fun interface VersionFormatter {
-    fun format(version: String, loader: String): String
+    fun format(mcVer: String, version: String, loader: String): String
 
     companion object {
-        val simple = VersionFormatter { version, _ -> version }
-        val dashLoader = VersionFormatter { version, loader -> "$version-$loader" }
-        val plusLoader = VersionFormatter { version, loader -> "$version+$loader" }
-        val loaderUnderscore = VersionFormatter { version, loader -> "${loader}_$version" }
+        val simple = VersionFormatter { _, version, _ -> version }
+        val dashLoader = VersionFormatter { _, version, loader -> "$version-$loader" }
+        val plusLoader = VersionFormatter { _, version, loader -> "$version+$loader" }
+        val loaderUnderscore = VersionFormatter { _, version, loader -> "${loader}_$version" }
     }
 }
 
@@ -55,7 +55,7 @@ class LoaderVariantBuilder {
         versionFormatter = formatter
     }
 
-    fun version(block: (version: String, loader: String) -> String) {
+    fun version(block: (mcVer: String, version: String, loader: String) -> String) {
         versionFormatter = VersionFormatter(block)
     }
 
@@ -86,7 +86,7 @@ data class McVersionConfig(
 
 class MultiVersionDepBuilder(val id: String, val group: String) {
     var artifact: String = id
-    var versionFormat: (String, String) -> String = { _, v -> v }
+    var versionFormat: (mcVer: String, ver: String) -> String = { _, v -> v }
 
     private val configs = mutableListOf<McVersionConfig>()
 
@@ -114,11 +114,11 @@ fun VersionCatalogBuilder.dependency(id: String, group: String, block: MultiVers
 
     dep.configs.forEach { config ->
         val version = dep.versionFormat(config.mcVersion, config.modVersion)
-        val mcVersionName = "mc${config.mcVersion.replace("_", "")}"
+        val mcVersionName = "mc${config.mcVersion.replace(".", "")}"
 
         config.loaders.forEach { (loaderName, variant) ->
             val finalArtifact = variant.artifactFormatter.format(dep.artifact, loaderName, config.mcVersion)
-            val finalVersion = variant.versionFormatter.format(version, loaderName)
+            val finalVersion = variant.versionFormatter.format(config.mcVersion, version, loaderName)
 
             val catalogId = when {
                 isSingleMcVersion && isSingleLoader -> dep.id
@@ -175,6 +175,22 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
         }
     }
 
+    library("betterLog4jConfig", "maven.modrinth", "better-log4j-config").version("1.2.0-fabric")
+
+    library("hash4j", "com.dynatrace.hash4j", "hash4j").version("0.29.0")
+
+    modrinth("dynamictrees") {
+        version("1.20") {
+            modVersion = "1.4.10"
+            loader("forge") { version { mcVer, version, _ -> "$mcVer.1-$version" } }
+        }
+
+        version("1.21") {
+            modVersion = "1.7.0"
+            loader("neoforge") { version { _, version, _ -> version } }
+            loader("fabric") { version { _, version, _ -> "$version-BETA1" } }
+        }
+    }
 }
 
 // #endregion

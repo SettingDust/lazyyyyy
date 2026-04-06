@@ -17,13 +17,16 @@ import earth.terrarium.cloche.api.metadata.CommonMetadata
 import earth.terrarium.cloche.api.metadata.FabricMetadata
 import earth.terrarium.cloche.api.target.FabricTarget
 import earth.terrarium.cloche.api.target.ForgeLikeTarget
+import earth.terrarium.cloche.api.target.ForgeTarget
 import earth.terrarium.cloche.api.target.MinecraftTarget
+import earth.terrarium.cloche.api.target.NeoforgeTarget
 import earth.terrarium.cloche.api.target.compilation.ClocheDependencyHandler
 import earth.terrarium.cloche.target.LazyConfigurableInternal
 import earth.terrarium.cloche.tasks.GenerateFabricModJson
 import earth.terrarium.cloche.util.target
 import groovy.lang.Closure
 import net.msrandom.minecraftcodev.core.utils.lowerCamelCaseGradleName
+import net.msrandom.minecraftcodev.fabric.MinecraftCodevFabricPlugin
 import net.msrandom.minecraftcodev.fabric.task.JarInJar
 import net.msrandom.minecraftcodev.forge.task.JarJar
 import net.msrandom.minecraftcodev.runs.MinecraftRunConfiguration
@@ -31,6 +34,7 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.jvm.tasks.Jar
 import java.nio.charset.StandardCharsets
+import java.time.Instant
 
 // region Plugins
 
@@ -43,7 +47,7 @@ plugins {
 
     id("com.palantir.git-version") version "5.0.0"
     id("com.gradleup.shadow") version "9.4.1"
-    id("earth.terrarium.cloche") version "0.18.10-dust.4"
+    id("earth.terrarium.cloche") version "0.18.11-dust.0"
 }
 
 // endregion
@@ -402,7 +406,7 @@ fun ClocheExtension.container(
     block: ContainerScope.() -> Unit,
 ): ContainerScope = ContainerScope(project, loader).apply(block)
 
-fun ClocheDependencyHandler.container(container: ContainerScope): Dependency =
+fun ClocheDependencyHandler.container(container: ContainerScope): ProjectDependency =
     project.dependencies.project(":").apply {
         capabilities {
             requireFeature(container.capabilitySuffix)
@@ -485,7 +489,7 @@ cloche {
 
     common()
 
-    val commonMain = common("common:common:main") {
+    val commonMain = common("common:common") {
         // mixins.from(file("src/common/common/main/resources/$id.mixins.json"))
         // accessWideners.from(file("src/common/common/main/resources/$id.accessWidener"))
 
@@ -496,26 +500,130 @@ cloche {
 
     val common201 = common("common:20.1") {
         dependsOn(commonMain)
-        // mixins.from("src/common/20.1/main/resources/$id.20_1.mixins.json")
+        mixins.from("src/common/20.1/main/resources/$id.20_1.mixins.json")
     }
     val common211 = common("common:21.1") {
         dependsOn(commonMain)
         // mixins.from("src/common/21.1/main/resources/$id.21_1.mixins.json")
     }
 
+    val fasterModuleResolver = common("faster-module-resolver") {
+        dependencies {
+            compileOnly(catalog.mixin.fabric)
+        }
+
+        project.dependencies {
+            val implementation = lowerCamelCaseGradleName(name, JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
+
+            implementation(project(":")) {
+                capabilities {
+                    requireFeature(commonMain.capabilitySuffix)
+                }
+            }
+        }
+    }
+
+    val fasterMixin = common("faster-mixin") {
+        project.dependencies {
+            val compileOnly = lowerCamelCaseGradleName(name, JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME)
+
+            compileOnly(catalog.mixin.fabric)
+            compileOnly(catalog.hash4j)
+        }
+    }
+
+    // endregion
+
+    // region Shared Target Defaults
+
+    targets.withType<FabricTarget> {
+        loaderVersion = "0.18.6"
+
+        includedClient()
+
+        metadata {
+            entrypoint("main") {
+                adapter = "kotlin"
+                value = "$group.fabric.LazyyyyyFabric::init"
+            }
+
+            entrypoint("client") {
+                adapter = "kotlin"
+                value = "$group.fabric.LazyyyyyFabric::clientInit"
+            }
+
+            dependency {
+                modId = "fabric-api"
+                type = CommonMetadata.Dependency.Type.Required
+            }
+
+            dependency {
+                modId = "fabric-language-kotlin"
+                type = CommonMetadata.Dependency.Type.Required
+            }
+        }
+
+        dependencies {
+            minecraftVersion.orNull
+                ?.let(String::fabricApiVersion)
+                ?.let(::fabricApi)
+
+            modImplementation("net.fabricmc:fabric-language-kotlin:1.13.7+kotlin.2.2.21")
+        }
+    }
+
+    targets.withType<ForgeTarget> {
+        loaderVersion.set(minecraftVersion.map(String::forgeLoaderVersion))
+    }
+
+    targets.withType<NeoforgeTarget> {
+        loaderVersion.set(minecraftVersion.map(String::neoForgeLoaderVersion))
+    }
+
+    targets.all {
+        if (name.startsWith("version:")) {
+            disableVersionTemplateTasks()
+        }
+
+        runs {
+            (client as LazyConfigurableInternal<MinecraftRunConfiguration>).onConfigured {
+                it.jvmArguments(
+                    "-Dmixin.debug.verbose=true",
+                    "-Dmixin.debug.export=true",
+                    "-Dclasstransform.dumpClasses=true"
+                )
+            }
+        }
+
+        mappings {
+            minecraftVersion.orNull
+                ?.let(String::parchmentVersion)
+                ?.let(::parchment)
+        }
+    }
     // endregion
 
     // region Game Targets
 
-    val commonGame = common("game:main") {
-        dependsOn(commonMain)
+    val game = common("game") {
+        mixins.from(files("src/game/main/resources/$id.game.mixins.json"))
+        accessWideners.from(file("src/game/main/resources/$id.game.accessWidener"))
+
+        project.dependencies {
+            val implementation = lowerCamelCaseGradleName(name, JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
+            val api = lowerCamelCaseGradleName(name, JavaPlugin.API_CONFIGURATION_NAME)
+
+            api(target(commonMain))
+
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+        }
     }
 
-    val commonGame201 = common("game:20.1") {
-        dependsOn(commonGame)
+    val game201 = common("game:20.1") {
+        dependsOn(game)
     }
-    val commonGame211 = common("game:21.1") {
-        dependsOn(commonGame)
+    val game211 = common("game:21.1") {
+        dependsOn(game)
     }
 
     // endregion
@@ -523,12 +631,19 @@ cloche {
     // region Main Targets - Fabric
 
     val fabricCommon = common("fabric:common") {
-        dependsOn(commonMain)
-        // mixins.from(file("src/fabric/common/main/resources/$id.fabric.mixins.json"))
+        dependsOn(commonMain, game, fasterModuleResolver)
+        stubSources(fasterMixin)
+        mixins.from(file("src/fabric/common/main/resources/$id.fabric.mixins.json"))
+
+        project.dependencies {
+            val implementation = lowerCamelCaseGradleName(name, JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
+
+            implementation(target(fasterMixin))
+        }
     }
 
     val fabric201 = fabric("fabric:20.1") {
-        dependsOn(common201, commonGame201, fabricCommon)
+        dependsOn(common201, game201, fasterModuleResolver, fabricCommon)
 
         minecraftVersion = "1.20.1"
 
@@ -544,7 +659,9 @@ cloche {
         }
 
         dependencies {
-            fabricApi("0.92.6")
+            implementation(catalog.preloadingTricks)
+            implementation(catalog.betterLog4jConfig)
+            localImplementation(catalog.hash4j)
         }
 
         tasks.named<GenerateFabricModJson>(generateModsManifestTaskName) {
@@ -553,7 +670,7 @@ cloche {
     }
 
     val fabric211 = fabric("fabric:21.1") {
-        dependsOn(common211, commonGame211, fabricCommon)
+        dependsOn(common211, game211, fasterModuleResolver, fabricCommon)
 
         minecraftVersion = "1.21.1"
 
@@ -568,11 +685,11 @@ cloche {
         }
 
         dependencies {
-            fabricApi("0.116.6")
-        }
+            implementation(catalog.preloadingTricks)
+            implementation(catalog.betterLog4jConfig)
+            localImplementation(catalog.hash4j)
 
-        tasks.named<GenerateFabricModJson>(generateModsManifestTaskName) {
-            modId = "${id}_21_1"
+            modImplementation(catalog.dynamictrees.mc121.fabric)
         }
     }
 
@@ -580,12 +697,24 @@ cloche {
 
     // region Main Targets - Forge
 
-
     val forgeService = forge("forge:service") {
-        dependsOn(common201)
+        dependsOn(common201, fasterModuleResolver)
+        stubSources(fasterMixin)
 
         minecraftVersion = "1.20.1"
-        loaderVersion = "47.4.4"
+
+        dependencies {
+            implementation(catalog.mixin.fabric)
+            compileOnly(catalog.mixinextras.common)
+            implementation(catalog.mixinextras.forge)
+
+            implementation(catalog.preloadingTricks)
+
+            implementation(target(fasterMixin))
+            implementation(target(commonMain))
+
+            implementation(catalog.hash4j)
+        }
 
         tasks {
             named(generateModsTomlTaskName) { enabled = false }
@@ -593,18 +722,15 @@ cloche {
     }
 
     val forgeGame = forge("forge:game") {
-        dependsOn(commonGame201)
+        dependsOn(game201)
 
         minecraftVersion = "1.20.1"
-        loaderVersion = "47.4.4"
 
         metadata {
-
             modLoader = "klf"
             loaderVersion {
                 start = "1"
             }
-
 
             dependency {
                 modId = "minecraft"
@@ -621,31 +747,23 @@ cloche {
             }
         }
 
-        repositories {
-            maven("https://repo.spongepowered.org/maven") {
-                content {
-                    includeGroup("org.spongepowered")
-                }
-            }
-        }
-
         dependencies {
-            implementation("org.spongepowered:mixin:0.8.7")
+            implementation(catalog.mixin.fabric)
             compileOnly(catalog.mixinextras.common)
             implementation(catalog.mixinextras.forge)
 
             modImplementation(catalog.klf.mc20.forge)
 
-            implementation(project(":")) {
-                capabilities {
-                    requireFeature(forgeService.capabilitySuffix!!)
-                }
-            }
+            implementation(target(forgeService))
+            implementation(target(commonMain))
 
+            implementation(catalog.hash4j)
+
+            modImplementation(catalog.dynamictrees.mc120.forge)
         }
 
         tasks {
-            named<Jar>(lowerCamelCaseGradleName(featureName, "jar")) {
+            named<Jar>(jarTaskName) {
                 manifest {
                     attributes(
                         "ForgeVariant" to "LexForge"
@@ -659,12 +777,24 @@ cloche {
 
     // region Main Targets - NeoForge
 
-
     val neoforgeService = neoforge("neoforge:service") {
-        dependsOn(common211)
+        dependsOn(common211, fasterModuleResolver)
+        stubSources(fasterMixin)
 
         minecraftVersion = "1.21.1"
-        loaderVersion = "21.1.192"
+
+        dependencies {
+            compileOnly(catalog.mixinextras.common)
+            implementation(catalog.mixinextras.forge)
+
+            implementation(catalog.preloadingTricks)
+
+            implementation(target(fasterMixin))
+
+            implementation(catalog.hash4j)
+
+            implementation(catalog.dynamictrees.mc121.neoforge)
+        }
 
         tasks {
             named(generateModsTomlTaskName) { enabled = false }
@@ -672,18 +802,15 @@ cloche {
     }
 
     val neoforgeGame = neoforge("neoforge:game") {
-        dependsOn(commonGame211)
+        dependsOn(game211)
 
         minecraftVersion = "1.21.1"
-        loaderVersion = "21.1.192"
 
         metadata {
-
             modLoader = "klf"
             loaderVersion {
                 start = "1"
             }
-
 
             dependency {
                 modId = "minecraft"
@@ -700,14 +827,15 @@ cloche {
         }
 
         dependencies {
+            compileOnly(catalog.mixinextras.common)
+            implementation(catalog.mixinextras.forge)
+
             modImplementation(catalog.klf.mc21.neoforge)
 
-            implementation(project(":")) {
-                capabilities {
-                    requireFeature(neoforgeService.capabilitySuffix!!)
-                }
-            }
+            implementation(target(neoforgeService))
+            implementation(target(commonMain))
 
+            implementation(catalog.hash4j)
         }
 
         tasks {
@@ -732,7 +860,7 @@ cloche {
             .map { it.dir("metadata").dir(featureName) }
         val generateModJson =
             tasks.register<GenerateFabricModJson>(lowerCamelCaseGradleName(featureName, "generateModJson")) {
-                modId = id
+                modId = "${id}_container"
                 metadata = objects.newInstance(FabricMetadata::class.java, fabric201).apply {
                     license.value(cloche.metadata.license)
                     dependencies.value(cloche.metadata.dependencies)
@@ -741,9 +869,16 @@ cloche {
                 output.set(metadataDirectory.map { it.file("fabric.mod.json") })
             }
 
+        embed("boot") {
+            into("boot")
+        }
+
         dependencies {
             includeTarget(fabric201)
             includeTarget(fabric211)
+
+            embed("boot", target(fasterMixin))
+            embed("boot", catalog.hash4j)
         }
 
         jar {
@@ -758,15 +893,40 @@ cloche {
 
     val forgeContainer = container(loader = MinecraftModLoader.forge) {
         embed()
+        embed(
+            name = "mixin",
+            configureConfiguration = {
+                attributes {
+                    attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
+                    attribute(REMAPPED_ATTRIBUTE, false)
+                    attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, true)
+                    attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
+                }
+            },
+        ) {
+            rename { "sponge-mixin.jar" }
+        }
+        embed(
+            name = "boot",
+            configureConfiguration = {
+                attributes {
+                    attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
+                    attribute(REMAPPED_ATTRIBUTE, false)
+                    attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, true)
+                    attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
+                }
+            },
+        ) {
+            into("boot")
+        }
 
         dependencies {
             includeTarget(forgeGame)
 
-            embed(project(":")) {
-                capabilities {
-                    requireFeature(forgeService.capabilitySuffix!!)
-                }
-            }
+            embed(target(forgeService))
+            embed("mixin", catalog.mixin.fabric)
+            embed("boot", target(fasterMixin))
+            embed("boot", catalog.hash4j)
         }
     }
 
@@ -776,17 +936,28 @@ cloche {
 
     val neoforgeContainer = container(loader = MinecraftModLoader.neoforge) {
         embed()
+        embed(
+            name = "boot",
+            configureConfiguration = {
+                attributes {
+                    attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.JAR_TYPE)
+                    attribute(REMAPPED_ATTRIBUTE, false)
+                    attribute(INCLUDE_TRANSFORMED_OUTPUT_ATTRIBUTE, true)
+                    attribute(IncludeTransformationStateAttribute.ATTRIBUTE, IncludeTransformationStateAttribute.None)
+                }
+            },
+        ) {
+            into("boot")
+        }
 
         dependencies {
             includeTarget(neoforgeGame)
 
             include(catalog.preloadingTricks)
 
-            embed(project(":")) {
-                capabilities {
-                    requireFeature(neoforgeService.capabilitySuffix!!)
-                }
-            }
+            embed(target(neoforgeService))
+            embed("boot", target(fasterMixin))
+            embed("boot", catalog.hash4j)
         }
     }
 
@@ -804,15 +975,9 @@ cloche {
         runs { client() }
 
         dependencies {
-            fabricApi("0.92.6")
-            runtimeOnly(container(fabricContainer))
-        }
-
-        tasks {
-            named(generateModsManifestTaskName) { enabled = false }
-            named(jarTaskName) { enabled = false }
-            named(remapJarTaskName) { enabled = false }
-            named(includeJarTaskName) { enabled = false }
+            runtimeOnly(container(fabricContainer)) {
+                exclude(project.group.toString())
+            }
         }
     }
 
@@ -822,15 +987,9 @@ cloche {
         runs { client() }
 
         dependencies {
-            fabricApi("0.116.6")
-            runtimeOnly(container(fabricContainer))
-        }
-
-        tasks {
-            named(generateModsManifestTaskName) { enabled = false }
-            named(jarTaskName) { enabled = false }
-            named(remapJarTaskName) { enabled = false }
-            named(includeJarTaskName) { enabled = false }
+            runtimeOnly(container(fabricContainer)) {
+                exclude(project.group.toString())
+            }
         }
     }
 
@@ -840,7 +999,6 @@ cloche {
 
     forge("version:forge:20.1") {
         minecraftVersion = "1.20.1"
-        loaderVersion = "47.4.4"
 
         runs {
             client {
@@ -852,11 +1010,11 @@ cloche {
             runtimeOnly(container(forgeContainer))
         }
 
-        tasks {
-            named(generateModsManifestTaskName) { enabled = false }
-            named(jarTaskName) { enabled = false }
-            named(remapJarTaskName) { enabled = false }
-            named(includeJarTaskName) { enabled = false }
+        project.configurations.named(sourceSet.runtimeClasspathConfigurationName) {
+            exclude("org.spongepowered", "mixin")
+        }
+        project.configurations.named(lowerCamelCaseGradleName(featureName, "minecraftLibraries")) {
+            exclude("org.spongepowered", "mixin")
         }
     }
 
@@ -866,7 +1024,6 @@ cloche {
 
     neoforge("version:neoforge:21.1") {
         minecraftVersion = "1.21.1"
-        loaderVersion = "21.1.192"
 
         runs {
             client {
@@ -877,88 +1034,47 @@ cloche {
         dependencies {
             runtimeOnly(container(neoforgeContainer))
         }
-
-        tasks {
-            named(generateModsManifestTaskName) { enabled = false }
-            named(jarTaskName) { enabled = false }
-            named(remapJarTaskName) { enabled = false }
-            named(includeJarTaskName) { enabled = false }
-        }
     }
 
     // endregion
 
-    // endregion
-
-    // region Shared Target Defaults
-
-    targets.withType<FabricTarget> {
-        loaderVersion = "0.18.4"
-
-        includedClient()
-
-        dependsOn(fabricCommon)
-
-        metadata {
-
-            entrypoint("main") {
-                adapter = "kotlin"
-                value = "$group.fabric.LazyyyyyFabric::init"
-            }
-
-            entrypoint("client") {
-                adapter = "kotlin"
-                value = "$group.fabric.LazyyyyyFabric::clientInit"
-            }
-
-
-            dependency {
-                modId = "fabric-api"
-                type = CommonMetadata.Dependency.Type.Required
-            }
-
-            dependency {
-                modId = "fabric-language-kotlin"
-                type = CommonMetadata.Dependency.Type.Required
-            }
-
-        }
-
-        dependencies {
-            modImplementation("net.fabricmc:fabric-language-kotlin:1.13.7+kotlin.2.2.21")
-        }
-
-    }
-
-    targets.all {
-        runs {
-            (client as LazyConfigurableInternal<MinecraftRunConfiguration>).onConfigured {
-                it.jvmArguments(
-                    "-Dmixin.debug.verbose=true",
-                    "-Dmixin.debug.export=true",
-                    "-Dclasstransform.dumpClasses=true"
-                )
-            }
-        }
-
-        mappings {
-            minecraftVersion.orNull
-                ?.let {
-                    when (it) {
-                        "1.20.1" -> "2023.09.03"
-                        "1.21.1" -> "2024.11.17"
-                        else -> null
-                    }
-                }
-                ?.let(::parchment)
-        }
-    }
     // endregion
 }
 
 // endregion
 
 // region Extension Properties
+
+fun String.fabricApiVersion(): String? = when (this) {
+    "1.20.1" -> "0.92.7"
+    "1.21.1" -> "0.116.10"
+    else -> null
+}
+
+fun String.parchmentVersion(): String? = when (this) {
+    "1.20.1" -> "2023.09.03"
+    "1.21.1" -> "2024.11.17"
+    else -> null
+}
+
+fun String.forgeLoaderVersion(): String? = when (this) {
+    "1.20.1" -> "47.4.4"
+    else -> null
+}
+
+fun String.neoForgeLoaderVersion(): String? = when (this) {
+    "1.21.1" -> "21.1.192"
+    else -> null
+}
+
+fun MinecraftTarget.disableVersionTemplateTasks() {
+    tasks {
+        named(generateModsManifestTaskName) { enabled = false }
+        named(jarTaskName) { enabled = false }
+        named(remapJarTaskName) { enabled = false }
+        named(includeJarTaskName) { enabled = false }
+    }
+}
 
 val SourceSet.includeJarTaskName: String
     get() = lowerCamelCaseGradleName(takeUnless(SourceSet::isMain)?.name, "includeJar")
