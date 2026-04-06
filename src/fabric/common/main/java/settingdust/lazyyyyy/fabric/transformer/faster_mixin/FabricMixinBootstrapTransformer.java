@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import settingdust.lazyyyyy.faster_mixin.fabric.ContainerHandleMod;
+import settingdust.lazyyyyy.fabric.faster_mixin.ContainerHandleMod;
 
 @Mixin(FabricMixinBootstrap.class)
 public abstract class FabricMixinBootstrapTransformer {
