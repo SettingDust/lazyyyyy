@@ -157,7 +157,7 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
     }
 
     library("preloadingTricks", "settingdust.preloading_tricks", "PreloadingTricks")
-        .version("3.4.6")
+        .version("3.5.9")
 
 
     dependency("klf", "dev.nyon") {
@@ -189,6 +189,42 @@ dependencyResolutionManagement.versionCatalogs.create("catalog") {
             modVersion = "1.7.0"
             loader("neoforge") { version { _, version, _ -> version } }
             loader("fabric") { version { _, version, _ -> "$version-BETA1" } }
+        }
+    }
+
+    dependency("connector-mc120", "org.sinytra") {
+        artifact = "Connector"
+
+        version("1.20") {
+            modVersion = "1.0.0-beta.48+1.20.1"
+            loader("forge")
+        }
+    }
+
+    dependency("connector-mc121", "org.sinytra") {
+        artifact = "connector"
+
+        version("1.21") {
+            modVersion = "2.0.0-beta.14+1.21.1"
+            loader("neoforge")
+        }
+    }
+
+    dependency("forgifiedFabricApi-mc120", "dev.su5ed.sinytra.fabric-api") {
+        artifact = "fabric-api"
+
+        version("1.20") {
+            modVersion = "0.92.6+1.11.14+1.20.1"
+            loader("forge")
+        }
+    }
+
+    dependency("forgifiedFabricApi-mc121", "org.sinytra.forgified-fabric-api") {
+        artifact = "forgified-fabric-api"
+
+        version("1.21") {
+            modVersion = "0.116.7+2.2.4+1.21.1"
+            loader("neoforge")
         }
     }
 }

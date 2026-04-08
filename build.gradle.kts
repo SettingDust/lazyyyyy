@@ -15,18 +15,13 @@ import earth.terrarium.cloche.api.attributes.RemapNamespaceAttribute
 import earth.terrarium.cloche.api.attributes.TargetAttributes
 import earth.terrarium.cloche.api.metadata.CommonMetadata
 import earth.terrarium.cloche.api.metadata.FabricMetadata
-import earth.terrarium.cloche.api.target.FabricTarget
-import earth.terrarium.cloche.api.target.ForgeLikeTarget
-import earth.terrarium.cloche.api.target.ForgeTarget
-import earth.terrarium.cloche.api.target.MinecraftTarget
-import earth.terrarium.cloche.api.target.NeoforgeTarget
+import earth.terrarium.cloche.api.target.*
 import earth.terrarium.cloche.api.target.compilation.ClocheDependencyHandler
 import earth.terrarium.cloche.target.LazyConfigurableInternal
 import earth.terrarium.cloche.tasks.GenerateFabricModJson
 import earth.terrarium.cloche.util.target
 import groovy.lang.Closure
 import net.msrandom.minecraftcodev.core.utils.lowerCamelCaseGradleName
-import net.msrandom.minecraftcodev.fabric.MinecraftCodevFabricPlugin
 import net.msrandom.minecraftcodev.fabric.task.JarInJar
 import net.msrandom.minecraftcodev.forge.task.JarJar
 import net.msrandom.minecraftcodev.runs.MinecraftRunConfiguration
@@ -34,9 +29,6 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.jvm.tasks.Jar
 import java.nio.charset.StandardCharsets
-import java.time.Instant
-
-// region Plugins
 
 plugins {
     java
@@ -47,10 +39,8 @@ plugins {
 
     id("com.palantir.git-version") version "5.0.0"
     id("com.gradleup.shadow") version "9.4.1"
-    id("earth.terrarium.cloche") version "0.18.11-dust.0"
+    id("earth.terrarium.cloche") version "0.18.11-dust.2"
 }
-
-// endregion
 
 // region Project Properties
 
@@ -455,8 +445,6 @@ dependencies {
 
 // endregion
 
-// region Cloche Configuration
-
 cloche {
     // region Metadata & Mappings
 
@@ -580,8 +568,10 @@ cloche {
         loaderVersion.set(minecraftVersion.map(String::neoForgeLoaderVersion))
     }
 
+    fun MinecraftTarget.isVersionTarget(): Boolean = name.startsWith("version:")
+
     targets.all {
-        if (name.startsWith("version:")) {
+        if (isVersionTarget()) {
             disableVersionTemplateTasks()
         }
 
@@ -634,6 +624,10 @@ cloche {
         dependsOn(commonMain, game, fasterModuleResolver)
         stubSources(fasterMixin)
         mixins.from(file("src/fabric/common/main/resources/$id.fabric.mixins.json"))
+
+        dependencies {
+            implementation(catalog.preloadingTricks)
+        }
 
         project.dependencies {
             val implementation = lowerCamelCaseGradleName(name, JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
@@ -748,6 +742,8 @@ cloche {
         }
 
         dependencies {
+            implementation(catalog.preloadingTricks)
+
             implementation(catalog.mixin.fabric)
             compileOnly(catalog.mixinextras.common)
             implementation(catalog.mixinextras.forge)
@@ -760,6 +756,8 @@ cloche {
             implementation(catalog.hash4j)
 
             modImplementation(catalog.dynamictrees.mc120.forge)
+
+            modImplementation(catalog.forgifiedFabricApi.mc120)
         }
 
         tasks {
@@ -827,15 +825,21 @@ cloche {
         }
 
         dependencies {
+            implementation(catalog.preloadingTricks)
+
             compileOnly(catalog.mixinextras.common)
             implementation(catalog.mixinextras.forge)
 
-            modImplementation(catalog.klf.mc21.neoforge)
+            implementation(catalog.klf.mc21.neoforge)
 
             implementation(target(neoforgeService))
             implementation(target(commonMain))
 
             implementation(catalog.hash4j)
+
+            implementation(catalog.dynamictrees.mc121.neoforge)
+
+            implementation(catalog.forgifiedFabricApi.mc121)
         }
 
         tasks {
@@ -1000,14 +1004,10 @@ cloche {
     forge("version:forge:20.1") {
         minecraftVersion = "1.20.1"
 
-        runs {
-            client {
-                env("MOD_CLASSES", "")
-            }
-        }
-
         dependencies {
             runtimeOnly(container(forgeContainer))
+
+            runtimeOnly(catalog.preloadingTricks)
         }
 
         project.configurations.named(sourceSet.runtimeClasspathConfigurationName) {
@@ -1025,23 +1025,27 @@ cloche {
     neoforge("version:neoforge:21.1") {
         minecraftVersion = "1.21.1"
 
-        runs {
-            client {
-                env("MOD_CLASSES", "")
-            }
-        }
-
         dependencies {
             runtimeOnly(container(neoforgeContainer))
+
+            runtimeOnly(catalog.preloadingTricks)
         }
     }
 
     // endregion
 
+    targets.withType<ForgeLikeTarget> {
+        if (isVersionTarget()) {
+            runs {
+                client {
+                    env("MOD_CLASSES", "")
+                }
+            }
+        }
+    }
+
     // endregion
 }
-
-// endregion
 
 // region Extension Properties
 
